@@ -1,0 +1,30 @@
+@charset "UTF-8";
+
+html {
+  direction: rtl;
+  writing-mode: horizontal-tb;
+}
+
+body {
+  direction: rtl;
+  font-family: serif;
+  line-height: 1.8;
+  text-align: right;
+}
+
+p {
+  margin: 0 0 0.75em;
+  text-indent: 1.5em;
+}
+
+h1,
+h2,
+h3 {
+  break-after: avoid;
+  text-align: center;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+  unicode-bidi: embed;
+}

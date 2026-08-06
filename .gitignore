@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local configuration
+.venv/
+venv/
+env/
+.env
+
+# Book inputs and generated/intermediate content
+input/*.pdf
+input/*.PDF
+extracted/**
+!extracted/.gitkeep
+!extracted/chapters/
+extracted/chapters/**
+!extracted/chapters/.gitkeep
+chunks/**
+!chunks/.gitkeep
+translated/drafts/**
+!translated/drafts/.gitkeep
+output/*.epub
+logs/**
+!logs/.gitkeep
+
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/

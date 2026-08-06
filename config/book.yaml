@@ -1,0 +1,11 @@
+book_id: "example-fantasy-novel-en-fa"
+title_en: "Example Fantasy Novel"
+title_fa: "رمان فانتزی نمونه"
+author: "Example Author"
+source_language: "en"
+target_language: "fa"
+pdf_path: "input/book.pdf"
+chunk_target_words: 1800
+chunk_max_words: 2400
+previous_context_words: 250
+output_format: "epub3"

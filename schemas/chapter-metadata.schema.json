@@ -1,0 +1,232 @@
+{
+  "$defs": {
+    "ChapterStatus": {
+      "enum": [
+        "discovered",
+        "extracted",
+        "normalized",
+        "validated",
+        "chunked",
+        "translating",
+        "translated",
+        "review_required",
+        "reviewed",
+        "approved",
+        "failed"
+      ],
+      "title": "ChapterStatus",
+      "type": "string"
+    },
+    "TocKind": {
+      "enum": [
+        "front_matter",
+        "prologue",
+        "chapter",
+        "appendix",
+        "unknown"
+      ],
+      "title": "TocKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "chapter_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Chapter Id",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/TocKind"
+    },
+    "number": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Number"
+    },
+    "title_en": {
+      "default": "",
+      "title": "Title En",
+      "type": "string"
+    },
+    "title_fa": {
+      "default": "",
+      "title": "Title Fa",
+      "type": "string"
+    },
+    "symbol": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Symbol"
+    },
+    "source_start_page": {
+      "minimum": 1,
+      "title": "Source Start Page",
+      "type": "integer"
+    },
+    "source_end_page": {
+      "minimum": 1,
+      "title": "Source End Page",
+      "type": "integer"
+    },
+    "source_file": {
+      "format": "path",
+      "title": "Source File",
+      "type": "string"
+    },
+    "source_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Sha256"
+    },
+    "cleaned_file": {
+      "format": "path",
+      "title": "Cleaned File",
+      "type": "string"
+    },
+    "cleaned_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cleaned Sha256"
+    },
+    "source_word_count": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Word Count"
+    },
+    "cleaned_word_count": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cleaned Word Count"
+    },
+    "source_paragraph_count": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Paragraph Count"
+    },
+    "cleaned_paragraph_count": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cleaned Paragraph Count"
+    },
+    "chunk_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Chunk Count",
+      "type": "integer"
+    },
+    "status": {
+      "$ref": "#/$defs/ChapterStatus"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "extraction_version": {
+      "title": "Extraction Version",
+      "type": "string"
+    },
+    "normalization_version": {
+      "title": "Normalization Version",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "chapter_id",
+    "kind",
+    "source_start_page",
+    "source_end_page",
+    "source_file",
+    "cleaned_file",
+    "status",
+    "extraction_version",
+    "normalization_version",
+    "created_at",
+    "updated_at"
+  ],
+  "title": "ChapterMetadata",
+  "type": "object"
+}

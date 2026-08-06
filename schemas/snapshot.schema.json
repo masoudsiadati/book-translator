@@ -1,0 +1,106 @@
+{
+  "$defs": {
+    "ChapterSnapshotHashes": {
+      "additionalProperties": false,
+      "properties": {
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "cleaned_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Cleaned Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_sha256",
+        "cleaned_sha256"
+      ],
+      "title": "ChapterSnapshotHashes",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "book_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "source_pdf_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Pdf Sha256",
+      "type": "string"
+    },
+    "toc_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Toc Sha256",
+      "type": "string"
+    },
+    "extraction_version": {
+      "title": "Extraction Version",
+      "type": "string"
+    },
+    "normalization_version": {
+      "title": "Normalization Version",
+      "type": "string"
+    },
+    "chapter_count": {
+      "minimum": 0,
+      "title": "Chapter Count",
+      "type": "integer"
+    },
+    "chapter_hashes": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ChapterSnapshotHashes"
+      },
+      "title": "Chapter Hashes",
+      "type": "object"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "validated": {
+      "title": "Validated",
+      "type": "boolean"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "book_id",
+    "source_pdf_sha256",
+    "toc_sha256",
+    "extraction_version",
+    "normalization_version",
+    "chapter_count",
+    "chapter_hashes",
+    "created_at",
+    "validated"
+  ],
+  "title": "ExtractionSnapshot",
+  "type": "object"
+}

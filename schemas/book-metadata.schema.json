@@ -1,0 +1,82 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "book_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "source_pdf": {
+      "format": "path",
+      "title": "Source Pdf",
+      "type": "string"
+    },
+    "source_pdf_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Pdf Sha256",
+      "type": "string"
+    },
+    "title_en": {
+      "minLength": 1,
+      "title": "Title En",
+      "type": "string"
+    },
+    "title_fa": {
+      "minLength": 1,
+      "title": "Title Fa",
+      "type": "string"
+    },
+    "author": {
+      "minLength": 1,
+      "title": "Author",
+      "type": "string"
+    },
+    "source_language": {
+      "minLength": 2,
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "minLength": 2,
+      "title": "Target Language",
+      "type": "string"
+    },
+    "expected_output_format": {
+      "const": "epub3",
+      "title": "Expected Output Format",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "book_id",
+    "source_pdf",
+    "source_pdf_sha256",
+    "title_en",
+    "title_fa",
+    "author",
+    "source_language",
+    "target_language",
+    "expected_output_format",
+    "created_at",
+    "updated_at"
+  ],
+  "title": "BookWorkspaceMetadata",
+  "type": "object"
+}
