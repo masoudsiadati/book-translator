@@ -71,6 +71,12 @@ class ProjectPaths:
     ) -> Path:
         return self.chapter(number, prologue=prologue) / "normalization-report.yaml"
 
+    def chapter_chunks(self, number: int | None = None, *, prologue: bool = False) -> Path:
+        return self.chapter(number, prologue=prologue) / "chunks"
+
+    def chapter_chunking_report(self, number: int | None = None, *, prologue: bool = False) -> Path:
+        return self.chapter(number, prologue=prologue) / "chunking-report.yaml"
+
     def chapter_review(self, number: int | None = None, *, prologue: bool = False) -> Path:
         return self.chapter(number, prologue=prologue) / "review"
 

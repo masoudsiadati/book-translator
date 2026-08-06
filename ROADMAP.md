@@ -12,11 +12,12 @@ governance process in `docs/developer-charter.md`.
 - Embedded TOC discovery and normalization
 - Canonical immutable chapter extraction
 - Deterministic modular chapter normalization
+- Generic Document Chunk Engine 1.0.0 (implemented under `Unreleased`)
 
 ## Planned
 
-- **0.6.0 — Generic Document Chunk Engine:** deterministic document-level chunk planning and
-  publication without translation behavior.
+- **0.6.0 — Document Chunk Engine release:** representative real-chapter pilots, release review, and
+  manual version/tag preparation for the implemented generic engine.
 - **0.7.0 — Translation job queue:** resumable provider execution, attempts, failures, and queue
   orchestration.
 - **0.8.0 — Translation engine:** prompt versioning, glossary integration, context packaging, and

@@ -28,6 +28,8 @@ class BookConfig(BaseModel):
     def target_must_not_exceed_maximum(self) -> "BookConfig":
         if self.chunk_target_words > self.chunk_max_words:
             raise ValueError("chunk_target_words must not exceed chunk_max_words")
+        if self.previous_context_words >= self.chunk_max_words:
+            raise ValueError("previous_context_words must be less than chunk_max_words")
         return self
 
 

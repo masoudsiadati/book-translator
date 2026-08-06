@@ -22,6 +22,9 @@ project root.
   hashes, algorithm version, ordered passes, physical-line and paragraph counts, page transitions,
   aggregate marker/join/hyphen/ambiguity counters, warnings, timestamp, and structural change records.
   It stores no book paragraphs or snippets.
+- Chapter `chunking-report.yaml` — Document Chunk Engine schema 1.0 lineage, configuration, source and
+  chunk counts, scene/tail decisions, oversize warnings, context totals, reconstruction hash, and
+  conservation result. It contains no text snippets.
 - Chunk `metadata.yaml` — `ChunkMetadata`: identity and order, artifact paths and hashes, counts,
   lifecycle status, attempt counts, provider/model/version provenance, error, and timestamps.
 - `workspace/snapshot.yaml` — `ExtractionSnapshot`: snapshot/book IDs, PDF and normalized TOC
@@ -49,6 +52,27 @@ structural operations, and reported page transitions remain 1-based.
 Success updates cleaned path/hash/counts, algorithm version, warnings, `status: normalized`, and
 `updated_at`. It preserves source metadata/hash/counts, extraction version, and `created_at`. These use
 existing schema 1.0 fields, so no stored-data migration is required.
+
+Chunking treats each canonical blank-line-separated cleaned block as one paragraph. Paragraph and
+chunk word counts split on Unicode whitespace; context counts are separate. Chunk `source.md` preserves
+exact paragraph text with canonical separators and a final newline. `context.md` is empty for the first
+chunk and otherwise contains only preceding text; it is never translated as chunk source and does not
+participate in reconstruction.
+
+`ChunkMetadata` records source/context paths and hashes, source/context counts, optional context
+paragraph provenance, cleaned-source lineage, engine version, oversize state, warnings, and future
+translation paths without creating `translation.md`. Chunk IDs retain the canonical
+`<chapter-id>-<three-digit-sequence>` form. Successful chapter publication sets `chunk_count`,
+`chunk_engine_version`, `status: chunked`, and `updated_at` while preserving extraction and
+normalization lineage and `created_at`.
+
+### Compatible chunk metadata extension
+
+Document Chunk Engine 1.0.0 adds defaulted fields to schema 1.0: chunk context hash/count/range,
+chunk-engine version, cleaned-source hash, oversize flag, and warnings, plus a defaulted chapter
+chunk-engine version. This is additive and existing stored chapter/chunk metadata remains valid; no
+rewrite or data migration is required. The committed schemas are regenerated from the canonical
+models. Removing or making these fields required later would require a breaking migration.
 
 ## Artifact mutability
 

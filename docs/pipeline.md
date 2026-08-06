@@ -6,9 +6,9 @@ The ordered pipeline is:
 2. Discover chapters from the embedded TOC and persist a normalized TOC.
 3. Extract each chapter to immutable `source.md` using inclusive 1-based boundaries.
 4. Normalize each source into `cleaned.md` without changing `source.md`.
-5. Validate extraction structure, coverage, counts, boundaries, and hashes.
-6. Freeze and validate an extraction snapshot.
-7. Split snapshot-normalized chapters into deterministic chunks.
+5. Validate normalized structure, counts, lineage, and hashes.
+6. Split hash-current normalized chapters into deterministic generic document chunks.
+7. Freeze and validate a future extraction/chunk snapshot before external processing.
 8. Translate chunks and record provider, model, prompt, glossary, hashes, and attempts.
 9. Validate translations; failures become flagged work, never approval.
 10. Review and correct flagged chunks.
@@ -16,8 +16,9 @@ The ordered pipeline is:
 12. Build an RTL EPUB 3 from final workspace chapters and metadata.
 13. Validate the EPUB structure and conformance.
 
-Stages 1–6 may access the PDF as required. Stages 7–13 must reference a validated snapshot ID
-and operate only on workspace Markdown and metadata; they must not reopen the PDF.
+Stages 1–5 may access the PDF as required. Chunking and every later stage operate only on workspace
+Markdown and metadata and must not reopen the PDF. Future external/translation stages must reference a
+validated snapshot ID; snapshot support is not implemented yet.
 
 Stage 3 reads boundaries exclusively from canonical `workspace/toc.yaml` and verifies its PDF
 hash and page-count provenance before a batch begins. It preserves ordered PDF text blocks and
@@ -38,6 +39,34 @@ Stage 4 is deterministic and non-AI. Its fixed pass order is:
 
 This stage does not remove headers or footers, infer heading markup, rewrite semantics, detect
 speakers, or perform sophisticated poetry classification. Ambiguous short-line blocks yield warnings.
+
+## Document Chunk Engine
+
+The generic Document Chunk Engine 1.0.0 consumes only canonical `cleaned.md` and matching chapter
+metadata. It parses exact blank-line-separated Markdown paragraphs and never classifies semantics,
+splits a paragraph, changes paragraph order, or discards a separator.
+
+Planning considers every paragraph boundary that keeps a normal chunk at or below the maximum. An
+explicit standalone separator (`***`, `* * *`, `# # #`, or `— — —`) is preferred as the chunk end
+when the resulting chunk is between 60% and 140% of target, bounded by the maximum. Otherwise the
+closest boundary to target is chosen; ties prefer the larger chunk, then source order. A paragraph
+larger than the maximum becomes one warned oversize chunk.
+
+After initial planning, if the final normal chunk is below 60% of target, only the final two chunks are
+considered for deterministic rebalance. Whole paragraphs may move when both results stay within the
+maximum and the smaller result strictly improves; candidates prefer both chunks above the minimum,
+then minimum total distance from target. No semantic or random optimization occurs.
+
+Chunk sources use one blank line between original paragraphs and one final newline. Concatenating the
+parsed paragraphs from chunk sources and rerendering by this rule must reproduce `cleaned.md` exactly,
+including its SHA-256. Context is derived only from preceding paragraphs, newest first for selection
+but restored to source order: complete paragraphs are preferred, then a whitespace-word tail from the
+next older paragraph fills the remaining allowance. Context never affects source counts or
+reconstruction.
+
+Chunking validates the existing `normalized → validated → chunked` transition path during preflight
+and publishes only the final `chunked` state after artifacts pass conservation and hash validation. It
+does not advance to translation.
 
 ## Lifecycle
 

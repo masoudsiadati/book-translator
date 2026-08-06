@@ -29,10 +29,16 @@ retries, and provider cost where meaningful and never disclose book content.
 | PDF inspection | Planned | Generated PDFs across representative page counts and text densities |
 | Chapter extraction | Planned | Generated PDF and canonical TOC with varying pages and block counts |
 | Deterministic normalization | Implemented | `scripts/benchmark_normalization.py` |
-| Document Chunk Engine | Planned for 0.6.0 | Generated paragraphs, boundary cases, and complete-book scale |
+| Document Chunk Engine | Implemented | `scripts/benchmark_chunking.py` |
 | Translation queue | Planned | Local provider double, queue depth, retry, rate, and memory measurements |
 | RTL EPUB generation | Planned | Generated approved chapters and archive/validation measurements |
 
 The normalization benchmark generates 500 synthetic blocks over multiple canonical pages, runs at
 least three iterations, traces peak Python memory, and verifies identical output and counters. Current
 observations and complexity analysis are recorded in `docs/normalization-audit.md`.
+
+The chunk benchmark generates 5,000 variable-size paragraphs with explicit separators and context,
+runs three iterations, validates exact reconstruction, and hashes the complete structural plan. On
+2026-08-06, a 2,039,410-byte / 397,004-word input produced 220 chunks and 54,750 context words with a
+0.303957-second median, 6.399 MiB/second throughput, 17,841,411 peak traced bytes, and stable plan hash
+`18a6ae310abdd45df8186f8f1249fef739ca3da538b3615a2603d6a7bbe9ef02`. Timings are observational.

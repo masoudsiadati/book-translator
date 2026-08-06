@@ -12,6 +12,13 @@ from book_translator.chapter_extraction import (
     plan_extraction,
 )
 from book_translator.config import ProjectDataError, load_book_config
+from book_translator.document_chunking import CHUNK_ENGINE_VERSION, ChunkingConfig
+from book_translator.document_chunking.workflow import (
+    ChapterChunkingPlan,
+    ChunkingExecution,
+    execute_chapter_chunking,
+    plan_chapter_chunking,
+)
 from book_translator.normalization import NORMALIZATION_VERSION
 from book_translator.normalization.workflow import (
     ChapterNormalizationError,
@@ -335,3 +342,113 @@ def normalize_chapters_command(
     _render_normalization_summary(
         plan, execution, dry_run=dry_run, show_diff_summary=show_diff_summary
     )
+
+
+def _render_chunk_plan(plan: ChapterChunkingPlan) -> None:
+    from rich.table import Table
+
+    table = Table(title="Document Chunk Plan")
+    table.add_column("Chapter")
+    table.add_column("Chunk", justify="right")
+    table.add_column("Paragraphs")
+    table.add_column("Words", justify="right")
+    table.add_column("Scene end")
+    table.add_column("Oversize")
+    table.add_column("Context words", justify="right")
+    for chapter in plan.chapters:
+        for chunk in chapter.document_plan.chunks:
+            table.add_row(
+                chapter.metadata.chapter_id,
+                str(chunk.sequence),
+                f"{chunk.paragraph_start}-{chunk.paragraph_end}",
+                str(chunk.word_count),
+                "yes" if chunk.ended_at_scene_boundary else "no",
+                "yes" if chunk.oversize else "no",
+                str(chunk.context.word_count),
+            )
+    console.print(table)
+
+
+def _render_chunking_summary(
+    plan: ChapterChunkingPlan,
+    execution: ChunkingExecution | None,
+    *,
+    dry_run: bool,
+) -> None:
+    from rich.table import Table
+
+    chunks = [chunk for chapter in plan.chapters for chunk in chapter.document_plan.chunks]
+    counts = [chunk.word_count for chunk in chunks]
+    table = Table(title="Document Chunking", show_header=False)
+    table.add_column("Field", style="bold")
+    table.add_column("Value")
+    rows = (
+        ("Selected chapters", len(plan.chapters)),
+        ("Chapters planned", sum(item.action in {"chunk", "replace"} for item in plan.chapters)),
+        ("Chapters chunked", len(execution.chunked_ids) if execution else 0),
+        ("Chapters skipped", sum(item.action == "skip" for item in plan.chapters)),
+        ("Chapters stale", sum(item.action == "stale" for item in plan.chapters)),
+        ("Chapters failed", sum(item.action == "conflict" for item in plan.chapters)),
+        ("Input paragraphs", sum(len(item.document_plan.paragraphs) for item in plan.chapters)),
+        ("Input words", sum(item.document_plan.source_word_count for item in plan.chapters)),
+        ("Total chunks", len(chunks)),
+        ("Oversize chunks", sum(chunk.oversize for chunk in chunks)),
+        ("Minimum chunk words", min(counts)),
+        ("Average chunk words", f"{sum(counts) / len(counts):.2f}"),
+        ("Maximum chunk words", max(counts)),
+        (
+            "Scene boundaries used",
+            sum(item.document_plan.scene_boundaries_used for item in plan.chapters),
+        ),
+        ("Tail rebalances", sum(item.document_plan.tail_rebalanced for item in plan.chapters)),
+        ("Total context words", sum(chunk.context.word_count for chunk in chunks)),
+        ("Conservation valid", "yes"),
+        ("Output bytes", execution.total_output_bytes if execution else 0),
+        ("Engine version", CHUNK_ENGINE_VERSION),
+        ("Dry run", "yes" if dry_run else "no"),
+    )
+    for label, value in rows:
+        table.add_row(label, str(value))
+    if len(plan.chapters) == 1:
+        item = plan.chapters[0]
+        table.add_row("Canonical chapter ID", item.metadata.chapter_id)
+        table.add_row("Title", item.metadata.title_en)
+        table.add_row("Cleaned hash", item.cleaned_sha256)
+        table.add_row("Chunk count", str(len(item.document_plan.chunks)))
+        table.add_row("Output directory", str(item.paths.chunks))
+    console.print(table)
+
+
+@app.command("chunk-chapters")
+def chunk_chapters_command(
+    chapter: Annotated[str | None, typer.Option("--chapter")] = None,
+    target_words: Annotated[int | None, typer.Option("--target-words")] = None,
+    max_words: Annotated[int | None, typer.Option("--max-words")] = None,
+    context_words: Annotated[int | None, typer.Option("--context-words")] = None,
+    force: Annotated[bool, typer.Option("--force")] = False,
+    dry_run: Annotated[bool, typer.Option("--dry-run")] = False,
+    show_plan: Annotated[bool, typer.Option("--show-plan")] = False,
+) -> None:
+    """Create deterministic generic document chunks from normalized chapters."""
+    try:
+        config = load_book_config(Path("config/book.yaml"))
+        chunking_config = ChunkingConfig(
+            target_words=config.chunk_target_words if target_words is None else target_words,
+            max_words=config.chunk_max_words if max_words is None else max_words,
+            context_words=(
+                config.previous_context_words if context_words is None else context_words
+            ),
+        )
+        plan = plan_chapter_chunking(
+            project_root=Path.cwd().resolve(),
+            config=chunking_config,
+            selector=chapter,
+            force=force,
+        )
+        execution = None if dry_run else execute_chapter_chunking(plan)
+    except (ProjectDataError, ValueError, OSError, UnicodeError) as exc:
+        error_console.print(f"[bold red]Error:[/bold red] {exc}")
+        raise typer.Exit(code=1) from exc
+    if show_plan:
+        _render_chunk_plan(plan)
+    _render_chunking_summary(plan, execution, dry_run=dry_run)

@@ -12,6 +12,7 @@ workspace/
     │   ├── metadata.yaml
     │   ├── source.md
     │   ├── cleaned.md
+    │   ├── chunking-report.yaml
     │   ├── chunks/
     │   │   └── 001/
     │   │       ├── metadata.yaml
@@ -37,6 +38,9 @@ exactly three digits (`001` through `999`), and chunk IDs combine chapter ID and
 example `042-003` or `000-prologue-001`. Invalid, zero, negative, missing, or greater-than-999
 numbered values are rejected. Machine names contain only safe ASCII; English and Persian titles
 belong in metadata.
+
+The Document Chunk Engine creates `metadata.yaml`, `source.md`, and `context.md` only. The
+`translation.md` path is reserved in metadata for a future stage and is not pre-created.
 
 All paths are derived by `ProjectPaths`, relative to its project root, with no creation side
 effect. Persisted paths are project-relative rather than machine-specific absolute paths.

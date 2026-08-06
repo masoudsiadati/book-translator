@@ -46,6 +46,7 @@ class ChapterMetadata(ContractModel):
     warnings: list[str] = Field(default_factory=list)
     extraction_version: str
     normalization_version: str
+    chunk_engine_version: str = ""
     created_at: AwareDatetime
     updated_at: AwareDatetime
 

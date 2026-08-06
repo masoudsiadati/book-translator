@@ -27,6 +27,10 @@ class ChunkMetadata(ContractModel):
     source_file: Path
     source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     context_file: Path
+    context_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    context_word_count: int = Field(default=0, ge=0)
+    context_source_start_paragraph: int | None = Field(default=None, ge=1)
+    context_source_end_paragraph: int | None = Field(default=None, ge=1)
     translation_file: Path
     translation_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     source_word_count: int = Field(ge=0)
@@ -40,6 +44,10 @@ class ChunkMetadata(ContractModel):
     model: str | None = None
     prompt_version: str | None = None
     glossary_version: str | None = None
+    chunk_engine_version: str = ""
+    cleaned_source_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    oversize: bool = False
+    warnings: list[str] = Field(default_factory=list)
     error: str | None = None
     created_at: AwareDatetime
     updated_at: AwareDatetime

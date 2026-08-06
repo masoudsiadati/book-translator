@@ -7,6 +7,7 @@ from typer.testing import CliRunner
 from book_translator import __version__
 from book_translator.chapter_extraction import EXTRACTION_VERSION
 from book_translator.cli import app
+from book_translator.document_chunking import CHUNK_ENGINE_VERSION
 from book_translator.normalization import NORMALIZATION_VERSION
 
 ROOT = Path(__file__).parents[1]
@@ -62,6 +63,7 @@ def test_agents_links_required_governance_entry_points() -> None:
 def test_implemented_engine_versions_are_explicit_and_stable() -> None:
     assert ENGINE_VERSION.fullmatch(EXTRACTION_VERSION)
     assert ENGINE_VERSION.fullmatch(NORMALIZATION_VERSION)
+    assert SEMANTIC_VERSION.fullmatch(CHUNK_ENGINE_VERSION)
 
 
 def test_existing_cli_commands_remain_registered() -> None:
@@ -75,5 +77,6 @@ def test_existing_cli_commands_remain_registered() -> None:
         "discover-toc",
         "extract-chapters",
         "normalize-chapters",
+        "chunk-chapters",
     }:
         assert command in result.stdout

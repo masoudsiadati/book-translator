@@ -58,6 +58,11 @@ def test_paths_are_deterministic_and_have_no_creation_side_effect(tmp_path: Path
     assert paths.book_metadata == tmp_path / "workspace/metadata.yaml"
     assert paths.toc == tmp_path / "workspace/toc.yaml"
     assert paths.snapshot == tmp_path / "workspace/snapshot.yaml"
+    assert paths.chapter_chunks(42) == tmp_path / "workspace/chapters/042/chunks"
+    assert (
+        paths.chapter_chunking_report(42)
+        == tmp_path / "workspace/chapters/042/chunking-report.yaml"
+    )
     assert not paths.workspace.exists()
 
 

@@ -54,6 +54,51 @@
       "title": "Context File",
       "type": "string"
     },
+    "context_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Context Sha256"
+    },
+    "context_word_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Context Word Count",
+      "type": "integer"
+    },
+    "context_source_start_paragraph": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Context Source Start Paragraph"
+    },
+    "context_source_end_paragraph": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Context Source End Paragraph"
+    },
     "translation_file": {
       "format": "path",
       "title": "Translation File",
@@ -170,6 +215,36 @@
       ],
       "default": null,
       "title": "Glossary Version"
+    },
+    "chunk_engine_version": {
+      "default": "",
+      "title": "Chunk Engine Version",
+      "type": "string"
+    },
+    "cleaned_source_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cleaned Source Sha256"
+    },
+    "oversize": {
+      "default": false,
+      "title": "Oversize",
+      "type": "boolean"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
     },
     "error": {
       "anyOf": [

@@ -23,14 +23,16 @@ contracts are [the data model](docs/data-model.md), [pipeline](docs/pipeline.md)
 ## Component boundaries
 
 Inspection and discovery may read the PDF. Extraction writes immutable chapter `source.md`.
-Normalization derives `cleaned.md`. Snapshot creation freezes validated extraction inputs.
-Chunking and every later component consume only the frozen workspace. Models and transition
+Normalization derives `cleaned.md`. Generic document chunking may derive deterministic chunks from a
+hash-verified canonical `cleaned.md` before snapshot support exists. Snapshot creation will freeze
+validated extraction and chunk lineage before any external or translation stage. Chunking and every
+later component consume only workspace Markdown and metadata and never reopen the PDF. Models and transition
 policy contain no file I/O; path derivation contains no directory creation; orchestration owns
 I/O, atomic replacement, hash checks, and state persistence.
 
 The freeze specifies boundaries rather than implementation details. Chapter extraction and
-deterministic normalization now implement those boundaries; chunking, translation, review, and EPUB
-generation remain outside the implemented scope.
+deterministic normalization and generic document chunking now implement those boundaries; translation,
+review, snapshots, and EPUB generation remain outside the implemented scope.
 
 Embedded TOC discovery preserves every source entry in source order. Classification is
 deterministic: numbered `Chapter` labels and `Prologue` are parsed structurally; non-structural

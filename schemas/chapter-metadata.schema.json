@@ -202,6 +202,11 @@
       "title": "Normalization Version",
       "type": "string"
     },
+    "chunk_engine_version": {
+      "default": "",
+      "title": "Chunk Engine Version",
+      "type": "string"
+    },
     "created_at": {
       "format": "date-time",
       "title": "Created At",

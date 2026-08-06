@@ -6,8 +6,8 @@
 
 This version provides typed configuration and progress models, PDF inspection, embedded TOC discovery,
 page extraction, immutable chapter extraction, deterministic chapter normalization, and frozen
-contracts. **Chunking, AI translation, review, snapshots, and EPUB generation are not implemented
-yet.** No OCR is performed.
+contracts, and generic deterministic document chunking. **AI translation, provider queues, review,
+snapshots, and EPUB generation are not implemented yet.** No OCR is performed.
 
 ## Architecture
 
@@ -95,6 +95,20 @@ reporting transitions, repairs boundary hyphens, joins wrapped prose only inside
 and renders canonical paragraph spacing. It does not remove headers or footers, infer headings,
 dehyphenate words, or rewrite semantics. `source.md` stays immutable and `cleaned.md` is derived.
 
+Plan or publish generic chunks from normalized chapters. Defaults come from `config/book.yaml`:
+
+```bash
+book-translator chunk-chapters --chapter prologue --dry-run --show-plan
+book-translator chunk-chapters --chapter 042
+book-translator chunk-chapters --target-words 1800 --max-words 2400 --context-words 250
+book-translator chunk-chapters --chapter chapter-042 --force
+```
+
+The engine preserves complete Markdown paragraphs, prefers explicit scene separators near the target,
+warns instead of splitting an oversize paragraph, and proves byte-exact reconstruction before writes.
+Each chunk contains only `source.md`, deterministic preceding `context.md`, and metadata. No
+translation file is created. Forced regeneration refuses translation, review, and final artifacts.
+
 Run checks:
 
 ```bash
@@ -108,6 +122,7 @@ Run the deterministic normalization benchmark, which generates synthetic text on
 
 ```bash
 python scripts/benchmark_normalization.py
+python scripts/benchmark_chunking.py
 ```
 
 The benchmark performs three identical runs over 500 generated source blocks and reports structural

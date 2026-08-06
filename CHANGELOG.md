@@ -5,7 +5,12 @@ the application; earlier milestone dates were not recorded and are not invented 
 
 ## [Unreleased]
 
-No changes yet.
+### Added
+
+- Generic deterministic Document Chunk Engine 1.0.0.
+- Paragraph-conserving chunk plans with explicit scene-boundary preference and tail rebalancing.
+- Deterministic preceding context, chunk lineage metadata, conservation reports, dry-run planning,
+  force safety, transactional publication, recovery, status counts, and synthetic benchmark coverage.
 
 ## [0.5.0] - 2026-08-06
 

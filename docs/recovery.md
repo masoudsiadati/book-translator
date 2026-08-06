@@ -49,3 +49,22 @@ atomic. If report or metadata publication fails, evidence remains and old metada
 success. A normal rerun identifies the partial set; after diagnosis, safe `--force` replacement can
 recover it when no downstream work exists. Earlier completed chapters remain valid and are skipped.
 Dry runs normalize and hash in memory without creating directories, files, or timestamps.
+
+Document chunking preflights every selected cleaned hash, status path, configuration, plan,
+reconstruction, existing artifact set, and downstream blocker before a batch publishes. A complete
+matching chunks/report/chapter-metadata set is skipped. Configuration, engine, or legitimate cleaned
+lineage changes are stale and require `--force`; partial directories and integrity failures block.
+Force is refused for translation content, non-pending chunk states, review evidence, or `final.md`.
+
+For each chapter, all chunk sources, contexts, and metadata are built in memory and written to a
+sibling staging directory. Staged hashes and metadata are validated before the directory is atomically
+renamed to `chunks/`; the report follows, and chapter metadata is atomic and last. A first-publication
+failure therefore leaves the old normalized/validated metadata and an explicit partial artifact set
+that a safe forced retry may replace. Previously completed chapters remain valid.
+
+Forced replacement first stages and validates the complete new set. Fixed stage-owned backup paths
+temporarily hold old metadata, report, and chunks so old `chunked` metadata cannot claim a half-swapped
+set. A publication failure restores the prior valid set and retains failed replacement evidence under
+stage-owned hidden paths; a subsequent explicit safe `--force` clears that evidence and retries. Any
+unresolved backup path blocks automated work for manual diagnosis. Neither mode changes `cleaned.md`
+or extraction artifacts.

@@ -31,7 +31,9 @@ def load_progress(path: Path = Path("state/progress.json")) -> Progress:
         raise ProjectDataError(f"invalid progress data in {path}: {exc}") from exc
 
 
-def _canonical_counts(project_root: Path) -> tuple[int | None, int, int, int, int, int]:
+def _canonical_counts(
+    project_root: Path,
+) -> tuple[int | None, int, int, int, int, int, int, int]:
     toc_path = project_root / "workspace/toc.yaml"
     detected: int | None = None
     if toc_path.is_file():
@@ -44,6 +46,8 @@ def _canonical_counts(project_root: Path) -> tuple[int | None, int, int, int, in
             detected = None
     extracted = 0
     normalized = 0
+    chunked = 0
+    total_chunks = 0
     translated = 0
     approved = 0
     failed_chunks = 0
@@ -70,6 +74,16 @@ def _canonical_counts(project_root: Path) -> tuple[int | None, int, int, int, in
                     }:
                         normalized += 1
                     if metadata.status in {
+                        ChapterStatus.CHUNKED,
+                        ChapterStatus.TRANSLATING,
+                        ChapterStatus.TRANSLATED,
+                        ChapterStatus.REVIEW_REQUIRED,
+                        ChapterStatus.REVIEWED,
+                        ChapterStatus.APPROVED,
+                    }:
+                        chunked += 1
+                    total_chunks += metadata.chunk_count
+                    if metadata.status in {
                         ChapterStatus.TRANSLATED,
                         ChapterStatus.REVIEW_REQUIRED,
                         ChapterStatus.REVIEWED,
@@ -90,15 +104,31 @@ def _canonical_counts(project_root: Path) -> tuple[int | None, int, int, int, in
                 failed_chunks += chunk_metadata.status is ChunkStatus.FAILED
             except (OSError, ValidationError, ValueError):
                 continue
-    return detected, extracted, normalized, translated, approved, failed_chunks
+    return (
+        detected,
+        extracted,
+        normalized,
+        chunked,
+        total_chunks,
+        translated,
+        approved,
+        failed_chunks,
+    )
 
 
 def render_status(
     config: BookConfig, progress: Progress, console: Console, project_root: Path = Path(".")
 ) -> None:
-    canonical_detected, extracted, normalized, translated, approved, failed_chunks = (
-        _canonical_counts(project_root)
-    )
+    (
+        canonical_detected,
+        extracted,
+        normalized,
+        chunked,
+        total_chunks,
+        translated,
+        approved,
+        failed_chunks,
+    ) = _canonical_counts(project_root)
     table = Table(title="Book Translator Status", show_header=False)
     table.add_column("Field", style="bold")
     table.add_column("Value")
@@ -109,6 +139,8 @@ def render_status(
     table.add_row("Detected chapters", str(detected))
     table.add_row("Extracted chapters", str(extracted))
     table.add_row("Normalized chapters", str(normalized))
+    table.add_row("Chunked chapters", str(chunked))
+    table.add_row("Total chunks", str(total_chunks))
     table.add_row("Translated chapters", str(translated))
     table.add_row("Approved chapters", str(approved))
     table.add_row("Failed chunks", str(failed_chunks))
