@@ -1,0 +1,264 @@
+{
+  "$defs": {
+    "LineageArtifact": {
+      "additionalProperties": false,
+      "description": "One immutable published file, addressed by its exact bytes.",
+      "properties": {
+        "artifact_id": {
+          "minLength": 1,
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/LineageArtifactKind"
+        },
+        "file": {
+          "minLength": 1,
+          "title": "File",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "kind",
+        "file",
+        "sha256"
+      ],
+      "title": "LineageArtifact",
+      "type": "object"
+    },
+    "LineageArtifactKind": {
+      "description": "What role a published lineage file plays in re-verifying a plan.",
+      "enum": [
+        "reconciliation_run",
+        "provenance_correction",
+        "residual_reconciliation_run",
+        "superseded_plan",
+        "superseded_simulation",
+        "remediation_audit",
+        "conflict_graph",
+        "component_evidence",
+        "frozen_source_registry"
+      ],
+      "title": "LineageArtifactKind",
+      "type": "string"
+    },
+    "ProtectedLookupCheck": {
+      "additionalProperties": false,
+      "description": "Both halves of the protected-term question: did it change, and is it correct?",
+      "properties": {
+        "source_form": {
+          "minLength": 1,
+          "title": "Source Form",
+          "type": "string"
+        },
+        "expected_target": {
+          "minLength": 1,
+          "title": "Expected Target",
+          "type": "string"
+        },
+        "before_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Before Target"
+        },
+        "after_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "After Target"
+        },
+        "lookup_changed": {
+          "title": "Lookup Changed",
+          "type": "boolean"
+        },
+        "lookup_correct": {
+          "title": "Lookup Correct",
+          "type": "boolean"
+        },
+        "owner_source_term_before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Owner Source Term Before"
+        },
+        "owner_source_term_after": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Owner Source Term After"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_form",
+        "expected_target",
+        "lookup_changed",
+        "lookup_correct",
+        "detail"
+      ],
+      "title": "ProtectedLookupCheck",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Everything needed to re-verify one remediation plan without the session that built it.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "plan_id": {
+      "pattern": "^trp-[0-9a-f]{24}$",
+      "title": "Plan Id",
+      "type": "string"
+    },
+    "plan_file": {
+      "minLength": 1,
+      "title": "Plan File",
+      "type": "string"
+    },
+    "plan_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Plan Sha256",
+      "type": "string"
+    },
+    "simulation_file": {
+      "minLength": 1,
+      "title": "Simulation File",
+      "type": "string"
+    },
+    "simulation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Simulation Sha256",
+      "type": "string"
+    },
+    "supersedes_plan_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Supersedes Plan Ids",
+      "type": "array"
+    },
+    "audit_id": {
+      "minLength": 1,
+      "title": "Audit Id",
+      "type": "string"
+    },
+    "source_registry_file": {
+      "minLength": 1,
+      "title": "Source Registry File",
+      "type": "string"
+    },
+    "source_registry_raw_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Registry Raw Sha256",
+      "type": "string"
+    },
+    "source_registry_semantic_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Registry Semantic Sha256",
+      "type": "string"
+    },
+    "expected_semantic_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Expected Semantic Sha256",
+      "type": "string"
+    },
+    "simulated_registry_raw_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Simulated Registry Raw Sha256",
+      "type": "string"
+    },
+    "operation_count": {
+      "minimum": 0,
+      "title": "Operation Count",
+      "type": "integer"
+    },
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/LineageArtifact"
+      },
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "protected_lookups": {
+      "items": {
+        "$ref": "#/$defs/ProtectedLookupCheck"
+      },
+      "title": "Protected Lookups",
+      "type": "array"
+    },
+    "lookup_regression_count": {
+      "minimum": 0,
+      "title": "Lookup Regression Count",
+      "type": "integer"
+    },
+    "accepted_conditions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Accepted Conditions",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "plan_id",
+    "plan_file",
+    "plan_sha256",
+    "simulation_file",
+    "simulation_sha256",
+    "audit_id",
+    "source_registry_file",
+    "source_registry_raw_sha256",
+    "source_registry_semantic_sha256",
+    "expected_semantic_sha256",
+    "simulated_registry_raw_sha256",
+    "operation_count",
+    "lookup_regression_count",
+    "created_at"
+  ],
+  "title": "TerminologyRemediationLineage",
+  "type": "object"
+}

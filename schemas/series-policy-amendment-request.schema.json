@@ -1,0 +1,131 @@
+{
+  "$defs": {
+    "SeriesTermAmendment": {
+      "additionalProperties": false,
+      "description": "One explicit decision a person states about an existing series term.\n\nEvery field is the decision's *complete* intended state rather than a patch: aliases and\nauthorized forms listed here replace the term's lists, so what the policy says afterwards is\nexactly what the request says and nothing is left to merge rules.",
+      "properties": {
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "status": {
+          "default": "LOCKED",
+          "enum": [
+            "LOCKED",
+            "STRONG_REFERENCE"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "target_term": {
+          "minLength": 1,
+          "title": "Target Term",
+          "type": "string"
+        },
+        "allowed_target_forms": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Target Forms",
+          "type": "array"
+        },
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_term",
+        "target_term",
+        "rationale"
+      ],
+      "title": "SeriesTermAmendment",
+      "type": "object"
+    },
+    "SeriesTermRetirement": {
+      "additionalProperties": false,
+      "description": "One decided term a person withdraws to evidence.\n\nRetirement is not deletion. The term keeps its concept, its spelling, and every observed\nvariant the corpora attested; it simply stops stating a canonical decision, which is the only\nway one concept can end up with two rival renderings. It is the governed answer to a promotion\nthat turned out to name something an explicit decision already governs.",
+      "properties": {
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_term",
+        "rationale"
+      ],
+      "title": "SeriesTermRetirement",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An operator's batch of explicit series decisions, applied atomically or not at all.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "request_kind": {
+      "const": "series_policy_amendment_request",
+      "default": "series_policy_amendment_request",
+      "title": "Request Kind",
+      "type": "string"
+    },
+    "series_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Series Id",
+      "type": "string"
+    },
+    "resulting_policy_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Resulting Policy Version",
+      "type": "string"
+    },
+    "rationale": {
+      "minLength": 1,
+      "title": "Rationale",
+      "type": "string"
+    },
+    "terms": {
+      "items": {
+        "$ref": "#/$defs/SeriesTermAmendment"
+      },
+      "minItems": 1,
+      "title": "Terms",
+      "type": "array"
+    },
+    "retired_terms": {
+      "items": {
+        "$ref": "#/$defs/SeriesTermRetirement"
+      },
+      "title": "Retired Terms",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "series_id",
+    "resulting_policy_version",
+    "rationale",
+    "terms"
+  ],
+  "title": "SeriesPolicyAmendmentRequest",
+  "type": "object"
+}

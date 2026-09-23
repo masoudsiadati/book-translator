@@ -1,0 +1,176 @@
+{
+  "$defs": {
+    "DerivedIdentityChange": {
+      "additionalProperties": false,
+      "description": "One book-scoped derived identifier that moved with the book identity.",
+      "properties": {
+        "field": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Field",
+          "type": "string"
+        },
+        "record": {
+          "minLength": 1,
+          "title": "Record",
+          "type": "string"
+        },
+        "before": {
+          "minLength": 1,
+          "title": "Before",
+          "type": "string"
+        },
+        "after": {
+          "minLength": 1,
+          "title": "After",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "record",
+        "before",
+        "after"
+      ],
+      "title": "DerivedIdentityChange",
+      "type": "object"
+    },
+    "MigratedRegistry": {
+      "additionalProperties": false,
+      "description": "Before and after evidence for one migrated registry file.",
+      "properties": {
+        "file": {
+          "format": "path",
+          "title": "File",
+          "type": "string"
+        },
+        "registry_kind": {
+          "minLength": 1,
+          "title": "Registry Kind",
+          "type": "string"
+        },
+        "before_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Before Sha256",
+          "type": "string"
+        },
+        "after_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "After Sha256",
+          "type": "string"
+        },
+        "semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Semantic Sha256",
+          "type": "string"
+        },
+        "book_id_occurrences": {
+          "minimum": 1,
+          "title": "Book Id Occurrences",
+          "type": "integer"
+        },
+        "changed_line_count": {
+          "minimum": 1,
+          "title": "Changed Line Count",
+          "type": "integer"
+        },
+        "derived_identity_changes": {
+          "items": {
+            "$ref": "#/$defs/DerivedIdentityChange"
+          },
+          "title": "Derived Identity Changes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "file",
+        "registry_kind",
+        "before_sha256",
+        "after_sha256",
+        "semantic_sha256",
+        "book_id_occurrences",
+        "changed_line_count"
+      ],
+      "title": "MigratedRegistry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable, independently auditable record of one book identity migration.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "migration_id": {
+      "pattern": "^bim-[0-9a-f]{24}$",
+      "title": "Migration Id",
+      "type": "string"
+    },
+    "engine_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "provenance": {
+      "const": "canonical_book_metadata",
+      "default": "canonical_book_metadata",
+      "title": "Provenance",
+      "type": "string"
+    },
+    "book_metadata_file": {
+      "format": "path",
+      "title": "Book Metadata File",
+      "type": "string"
+    },
+    "book_metadata_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Book Metadata Sha256",
+      "type": "string"
+    },
+    "previous_book_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Previous Book Id",
+      "type": "string"
+    },
+    "book_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "registries": {
+      "items": {
+        "$ref": "#/$defs/MigratedRegistry"
+      },
+      "minItems": 1,
+      "title": "Registries",
+      "type": "array"
+    },
+    "semantic_content_unchanged": {
+      "title": "Semantic Content Unchanged",
+      "type": "boolean"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "migration_id",
+    "engine_version",
+    "book_metadata_file",
+    "book_metadata_sha256",
+    "previous_book_id",
+    "book_id",
+    "registries",
+    "semantic_content_unchanged",
+    "created_at"
+  ],
+  "title": "BookIdentityMigration",
+  "type": "object"
+}

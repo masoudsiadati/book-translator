@@ -1,0 +1,4 @@
+schema_version: '1.0'
+resource_kind: series_terminology
+resource_file: config/series/wheel-of-time/terminology-policy.yaml
+version: 1.2.0

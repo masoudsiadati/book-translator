@@ -1,0 +1,162 @@
+{
+  "$defs": {
+    "OccurrenceSense": {
+      "description": "Why the occurrence is not the governed term.",
+      "enum": [
+        "ordinary_english"
+      ],
+      "title": "OccurrenceSense",
+      "type": "string"
+    },
+    "TerminologyOccurrenceExemption": {
+      "additionalProperties": false,
+      "properties": {
+        "exemption_id": {
+          "pattern": "^toe-[0-9a-f]{24}$",
+          "title": "Exemption Id",
+          "type": "string"
+        },
+        "chunk_id": {
+          "pattern": "^(?:000-prologue|[0-9]{3}|999-epilogue)-[0-9]{3}$",
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "chunk_source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Chunk Source Sha256",
+          "type": "string"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "decision_id": {
+          "pattern": "^td-[0-9a-f]{24}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "decision_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Decision Sha256",
+          "type": "string"
+        },
+        "concept_id": {
+          "anyOf": [
+            {
+              "pattern": "^sc-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Concept Id"
+        },
+        "spelling": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Spelling",
+          "type": "string"
+        },
+        "occurrence_index": {
+          "minimum": 1,
+          "title": "Occurrence Index",
+          "type": "integer"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "minimum": 1,
+          "title": "End",
+          "type": "integer"
+        },
+        "paragraph_number": {
+          "minimum": 1,
+          "title": "Paragraph Number",
+          "type": "integer"
+        },
+        "paragraph_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Paragraph Sha256",
+          "type": "string"
+        },
+        "sense": {
+          "$ref": "#/$defs/OccurrenceSense"
+        },
+        "decided_by": {
+          "const": "user",
+          "default": "user",
+          "title": "Decided By",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "exemption_id",
+        "chunk_id",
+        "chunk_source_sha256",
+        "candidate_id",
+        "decision_id",
+        "decision_sha256",
+        "spelling",
+        "occurrence_index",
+        "start",
+        "end",
+        "paragraph_number",
+        "paragraph_sha256",
+        "sense",
+        "rationale",
+        "created_at"
+      ],
+      "title": "TerminologyOccurrenceExemption",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "registry_kind": {
+      "const": "terminology_occurrence_exemptions",
+      "default": "terminology_occurrence_exemptions",
+      "title": "Registry Kind",
+      "type": "string"
+    },
+    "book_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "exemptions": {
+      "items": {
+        "$ref": "#/$defs/TerminologyOccurrenceExemption"
+      },
+      "title": "Exemptions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "book_id"
+  ],
+  "title": "TerminologyOccurrenceExemptionRegistry",
+  "type": "object"
+}

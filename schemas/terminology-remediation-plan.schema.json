@@ -1,0 +1,1197 @@
+{
+  "$defs": {
+    "QuestionCategory": {
+      "description": "A general, term-agnostic classification of what is unresolved.",
+      "enum": [
+        "kinship_side",
+        "gender",
+        "identity",
+        "title_meaning",
+        "transliteration",
+        "world_term_semantics",
+        "proper_noun_classification",
+        "other"
+      ],
+      "title": "QuestionCategory",
+      "type": "string"
+    },
+    "RegistryEdit": {
+      "additionalProperties": false,
+      "description": "One typed, auditable registry change derived from a semantic resolution.",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/RegistryEditKind"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^td-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Id"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        },
+        "previous_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Previous Value"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "candidate_id",
+        "source_term",
+        "value",
+        "reason"
+      ],
+      "title": "RegistryEdit",
+      "type": "object"
+    },
+    "RegistryEditKind": {
+      "enum": [
+        "set_target",
+        "add_alias",
+        "remove_alias",
+        "create_decision",
+        "remove_competing_variant"
+      ],
+      "title": "RegistryEditKind",
+      "type": "string"
+    },
+    "TerminologyCandidateMigration": {
+      "additionalProperties": false,
+      "description": "An explicit, non-destructive normalized-identity migration record.",
+      "properties": {
+        "original_candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Original Candidate Id",
+          "type": "string"
+        },
+        "original_source_term": {
+          "minLength": 1,
+          "title": "Original Source Term",
+          "type": "string"
+        },
+        "normalized_candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Normalized Candidate Id",
+          "type": "string"
+        },
+        "normalized_source_term": {
+          "minLength": 1,
+          "title": "Normalized Source Term",
+          "type": "string"
+        },
+        "merged_occurrence_count": {
+          "minimum": 0,
+          "title": "Merged Occurrence Count",
+          "type": "integer"
+        },
+        "merged_alias_count": {
+          "minimum": 0,
+          "title": "Merged Alias Count",
+          "type": "integer"
+        },
+        "merged_evidence_note_count": {
+          "minimum": 0,
+          "title": "Merged Evidence Note Count",
+          "type": "integer"
+        },
+        "historical_run_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Historical Run Ids",
+          "type": "array"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "original_candidate_id",
+        "original_source_term",
+        "normalized_candidate_id",
+        "normalized_source_term",
+        "merged_occurrence_count",
+        "merged_alias_count",
+        "merged_evidence_note_count",
+        "reason"
+      ],
+      "title": "TerminologyCandidateMigration",
+      "type": "object"
+    },
+    "TerminologyDecisionRetirement": {
+      "additionalProperties": false,
+      "description": "The governed withdrawal of one canonical decision, with its superseded record preserved.\n\nThere is deliberately no ``delete-terminology-decision`` command.  Removing a canonical\ndecision is the most destructive change the registry allows — every downstream snapshot, QA\nreport, and acceptance record was produced under it — so it exists only as this record inside\nan immutable plan, carrying the precondition hashes that prove the plan saw the decision it\nclaims to withdraw.  ``locked`` is pinned to ``False`` by the contract itself: a locked user\ndecision can never even be described as retired, let alone applied.",
+      "properties": {
+        "decision_id": {
+          "pattern": "^td-[0-9a-f]{24}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "retired_target_term": {
+          "minLength": 1,
+          "title": "Retired Target Term",
+          "type": "string"
+        },
+        "retired_enforcement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyEnforcement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "resolved_enforcement": {
+          "$ref": "#/$defs/TerminologyEnforcement"
+        },
+        "decision_source": {
+          "minLength": 1,
+          "title": "Decision Source",
+          "type": "string"
+        },
+        "decision_state": {
+          "minLength": 1,
+          "title": "Decision State",
+          "type": "string"
+        },
+        "locked": {
+          "const": false,
+          "default": false,
+          "title": "Locked",
+          "type": "boolean"
+        },
+        "retired_aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Retired Aliases",
+          "type": "array"
+        },
+        "retired_competing_variants": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Retired Competing Variants",
+          "type": "array"
+        },
+        "occurrence_count": {
+          "minimum": 0,
+          "title": "Occurrence Count",
+          "type": "integer"
+        },
+        "reject_candidate": {
+          "title": "Reject Candidate",
+          "type": "boolean"
+        },
+        "candidate_status_before": {
+          "minLength": 1,
+          "title": "Candidate Status Before",
+          "type": "string"
+        },
+        "candidate_status_after": {
+          "minLength": 1,
+          "title": "Candidate Status After",
+          "type": "string"
+        },
+        "rejection_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rejection Reason"
+        },
+        "owner_authorization": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Owner Authorization"
+        },
+        "decision_record_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Decision Record Sha256",
+          "type": "string"
+        },
+        "candidate_record_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Candidate Record Sha256",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_id",
+        "candidate_id",
+        "source_term",
+        "retired_target_term",
+        "resolved_enforcement",
+        "decision_source",
+        "decision_state",
+        "occurrence_count",
+        "reject_candidate",
+        "candidate_status_before",
+        "candidate_status_after",
+        "decision_record_sha256",
+        "candidate_record_sha256",
+        "reason"
+      ],
+      "title": "TerminologyDecisionRetirement",
+      "type": "object"
+    },
+    "TerminologyEnforcement": {
+      "description": "What kind of target evidence proves a canonical decision was honored.\n\n``required`` answers whether a decision is in scope for QA at all; this answers the separate\nquestion of what counts as proof.  Collapsing the two forces every approved decision into\n\"the exact canonical string must appear\", which is correct for a name and wrong for a form the\ntarget language legitimately transforms.",
+      "enum": [
+        "exact",
+        "morphological",
+        "contextual",
+        "advisory"
+      ],
+      "title": "TerminologyEnforcement",
+      "type": "string"
+    },
+    "TerminologyEnforcementChange": {
+      "additionalProperties": false,
+      "description": "A relaxation of what target evidence one decision demands, changing no target text.",
+      "properties": {
+        "decision_id": {
+          "pattern": "^td-[0-9a-f]{24}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "target_term": {
+          "minLength": 1,
+          "title": "Target Term",
+          "type": "string"
+        },
+        "enforcement_before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyEnforcement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "resolved_enforcement_before": {
+          "$ref": "#/$defs/TerminologyEnforcement"
+        },
+        "enforcement_after": {
+          "$ref": "#/$defs/TerminologyEnforcement"
+        },
+        "locked": {
+          "const": false,
+          "default": false,
+          "title": "Locked",
+          "type": "boolean"
+        },
+        "decision_record_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Decision Record Sha256",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_id",
+        "candidate_id",
+        "source_term",
+        "target_term",
+        "resolved_enforcement_before",
+        "enforcement_after",
+        "decision_record_sha256",
+        "reason"
+      ],
+      "title": "TerminologyEnforcementChange",
+      "type": "object"
+    },
+    "TerminologyExactnessDisposition": {
+      "description": "How certain the audit is about one exactly enforced decision.\n\nThe disposition judges the *finding*; :class:`TerminologyRemediationResolution` judges whether\nthe plan can act on it.  The two are deliberately independent: an ownership boundary makes a\nreal defect ``unresolved`` while the plan's answer — change nothing — stays fully determined.",
+      "enum": [
+        "definitely_invalid",
+        "definitely_valid",
+        "context_review_required",
+        "unresolved"
+      ],
+      "title": "TerminologyExactnessDisposition",
+      "type": "string"
+    },
+    "TerminologyFindingFamily": {
+      "description": "Which read-only audit produced a remediation finding.\n\nThe two families ask different questions of the same registry.  The canonical validator asks\nwhether two canonical records contradict each other; exact enforcement asks whether a source\nform is the kind of thing that can have a fixed target lexeme at all.  A defect of the second\nkind raises no validator conflict, which is exactly why the planner needs the discriminator.",
+      "enum": [
+        "canonical_validator",
+        "exact_enforcement"
+      ],
+      "title": "TerminologyFindingFamily",
+      "type": "string"
+    },
+    "TerminologyQuestionRequest": {
+      "additionalProperties": false,
+      "description": "The durable terminology question one unresolvable finding requires, never opened by apply.\n\nRecording the request rather than writing the question keeps ``apply`` bounded to the registry:\nthe plan states exactly which question must exist, deterministically identified, so the\noperator opens it through the question workflow that owns that file.",
+      "properties": {
+        "question_id": {
+          "pattern": "^tq-[0-9a-f]{24}$",
+          "title": "Question Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^td-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Id"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "provisional_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provisional Target"
+        },
+        "category": {
+          "$ref": "#/$defs/QuestionCategory"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "blocking": {
+          "default": false,
+          "title": "Blocking",
+          "type": "boolean"
+        },
+        "related_source_terms": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Source Terms",
+          "type": "array"
+        },
+        "evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "question_id",
+        "candidate_id",
+        "source_term",
+        "category",
+        "question"
+      ],
+      "title": "TerminologyQuestionRequest",
+      "type": "object"
+    },
+    "TerminologyRemediationAction": {
+      "enum": [
+        "no_change_validator_fix",
+        "no_change_valid_distinct",
+        "merge_decisions",
+        "remove_invalid_variant",
+        "convert_to_alias",
+        "change_target_requires_review",
+        "identity_migration",
+        "apply_semantic_resolution",
+        "manual_context_review",
+        "retire_decision",
+        "retire_and_reject_candidate",
+        "change_enforcement",
+        "correct_target",
+        "open_terminology_question",
+        "no_change_exact_upheld",
+        "no_change_owner_authority"
+      ],
+      "title": "TerminologyRemediationAction",
+      "type": "string"
+    },
+    "TerminologyRemediationCategory": {
+      "enum": [
+        "valid_compound_or_morphology",
+        "valid_distinct_term",
+        "duplicate_canonical",
+        "invalid_competing_variant",
+        "conflicting_target",
+        "alias_misclassification",
+        "normalization_identity_bug",
+        "requires_context_review",
+        "non_terminology_source_form",
+        "fragment_of_canonical_term",
+        "overbroad_exact_enforcement",
+        "exact_enforcement_upheld",
+        "exact_target_requires_review",
+        "component_spelling_divergence",
+        "owner_governed_decision"
+      ],
+      "title": "TerminologyRemediationCategory",
+      "type": "string"
+    },
+    "TerminologyRemediationOperation": {
+      "additionalProperties": false,
+      "description": "One primary remediation action for exactly one audited finding.",
+      "properties": {
+        "operation_id": {
+          "pattern": "^rmo-[0-9a-f]{24}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "finding_id": {
+          "pattern": "^rmf-[0-9a-f]{24}$",
+          "title": "Finding Id",
+          "type": "string"
+        },
+        "finding_family": {
+          "$ref": "#/$defs/TerminologyFindingFamily",
+          "default": "canonical_validator"
+        },
+        "remediation_category": {
+          "$ref": "#/$defs/TerminologyRemediationCategory"
+        },
+        "action": {
+          "$ref": "#/$defs/TerminologyRemediationAction"
+        },
+        "resolution": {
+          "$ref": "#/$defs/TerminologyRemediationResolution"
+        },
+        "exactness_disposition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyExactnessDisposition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "exactness_risks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Exactness Risks",
+          "type": "array"
+        },
+        "exactness_rule": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exactness Rule"
+        },
+        "mutates_registry": {
+          "title": "Mutates Registry",
+          "type": "boolean"
+        },
+        "decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^td-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Id"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "target_term": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Term"
+        },
+        "affected_decision_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Affected Decision Ids",
+          "type": "array"
+        },
+        "affected_candidate_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Affected Candidate Ids",
+          "type": "array"
+        },
+        "before_state_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Before State Sha256",
+          "type": "string"
+        },
+        "variant_removals": {
+          "items": {
+            "$ref": "#/$defs/TerminologyVariantRemoval"
+          },
+          "title": "Variant Removals",
+          "type": "array"
+        },
+        "edits": {
+          "items": {
+            "$ref": "#/$defs/RegistryEdit"
+          },
+          "title": "Edits",
+          "type": "array"
+        },
+        "component_id": {
+          "anyOf": [
+            {
+              "pattern": "^tcc-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Component Id"
+        },
+        "migration": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyCandidateMigration"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "retirement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyDecisionRetirement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "enforcement_change": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyEnforcementChange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "target_correction": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyTargetCorrection"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "question_request": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyQuestionRequest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "provenance": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Provenance",
+          "type": "object"
+        },
+        "blocked_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Blocked Reason"
+        },
+        "blocking_evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Blocking Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "operation_id",
+        "sequence",
+        "finding_id",
+        "remediation_category",
+        "action",
+        "resolution",
+        "mutates_registry",
+        "candidate_id",
+        "source_term",
+        "before_state_sha256",
+        "reason"
+      ],
+      "title": "TerminologyRemediationOperation",
+      "type": "object"
+    },
+    "TerminologyRemediationResolution": {
+      "description": "Whether an operation's outcome is provable from stored governance evidence.",
+      "enum": [
+        "deterministic",
+        "unresolved"
+      ],
+      "title": "TerminologyRemediationResolution",
+      "type": "string"
+    },
+    "TerminologyTargetCorrection": {
+      "additionalProperties": false,
+      "description": "One canonical target rewritten to spell a decided component the way that component spells it.\n\nComposing a target is a translation act and stays forbidden.  This is the narrow opposite case:\nthe compound already renders its component, in the right place and the right order, using a\nspelling the registry does not recognize — so the correction substitutes the component's own\ncanonical target for exactly the one token standing in for it and copies every other token\nverbatim.  No new lexeme is invented, and the recorded ``replaced_token`` makes the whole edit\nre-derivable from the two decisions it joins.",
+      "properties": {
+        "decision_id": {
+          "pattern": "^td-[0-9a-f]{24}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "target_before": {
+          "minLength": 1,
+          "title": "Target Before",
+          "type": "string"
+        },
+        "target_after": {
+          "minLength": 1,
+          "title": "Target After",
+          "type": "string"
+        },
+        "component_source_term": {
+          "minLength": 1,
+          "title": "Component Source Term",
+          "type": "string"
+        },
+        "component_decision_id": {
+          "pattern": "^td-[0-9a-f]{24}$",
+          "title": "Component Decision Id",
+          "type": "string"
+        },
+        "component_target_term": {
+          "minLength": 1,
+          "title": "Component Target Term",
+          "type": "string"
+        },
+        "replaced_token": {
+          "minLength": 1,
+          "title": "Replaced Token",
+          "type": "string"
+        },
+        "locked": {
+          "const": false,
+          "default": false,
+          "title": "Locked",
+          "type": "boolean"
+        },
+        "decision_record_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Decision Record Sha256",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_id",
+        "candidate_id",
+        "source_term",
+        "target_before",
+        "target_after",
+        "component_source_term",
+        "component_decision_id",
+        "component_target_term",
+        "replaced_token",
+        "decision_record_sha256",
+        "reason"
+      ],
+      "title": "TerminologyTargetCorrection",
+      "type": "object"
+    },
+    "TerminologyVariantRemoval": {
+      "additionalProperties": false,
+      "description": "One competing-variant relation that duplicates another decision's canonical target.",
+      "properties": {
+        "holder_decision_id": {
+          "pattern": "^td-[0-9a-f]{24}$",
+          "title": "Holder Decision Id",
+          "type": "string"
+        },
+        "holder_candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Holder Candidate Id",
+          "type": "string"
+        },
+        "holder_source_term": {
+          "minLength": 1,
+          "title": "Holder Source Term",
+          "type": "string"
+        },
+        "holder_target_term": {
+          "minLength": 1,
+          "title": "Holder Target Term",
+          "type": "string"
+        },
+        "removed_variant": {
+          "minLength": 1,
+          "title": "Removed Variant",
+          "type": "string"
+        },
+        "canonical_owner_decision_id": {
+          "pattern": "^td-[0-9a-f]{24}$",
+          "title": "Canonical Owner Decision Id",
+          "type": "string"
+        },
+        "canonical_owner_source_term": {
+          "minLength": 1,
+          "title": "Canonical Owner Source Term",
+          "type": "string"
+        },
+        "canonical_owner_target_term": {
+          "minLength": 1,
+          "title": "Canonical Owner Target Term",
+          "type": "string"
+        }
+      },
+      "required": [
+        "holder_decision_id",
+        "holder_candidate_id",
+        "holder_source_term",
+        "holder_target_term",
+        "removed_variant",
+        "canonical_owner_decision_id",
+        "canonical_owner_source_term",
+        "canonical_owner_target_term"
+      ],
+      "title": "TerminologyVariantRemoval",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An immutable, content-addressed remediation plan bound to one registry state.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "plan_id": {
+      "pattern": "^trp-[0-9a-f]{24}$",
+      "title": "Plan Id",
+      "type": "string"
+    },
+    "engine_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "audit_id": {
+      "pattern": "^remediation-audit-[0-9a-f]{24}$",
+      "title": "Audit Id",
+      "type": "string"
+    },
+    "audit_schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Audit Schema Version",
+      "type": "string"
+    },
+    "review_run_id": {
+      "anyOf": [
+        {
+          "pattern": "^ta-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Review Run Id"
+    },
+    "proposal_run_id": {
+      "anyOf": [
+        {
+          "pattern": "^ta-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Proposal Run Id"
+    },
+    "analysis_run_id": {
+      "anyOf": [
+        {
+          "pattern": "^ta-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Analysis Run Id"
+    },
+    "registry_file": {
+      "minLength": 1,
+      "title": "Registry File",
+      "type": "string"
+    },
+    "registry_version_before": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Registry Version Before",
+      "type": "string"
+    },
+    "registry_version_after": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Registry Version After",
+      "type": "string"
+    },
+    "source_registry_semantic_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Registry Semantic Sha256",
+      "type": "string"
+    },
+    "source_registry_raw_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Registry Raw Sha256",
+      "type": "string"
+    },
+    "glossary_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Glossary Sha256",
+      "type": "string"
+    },
+    "decisions_before": {
+      "minimum": 0,
+      "title": "Decisions Before",
+      "type": "integer"
+    },
+    "candidates_before": {
+      "minimum": 0,
+      "title": "Candidates Before",
+      "type": "integer"
+    },
+    "operations": {
+      "items": {
+        "$ref": "#/$defs/TerminologyRemediationOperation"
+      },
+      "title": "Operations",
+      "type": "array"
+    },
+    "operation_count": {
+      "minimum": 0,
+      "title": "Operation Count",
+      "type": "integer"
+    },
+    "deterministic_operation_count": {
+      "minimum": 0,
+      "title": "Deterministic Operation Count",
+      "type": "integer"
+    },
+    "unresolved_operation_count": {
+      "minimum": 0,
+      "title": "Unresolved Operation Count",
+      "type": "integer"
+    },
+    "mutating_operation_count": {
+      "minimum": 0,
+      "title": "Mutating Operation Count",
+      "type": "integer"
+    },
+    "exactness_operation_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Exactness Operation Count",
+      "type": "integer"
+    },
+    "retirement_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Retirement Count",
+      "type": "integer"
+    },
+    "candidate_rejection_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Candidate Rejection Count",
+      "type": "integer"
+    },
+    "enforcement_change_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Enforcement Change Count",
+      "type": "integer"
+    },
+    "target_correction_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Target Correction Count",
+      "type": "integer"
+    },
+    "question_request_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Question Request Count",
+      "type": "integer"
+    },
+    "action_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Action Counts",
+      "type": "object"
+    },
+    "category_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Category Counts",
+      "type": "object"
+    },
+    "disposition_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Disposition Counts",
+      "type": "object"
+    },
+    "affected_decision_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Affected Decision Ids",
+      "type": "array"
+    },
+    "affected_candidate_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Affected Candidate Ids",
+      "type": "array"
+    },
+    "expected_semantic_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Semantic Sha256"
+    },
+    "applicable": {
+      "title": "Applicable",
+      "type": "boolean"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "plan_id",
+    "engine_version",
+    "audit_id",
+    "audit_schema_version",
+    "registry_file",
+    "registry_version_before",
+    "registry_version_after",
+    "source_registry_semantic_sha256",
+    "source_registry_raw_sha256",
+    "glossary_sha256",
+    "decisions_before",
+    "candidates_before",
+    "operation_count",
+    "deterministic_operation_count",
+    "unresolved_operation_count",
+    "mutating_operation_count",
+    "applicable",
+    "created_at"
+  ],
+  "title": "TerminologyRemediationPlan",
+  "type": "object"
+}

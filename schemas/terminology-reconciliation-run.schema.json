@@ -1,0 +1,529 @@
+{
+  "$defs": {
+    "DisclosedMaterial": {
+      "description": "Categories of source-derived material, ordered from least to most revealing.",
+      "enum": [
+        "terminology_names",
+        "target_translations",
+        "aggregate_corpus_statistics",
+        "entity_cooccurrence",
+        "sentence_excerpts",
+        "paragraph_excerpts",
+        "chunk_excerpts"
+      ],
+      "title": "DisclosedMaterial",
+      "type": "string"
+    },
+    "InferenceLocality": {
+      "description": "Where the reasoning that produced a resolution actually ran.",
+      "enum": [
+        "local_process",
+        "remote_hosted",
+        "deterministic_none"
+      ],
+      "title": "InferenceLocality",
+      "type": "string"
+    },
+    "ReconciliationClassification": {
+      "description": "The semantic relationship the reviewer established for a component.",
+      "enum": [
+        "same_concept_alias",
+        "distinct_concepts",
+        "canonical_and_compound",
+        "wrong_target",
+        "invalid_relationship_only",
+        "insufficient_evidence"
+      ],
+      "title": "ReconciliationClassification",
+      "type": "string"
+    },
+    "ReconciliationResolution": {
+      "additionalProperties": false,
+      "description": "The machine-readable outcome for exactly one conflict component.",
+      "properties": {
+        "component_id": {
+          "pattern": "^tcc-[0-9a-f]{24}$",
+          "title": "Component Id",
+          "type": "string"
+        },
+        "classification": {
+          "$ref": "#/$defs/ReconciliationClassification"
+        },
+        "affected_decision_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Affected Decision Ids",
+          "type": "array"
+        },
+        "affected_candidate_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Affected Candidate Ids",
+          "type": "array"
+        },
+        "canonical_source_forms": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Canonical Source Forms",
+          "type": "array"
+        },
+        "existing_targets": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Existing Targets",
+          "type": "object"
+        },
+        "chosen_canonical_decisions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Chosen Canonical Decisions",
+          "type": "object"
+        },
+        "aliases_to_retain": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Aliases To Retain",
+          "type": "object"
+        },
+        "aliases_to_remove": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Aliases To Remove",
+          "type": "object"
+        },
+        "variants_to_retain": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Variants To Retain",
+          "type": "object"
+        },
+        "variants_to_remove": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Variants To Remove",
+          "type": "object"
+        },
+        "targets_to_change": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Targets To Change",
+          "type": "object"
+        },
+        "composed_targets": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Composed Targets",
+          "type": "object"
+        },
+        "edits": {
+          "items": {
+            "$ref": "#/$defs/RegistryEdit"
+          },
+          "title": "Edits",
+          "type": "array"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "evidence_references": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence References",
+          "type": "array"
+        },
+        "reasoning_summary": {
+          "minLength": 1,
+          "title": "Reasoning Summary",
+          "type": "string"
+        },
+        "escalated": {
+          "default": false,
+          "title": "Escalated",
+          "type": "boolean"
+        },
+        "escalation_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Escalation Reason"
+        }
+      },
+      "required": [
+        "component_id",
+        "classification",
+        "confidence",
+        "reasoning_summary"
+      ],
+      "title": "ReconciliationResolution",
+      "type": "object"
+    },
+    "ReconciliationShard": {
+      "additionalProperties": false,
+      "properties": {
+        "shard_id": {
+          "pattern": "^tsr-[0-9a-f]{24}$",
+          "title": "Shard Id",
+          "type": "string"
+        },
+        "index": {
+          "minimum": 0,
+          "title": "Index",
+          "type": "integer"
+        },
+        "component_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Component Ids",
+          "type": "array"
+        },
+        "decision_count": {
+          "minimum": 0,
+          "title": "Decision Count",
+          "type": "integer"
+        },
+        "estimated_tokens": {
+          "minimum": 0,
+          "title": "Estimated Tokens",
+          "type": "integer"
+        },
+        "attempts": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Attempts",
+          "type": "integer"
+        },
+        "validated": {
+          "default": false,
+          "title": "Validated",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "shard_id",
+        "index",
+        "component_ids",
+        "decision_count",
+        "estimated_tokens"
+      ],
+      "title": "ReconciliationShard",
+      "type": "object"
+    },
+    "RegistryEdit": {
+      "additionalProperties": false,
+      "description": "One typed, auditable registry change derived from a semantic resolution.",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/RegistryEditKind"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^td-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Id"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        },
+        "previous_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Previous Value"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "candidate_id",
+        "source_term",
+        "value",
+        "reason"
+      ],
+      "title": "RegistryEdit",
+      "type": "object"
+    },
+    "RegistryEditKind": {
+      "enum": [
+        "set_target",
+        "add_alias",
+        "remove_alias",
+        "create_decision",
+        "remove_competing_variant"
+      ],
+      "title": "RegistryEditKind",
+      "type": "string"
+    },
+    "ReviewerProvenance": {
+      "additionalProperties": false,
+      "description": "Separates local orchestration from the service that performed model inference.",
+      "properties": {
+        "reviewer": {
+          "minLength": 1,
+          "title": "Reviewer",
+          "type": "string"
+        },
+        "reviewer_kind": {
+          "minLength": 1,
+          "title": "Reviewer Kind",
+          "type": "string"
+        },
+        "inference_locality": {
+          "$ref": "#/$defs/InferenceLocality"
+        },
+        "inference_provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Inference Provider"
+        },
+        "account_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Account Type"
+        },
+        "local_orchestration": {
+          "title": "Local Orchestration",
+          "type": "boolean"
+        },
+        "external_service_contacted": {
+          "title": "External Service Contacted",
+          "type": "boolean"
+        },
+        "disclosed_material": {
+          "items": {
+            "$ref": "#/$defs/DisclosedMaterial"
+          },
+          "title": "Disclosed Material",
+          "type": "array"
+        },
+        "withheld_material": {
+          "items": {
+            "$ref": "#/$defs/DisclosedMaterial"
+          },
+          "title": "Withheld Material",
+          "type": "array"
+        },
+        "prior_model_knowledge_used": {
+          "default": false,
+          "title": "Prior Model Knowledge Used",
+          "type": "boolean"
+        },
+        "disclosure_note": {
+          "minLength": 1,
+          "title": "Disclosure Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reviewer",
+        "reviewer_kind",
+        "inference_locality",
+        "local_orchestration",
+        "external_service_contacted",
+        "disclosure_note"
+      ],
+      "title": "ReviewerProvenance",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An immutable record of one targeted semantic reconciliation.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tsr-run-[0-9a-f]{24}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "engine_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "graph_id": {
+      "pattern": "^tcg-[0-9a-f]{24}$",
+      "title": "Graph Id",
+      "type": "string"
+    },
+    "plan_id": {
+      "pattern": "^trp-[0-9a-f]{24}$",
+      "title": "Plan Id",
+      "type": "string"
+    },
+    "registry_semantic_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Registry Semantic Sha256",
+      "type": "string"
+    },
+    "reviewer": {
+      "minLength": 1,
+      "title": "Reviewer",
+      "type": "string"
+    },
+    "reviewer_kind": {
+      "minLength": 1,
+      "title": "Reviewer Kind",
+      "type": "string"
+    },
+    "external_service_contacted": {
+      "title": "External Service Contacted",
+      "type": "boolean"
+    },
+    "provenance": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ReviewerProvenance"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "shards": {
+      "items": {
+        "$ref": "#/$defs/ReconciliationShard"
+      },
+      "title": "Shards",
+      "type": "array"
+    },
+    "shard_count": {
+      "minimum": 0,
+      "title": "Shard Count",
+      "type": "integer"
+    },
+    "provider_call_count": {
+      "minimum": 0,
+      "title": "Provider Call Count",
+      "type": "integer"
+    },
+    "retry_count": {
+      "minimum": 0,
+      "title": "Retry Count",
+      "type": "integer"
+    },
+    "resolutions": {
+      "items": {
+        "$ref": "#/$defs/ReconciliationResolution"
+      },
+      "title": "Resolutions",
+      "type": "array"
+    },
+    "classification_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Classification Counts",
+      "type": "object"
+    },
+    "escalation_count": {
+      "minimum": 0,
+      "title": "Escalation Count",
+      "type": "integer"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "engine_version",
+    "graph_id",
+    "plan_id",
+    "registry_semantic_sha256",
+    "reviewer",
+    "reviewer_kind",
+    "external_service_contacted",
+    "shard_count",
+    "provider_call_count",
+    "retry_count",
+    "escalation_count",
+    "created_at"
+  ],
+  "title": "ReconciliationRun",
+  "type": "object"
+}

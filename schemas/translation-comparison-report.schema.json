@@ -1,0 +1,355 @@
+{
+  "$defs": {
+    "ComparedChunk": {
+      "additionalProperties": false,
+      "properties": {
+        "chunk_id": {
+          "minLength": 1,
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "chunk_sequence": {
+          "minimum": 1,
+          "title": "Chunk Sequence",
+          "type": "integer"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "source_paragraph_count": {
+          "minimum": 1,
+          "title": "Source Paragraph Count",
+          "type": "integer"
+        },
+        "first": {
+          "$ref": "#/$defs/ComparedTranslation"
+        },
+        "second": {
+          "$ref": "#/$defs/ComparedTranslation"
+        },
+        "paragraph_identity_aligned": {
+          "title": "Paragraph Identity Aligned",
+          "type": "boolean"
+        },
+        "differing_paragraph_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Differing Paragraph Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "chunk_id",
+        "chunk_sequence",
+        "source_sha256",
+        "source_paragraph_count",
+        "first",
+        "second",
+        "paragraph_identity_aligned"
+      ],
+      "title": "ComparedChunk",
+      "type": "object"
+    },
+    "ComparedTranslation": {
+      "additionalProperties": false,
+      "description": "One side of one chunk: what was accepted, where it came from, and what QA says about it.",
+      "properties": {
+        "run_id": {
+          "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "job_id": {
+          "minLength": 1,
+          "title": "Job Id",
+          "type": "string"
+        },
+        "output_contract_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Contract Version"
+        },
+        "acceptance_origin": {
+          "minLength": 1,
+          "title": "Acceptance Origin",
+          "type": "string"
+        },
+        "translation_file": {
+          "format": "path",
+          "title": "Translation File",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "paragraph_count": {
+          "minimum": 0,
+          "title": "Paragraph Count",
+          "type": "integer"
+        },
+        "provider_attempts": {
+          "minimum": 0,
+          "title": "Provider Attempts",
+          "type": "integer"
+        },
+        "structural_repairs": {
+          "minimum": 0,
+          "title": "Structural Repairs",
+          "type": "integer"
+        },
+        "provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "structural_blocking_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Structural Blocking Codes",
+          "type": "array"
+        },
+        "terminology_blocking_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Terminology Blocking Codes",
+          "type": "array"
+        },
+        "alignment_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Alignment Codes",
+          "type": "array"
+        },
+        "alignment_blocking": {
+          "minimum": 0,
+          "title": "Alignment Blocking",
+          "type": "integer"
+        },
+        "semantic_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Semantic Status"
+        },
+        "semantic_evidence_count": {
+          "minimum": 0,
+          "title": "Semantic Evidence Count",
+          "type": "integer"
+        },
+        "semantic_judge_calls": {
+          "minimum": 0,
+          "title": "Semantic Judge Calls",
+          "type": "integer"
+        },
+        "semantic_second_looks": {
+          "minimum": 0,
+          "title": "Semantic Second Looks",
+          "type": "integer"
+        },
+        "semantic_revise_findings": {
+          "minimum": 0,
+          "title": "Semantic Revise Findings",
+          "type": "integer"
+        },
+        "semantic_revisions_attempted": {
+          "minimum": 0,
+          "title": "Semantic Revisions Attempted",
+          "type": "integer"
+        },
+        "semantic_revisions_adopted": {
+          "minimum": 0,
+          "title": "Semantic Revisions Adopted",
+          "type": "integer"
+        },
+        "semantic_reviser_calls": {
+          "minimum": 0,
+          "title": "Semantic Reviser Calls",
+          "type": "integer"
+        },
+        "revised_paragraph_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Revised Paragraph Ids",
+          "type": "array"
+        },
+        "unresolved_paragraph_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Paragraph Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "run_id",
+        "job_id",
+        "acceptance_origin",
+        "translation_file",
+        "translation_sha256",
+        "paragraph_count",
+        "provider_attempts",
+        "structural_repairs",
+        "alignment_blocking",
+        "semantic_evidence_count",
+        "semantic_judge_calls",
+        "semantic_second_looks",
+        "semantic_revise_findings",
+        "semantic_revisions_attempted",
+        "semantic_revisions_adopted",
+        "semantic_reviser_calls"
+      ],
+      "title": "ComparedTranslation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Two runs' effective translations of one chapter, side by side, in counts and hashes.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "comparison_engine_version": {
+      "title": "Comparison Engine Version",
+      "type": "string"
+    },
+    "chapter_id": {
+      "minLength": 1,
+      "title": "Chapter Id",
+      "type": "string"
+    },
+    "first_run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "First Run Id",
+      "type": "string"
+    },
+    "second_run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Second Run Id",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "same_snapshot": {
+      "title": "Same Snapshot",
+      "type": "boolean"
+    },
+    "first_chapter_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "First Chapter Sha256",
+      "type": "string"
+    },
+    "second_chapter_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Second Chapter Sha256",
+      "type": "string"
+    },
+    "first_release_chapter_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "First Release Chapter File"
+    },
+    "first_release_chapter_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "First Release Chapter Sha256"
+    },
+    "provider_contacted": {
+      "default": false,
+      "title": "Provider Contacted",
+      "type": "boolean"
+    },
+    "literary_judgement": {
+      "default": false,
+      "title": "Literary Judgement",
+      "type": "boolean"
+    },
+    "chunks": {
+      "items": {
+        "$ref": "#/$defs/ComparedChunk"
+      },
+      "title": "Chunks",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "comparison_engine_version",
+    "chapter_id",
+    "first_run_id",
+    "second_run_id",
+    "snapshot_id",
+    "same_snapshot",
+    "first_chapter_sha256",
+    "second_chapter_sha256",
+    "created_at"
+  ],
+  "title": "TranslationComparisonReport",
+  "type": "object"
+}

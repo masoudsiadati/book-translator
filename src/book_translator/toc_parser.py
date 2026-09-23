@@ -21,7 +21,9 @@ class RawTocEntry:
 
 
 _CHAPTER_RE = re.compile(r"^chapter\s+(?P<number>\d+)\s+(?P<remainder>\S.*)$", re.IGNORECASE)
-_PROLOGUE_RE = re.compile(r"^prologue\s+(?P<remainder>\S.*)$", re.IGNORECASE)
+_NUMBERED_TITLE_RE = re.compile(r"^(?P<number>\d+)\s+(?P<remainder>\S.*)$")
+_PROLOGUE_RE = re.compile(r"^prologue(?:\s*:\s*|\s+)(?P<remainder>\S.*)$", re.IGNORECASE)
+_EPILOGUE_RE = re.compile(r"^epilogue\s*:\s*(?P<remainder>\S.*)$", re.IGNORECASE)
 _APPENDIX_RE = re.compile(r"^appendix(?:\s+[A-Za-z0-9]+)?$", re.IGNORECASE)
 _GLOSSARY_RE = re.compile(r"^glossary$", re.IGNORECASE)
 
@@ -80,10 +82,12 @@ def normalize_toc_entries(raw_entries: list[RawTocEntry], page_count: int) -> li
     for index, raw in enumerate(raw_entries):
         source_title = str(raw.title).strip()
         parsed_title = _collapsed(source_title)
-        chapter = _CHAPTER_RE.fullmatch(parsed_title)
+        chapter = _CHAPTER_RE.fullmatch(parsed_title) or _NUMBERED_TITLE_RE.fullmatch(parsed_title)
         prologue = _PROLOGUE_RE.fullmatch(parsed_title)
+        epilogue = _EPILOGUE_RE.fullmatch(parsed_title)
         chapter_parts = _symbol_and_title(chapter.group("remainder")) if chapter else None
         prologue_parts = _symbol_and_title(prologue.group("remainder")) if prologue else None
+        epilogue_parts = _symbol_and_title(epilogue.group("remainder")) if epilogue else None
 
         number: int | None = None
         symbol: str | None = None
@@ -105,11 +109,18 @@ def normalize_toc_entries(raw_entries: list[RawTocEntry], page_count: int) -> li
             entry_id = "prologue"
             symbol, title_en = prologue_parts
             seen_narrative = True
+        elif epilogue and epilogue_parts is not None:
+            kind = TocKind.EPILOGUE
+            entry_id = "epilogue"
+            symbol, title_en = epilogue_parts
+            seen_narrative = True
         elif _APPENDIX_RE.fullmatch(parsed_title) or _GLOSSARY_RE.fullmatch(parsed_title):
             kind = TocKind.APPENDIX
             counters[kind] += 1
             entry_id = f"appendix-{counters[kind]:03d}"
-        elif not seen_narrative and not re.match(r"^(?:chapter|prologue)\b", parsed_title, re.I):
+        elif not seen_narrative and not re.match(
+            r"^(?:chapter|prologue|epilogue)\b", parsed_title, re.I
+        ):
             kind = TocKind.FRONT_MATTER
             counters[kind] += 1
             entry_id = f"front-matter-{counters[kind]:03d}"

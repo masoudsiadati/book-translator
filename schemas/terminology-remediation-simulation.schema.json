@@ -1,0 +1,402 @@
+{
+  "$defs": {
+    "TerminologyLookupChangeKind": {
+      "enum": [
+        "intended_correction",
+        "equivalent_preserved",
+        "unintended_regression"
+      ],
+      "title": "TerminologyLookupChangeKind",
+      "type": "string"
+    },
+    "TerminologyLookupComparison": {
+      "additionalProperties": false,
+      "description": "One read-only before/after canonical lookup for an affected source form.",
+      "properties": {
+        "source_form": {
+          "minLength": 1,
+          "title": "Source Form",
+          "type": "string"
+        },
+        "before_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Before Target"
+        },
+        "after_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "After Target"
+        },
+        "change_kind": {
+          "$ref": "#/$defs/TerminologyLookupChangeKind"
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "pattern": "^rmo-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operation Id"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_form",
+        "change_kind",
+        "detail"
+      ],
+      "title": "TerminologyLookupComparison",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The result of applying a plan to an isolated registry copy.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "plan_id": {
+      "pattern": "^trp-[0-9a-f]{24}$",
+      "title": "Plan Id",
+      "type": "string"
+    },
+    "engine_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "dry_run": {
+      "const": true,
+      "default": true,
+      "title": "Dry Run",
+      "type": "boolean"
+    },
+    "source_registry_semantic_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Registry Semantic Sha256",
+      "type": "string"
+    },
+    "source_registry_raw_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Registry Raw Sha256",
+      "type": "string"
+    },
+    "simulated_registry_semantic_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Simulated Registry Semantic Sha256",
+      "type": "string"
+    },
+    "simulated_registry_raw_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Simulated Registry Raw Sha256",
+      "type": "string"
+    },
+    "real_registry_raw_sha256_after": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Real Registry Raw Sha256 After",
+      "type": "string"
+    },
+    "real_registry_unchanged": {
+      "title": "Real Registry Unchanged",
+      "type": "boolean"
+    },
+    "decisions_before": {
+      "minimum": 0,
+      "title": "Decisions Before",
+      "type": "integer"
+    },
+    "decisions_after": {
+      "minimum": 0,
+      "title": "Decisions After",
+      "type": "integer"
+    },
+    "candidates_before": {
+      "minimum": 0,
+      "title": "Candidates Before",
+      "type": "integer"
+    },
+    "candidates_after": {
+      "minimum": 0,
+      "title": "Candidates After",
+      "type": "integer"
+    },
+    "applied_operation_count": {
+      "minimum": 0,
+      "title": "Applied Operation Count",
+      "type": "integer"
+    },
+    "skipped_unresolved_count": {
+      "minimum": 0,
+      "title": "Skipped Unresolved Count",
+      "type": "integer"
+    },
+    "decisions_retired": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Decisions Retired",
+      "type": "integer"
+    },
+    "candidates_rejected": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Candidates Rejected",
+      "type": "integer"
+    },
+    "enforcement_changes_applied": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Enforcement Changes Applied",
+      "type": "integer"
+    },
+    "target_corrections_applied": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Target Corrections Applied",
+      "type": "integer"
+    },
+    "question_requests_recorded": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Question Requests Recorded",
+      "type": "integer"
+    },
+    "exact_enforcement_findings_before": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Exact Enforcement Findings Before",
+      "type": "integer"
+    },
+    "exact_enforcement_findings_after": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Exact Enforcement Findings After",
+      "type": "integer"
+    },
+    "retired_source_forms_resolved_after": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "title": "Retired Source Forms Resolved After",
+      "type": "object"
+    },
+    "registry_valid_after": {
+      "title": "Registry Valid After",
+      "type": "boolean"
+    },
+    "registry_validation_errors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Registry Validation Errors",
+      "type": "array"
+    },
+    "invariant_violations_before": {
+      "minimum": 0,
+      "title": "Invariant Violations Before",
+      "type": "integer"
+    },
+    "invariant_violations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Invariant Violations",
+      "type": "array"
+    },
+    "invariant_violations_introduced": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Invariant Violations Introduced",
+      "type": "array"
+    },
+    "audit_findings_before": {
+      "minimum": 0,
+      "title": "Audit Findings Before",
+      "type": "integer"
+    },
+    "audit_findings_after": {
+      "minimum": 0,
+      "title": "Audit Findings After",
+      "type": "integer"
+    },
+    "blocking_findings_before": {
+      "minimum": 0,
+      "title": "Blocking Findings Before",
+      "type": "integer"
+    },
+    "blocking_findings_after": {
+      "minimum": 0,
+      "title": "Blocking Findings After",
+      "type": "integer"
+    },
+    "unaccounted_blocking_findings_after": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Unaccounted Blocking Findings After"
+    },
+    "accounted_blocking_source_terms": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Accounted Blocking Source Terms",
+      "type": "array"
+    },
+    "category_counts_after": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Category Counts After",
+      "type": "object"
+    },
+    "identity_mismatches_after": {
+      "minimum": 0,
+      "title": "Identity Mismatches After",
+      "type": "integer"
+    },
+    "lookup_comparisons": {
+      "items": {
+        "$ref": "#/$defs/TerminologyLookupComparison"
+      },
+      "title": "Lookup Comparisons",
+      "type": "array"
+    },
+    "lookup_regression_count": {
+      "minimum": 0,
+      "title": "Lookup Regression Count",
+      "type": "integer"
+    },
+    "protected_terms_unchanged": {
+      "additionalProperties": {
+        "type": "boolean"
+      },
+      "title": "Protected Terms Unchanged",
+      "type": "object"
+    },
+    "protected_terms_correct": {
+      "additionalProperties": {
+        "type": "boolean"
+      },
+      "title": "Protected Terms Correct",
+      "type": "object"
+    },
+    "protected_terms_before": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "title": "Protected Terms Before",
+      "type": "object"
+    },
+    "protected_terms_after": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "title": "Protected Terms After",
+      "type": "object"
+    },
+    "locked_decisions_preserved": {
+      "title": "Locked Decisions Preserved",
+      "type": "boolean"
+    },
+    "safe_to_apply": {
+      "title": "Safe To Apply",
+      "type": "boolean"
+    },
+    "blockers": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Blockers",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "plan_id",
+    "engine_version",
+    "source_registry_semantic_sha256",
+    "source_registry_raw_sha256",
+    "simulated_registry_semantic_sha256",
+    "simulated_registry_raw_sha256",
+    "real_registry_raw_sha256_after",
+    "real_registry_unchanged",
+    "decisions_before",
+    "decisions_after",
+    "candidates_before",
+    "candidates_after",
+    "applied_operation_count",
+    "skipped_unresolved_count",
+    "registry_valid_after",
+    "invariant_violations_before",
+    "audit_findings_before",
+    "audit_findings_after",
+    "blocking_findings_before",
+    "blocking_findings_after",
+    "identity_mismatches_after",
+    "lookup_regression_count",
+    "locked_decisions_preserved",
+    "safe_to_apply",
+    "created_at"
+  ],
+  "title": "TerminologyRemediationSimulation",
+  "type": "object"
+}

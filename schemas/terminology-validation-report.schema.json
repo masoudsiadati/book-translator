@@ -1,0 +1,121 @@
+{
+  "$defs": {
+    "TerminologyEnforcement": {
+      "description": "What kind of target evidence proves a canonical decision was honored.\n\n``required`` answers whether a decision is in scope for QA at all; this answers the separate\nquestion of what counts as proof.  Collapsing the two forces every approved decision into\n\"the exact canonical string must appear\", which is correct for a name and wrong for a form the\ntarget language legitimately transforms.",
+      "enum": [
+        "exact",
+        "morphological",
+        "contextual",
+        "advisory"
+      ],
+      "title": "TerminologyEnforcement",
+      "type": "string"
+    },
+    "TerminologyFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
+        "source_term": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Term"
+        },
+        "enforcement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyEnforcement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "TerminologyFinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "valid": {
+      "title": "Valid",
+      "type": "boolean"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "translation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Translation Sha256",
+      "type": "string"
+    },
+    "checked_decisions": {
+      "minimum": 0,
+      "title": "Checked Decisions",
+      "type": "integer"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/TerminologyFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "valid",
+    "source_sha256",
+    "translation_sha256",
+    "checked_decisions"
+  ],
+  "title": "TerminologyValidationReport",
+  "type": "object"
+}

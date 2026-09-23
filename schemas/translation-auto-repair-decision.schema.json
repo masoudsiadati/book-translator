@@ -1,0 +1,259 @@
+{
+  "$defs": {
+    "AutoRepairFindingRecord": {
+      "additionalProperties": false,
+      "description": "One classified QA finding, without any translated content.",
+      "properties": {
+        "origin": {
+          "enum": [
+            "terminology",
+            "structural"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "classification": {
+          "$ref": "#/$defs/RepairFindingClass"
+        },
+        "blocking": {
+          "title": "Blocking",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "origin",
+        "code",
+        "severity",
+        "classification",
+        "blocking"
+      ],
+      "title": "AutoRepairFindingRecord",
+      "type": "object"
+    },
+    "AutoRepairVerdict": {
+      "description": "The policy's decision for one QA-rejected job.",
+      "enum": [
+        "repairable",
+        "not_rejected",
+        "refused",
+        "budget_exhausted",
+        "reevaluation_required"
+      ],
+      "title": "AutoRepairVerdict",
+      "type": "string"
+    },
+    "RepairFindingClass": {
+      "description": "What kind of remedy a single QA finding admits.\n\nThe classes are about the *remedy*, not the severity: a warning is never blocking, but it\nstill belongs to a class, because the same code can appear as an error once a QA engine\ntightens.",
+      "enum": [
+        "auto_repairable",
+        "reevaluation_candidate",
+        "non_repairable",
+        "operator_required"
+      ],
+      "title": "RepairFindingClass",
+      "type": "string"
+    },
+    "TranslationAcceptanceOrigin": {
+      "enum": [
+        "initial_qa",
+        "qa_reevaluation",
+        "reuse_qa",
+        "historical_reevaluation",
+        "structural_repair"
+      ],
+      "title": "TranslationAcceptanceOrigin",
+      "type": "string"
+    },
+    "TranslationRepairInitiator": {
+      "description": "Who decided that a repair attempt should be spent.",
+      "enum": [
+        "automatic",
+        "operator"
+      ],
+      "title": "TranslationRepairInitiator",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable authorization for exactly one automatic repair attempt.\n\nOnly an authorization is ever persisted. The outcome is deliberately not copied here: the\nattempt and the acceptance sidecar for the same attempt number already hold it, and\nduplicating evidence is how evidence starts disagreeing with itself.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "auto_repair_engine_version": {
+      "title": "Auto Repair Engine Version",
+      "type": "string"
+    },
+    "auto_repair_policy_version": {
+      "title": "Auto Repair Policy Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "job_id": {
+      "title": "Job Id",
+      "type": "string"
+    },
+    "initiator": {
+      "$ref": "#/$defs/TranslationRepairInitiator"
+    },
+    "verdict": {
+      "$ref": "#/$defs/AutoRepairVerdict"
+    },
+    "repaired_from_attempt": {
+      "minimum": 1,
+      "title": "Repaired From Attempt",
+      "type": "integer"
+    },
+    "repair_attempt_number": {
+      "minimum": 2,
+      "title": "Repair Attempt Number",
+      "type": "integer"
+    },
+    "repair_attempts_used": {
+      "minimum": 0,
+      "title": "Repair Attempts Used",
+      "type": "integer"
+    },
+    "max_repair_attempts": {
+      "minimum": 1,
+      "title": "Max Repair Attempts",
+      "type": "integer"
+    },
+    "provider_attempts_used": {
+      "minimum": 1,
+      "title": "Provider Attempts Used",
+      "type": "integer"
+    },
+    "max_provider_attempts": {
+      "minimum": 1,
+      "title": "Max Provider Attempts",
+      "type": "integer"
+    },
+    "remaining_repair_attempts": {
+      "minimum": 1,
+      "title": "Remaining Repair Attempts",
+      "type": "integer"
+    },
+    "rejection_origin": {
+      "$ref": "#/$defs/TranslationAcceptanceOrigin"
+    },
+    "rejection_evidence_file": {
+      "format": "path",
+      "title": "Rejection Evidence File",
+      "type": "string"
+    },
+    "rejection_evidence_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Rejection Evidence Sha256",
+      "type": "string"
+    },
+    "attempt_file": {
+      "format": "path",
+      "title": "Attempt File",
+      "type": "string"
+    },
+    "attempt_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Attempt Sha256",
+      "type": "string"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "rejected_translation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Rejected Translation Sha256",
+      "type": "string"
+    },
+    "terminology_qa_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Qa Version"
+    },
+    "structural_qa_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Structural Qa Version"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/AutoRepairFindingRecord"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "triggering_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Triggering Codes",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "auto_repair_engine_version",
+    "auto_repair_policy_version",
+    "run_id",
+    "job_id",
+    "initiator",
+    "verdict",
+    "repaired_from_attempt",
+    "repair_attempt_number",
+    "repair_attempts_used",
+    "max_repair_attempts",
+    "provider_attempts_used",
+    "max_provider_attempts",
+    "remaining_repair_attempts",
+    "rejection_origin",
+    "rejection_evidence_file",
+    "rejection_evidence_sha256",
+    "attempt_file",
+    "attempt_sha256",
+    "source_sha256",
+    "rejected_translation_sha256",
+    "created_at"
+  ],
+  "title": "TranslationAutoRepairDecision",
+  "type": "object"
+}

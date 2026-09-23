@@ -1,0 +1,466 @@
+{
+  "$defs": {
+    "ChapterTitleOrigin": {
+      "description": "Where one released Persian chapter title actually came from.",
+      "enum": [
+        "provider_translation",
+        "recorded_title",
+        "deduplicated",
+        "inherited_title",
+        "operator_override"
+      ],
+      "title": "ChapterTitleOrigin",
+      "type": "string"
+    },
+    "ChapterTitleProvenanceRecord": {
+      "additionalProperties": false,
+      "description": "The history of one released chapter title. Digests only — never prompts or responses.",
+      "properties": {
+        "chapter_id": {
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "chapter_sequence": {
+          "minimum": 1,
+          "title": "Chapter Sequence",
+          "type": "integer"
+        },
+        "title_en": {
+          "minLength": 1,
+          "title": "Title En",
+          "type": "string"
+        },
+        "title_fa": {
+          "minLength": 1,
+          "title": "Title Fa",
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "origin": {
+          "$ref": "#/$defs/ChapterTitleOrigin"
+        },
+        "provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider"
+        },
+        "provider_adapter_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Adapter Version"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "provider_response_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Response Id"
+        },
+        "request_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Sha256"
+        },
+        "snapshot_id": {
+          "minLength": 1,
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "terminology_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Terminology Sha256"
+        },
+        "terminology_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Terminology Version"
+        },
+        "enforced_terminology_decisions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Enforced Terminology Decisions",
+          "type": "array"
+        },
+        "qa_valid": {
+          "title": "Qa Valid",
+          "type": "boolean"
+        },
+        "qa_finding_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Qa Finding Codes",
+          "type": "array"
+        },
+        "translated_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Translated At"
+        },
+        "deduplicated_from_chapter_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deduplicated From Chapter Id"
+        },
+        "parent_artifact_id": {
+          "anyOf": [
+            {
+              "pattern": "^ct-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Artifact Id"
+        },
+        "superseded_title_fa": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Superseded Title Fa"
+        },
+        "superseded_translation_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Superseded Translation Sha256"
+        },
+        "override_reason": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Override Reason"
+        },
+        "decided_by": {
+          "anyOf": [
+            {
+              "const": "user",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decided By"
+        }
+      },
+      "required": [
+        "chapter_id",
+        "chapter_sequence",
+        "title_en",
+        "title_fa",
+        "source_sha256",
+        "translation_sha256",
+        "origin",
+        "snapshot_id",
+        "qa_valid"
+      ],
+      "title": "ChapterTitleProvenanceRecord",
+      "type": "object"
+    },
+    "ChapterTitleQAFinding": {
+      "additionalProperties": false,
+      "description": "One title QA finding. It names a chapter and a code, never a title's text.",
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "chapter_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Chapter Id"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "pattern": "^tc-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "ChapterTitleQAFinding",
+      "type": "object"
+    },
+    "ChapterTitleQAReport": {
+      "additionalProperties": false,
+      "description": "The provider-free verdict on one set of chapter titles.",
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "chapter_title_qa_version": {
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+          "title": "Chapter Title Qa Version",
+          "type": "string"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "provider_contacted": {
+          "const": false,
+          "default": false,
+          "title": "Provider Contacted",
+          "type": "boolean"
+        },
+        "checked_chapters": {
+          "minimum": 0,
+          "title": "Checked Chapters",
+          "type": "integer"
+        },
+        "checked_terminology_decisions": {
+          "minimum": 0,
+          "title": "Checked Terminology Decisions",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/ChapterTitleQAFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "chapter_title_qa_version",
+        "valid",
+        "checked_chapters",
+        "checked_terminology_decisions"
+      ],
+      "title": "ChapterTitleQAReport",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The complete history of one chapter-title artifact.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "chapter_title_engine_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Chapter Title Engine Version",
+      "type": "string"
+    },
+    "chapter_title_prompt_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Chapter Title Prompt Version",
+      "type": "string"
+    },
+    "artifact_id": {
+      "pattern": "^ct-[0-9a-f]{24}$",
+      "title": "Artifact Id",
+      "type": "string"
+    },
+    "book_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "source_translation_run": {
+      "anyOf": [
+        {
+          "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Translation Run"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "snapshot_manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Snapshot Manifest Sha256",
+      "type": "string"
+    },
+    "chapter_count": {
+      "minimum": 1,
+      "title": "Chapter Count",
+      "type": "integer"
+    },
+    "titles": {
+      "items": {
+        "$ref": "#/$defs/ChapterTitleProvenanceRecord"
+      },
+      "title": "Titles",
+      "type": "array"
+    },
+    "qa": {
+      "$ref": "#/$defs/ChapterTitleQAReport"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "chapter_title_engine_version",
+    "chapter_title_prompt_version",
+    "artifact_id",
+    "book_id",
+    "snapshot_id",
+    "snapshot_manifest_sha256",
+    "chapter_count",
+    "titles",
+    "qa",
+    "created_at"
+  ],
+  "title": "ChapterTitleProvenance",
+  "type": "object"
+}

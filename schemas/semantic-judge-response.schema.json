@@ -1,0 +1,144 @@
+{
+  "$defs": {
+    "SemanticFinding": {
+      "additionalProperties": false,
+      "description": "One fidelity defect the judge claims, with the evidence a repair stage would need.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/SemanticFindingCode"
+        },
+        "severity": {
+          "$ref": "#/$defs/SemanticSeverity"
+        },
+        "source_evidence": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Source Evidence",
+          "type": "string"
+        },
+        "explanation": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "source_evidence",
+        "explanation",
+        "confidence"
+      ],
+      "title": "SemanticFinding",
+      "type": "object"
+    },
+    "SemanticFindingCode": {
+      "description": "The closed vocabulary of fidelity defects the judge may report.\n\nIt is closed on purpose. An open vocabulary would let a provider invent a category nothing\ndownstream can classify, and the acceptance policy would then have to guess how serious an\nunknown code is. A code outside this set fails the response.",
+      "enum": [
+        "meaning_omitted",
+        "meaning_added",
+        "factual_change",
+        "action_changed",
+        "negation_changed",
+        "modality_changed",
+        "number_changed",
+        "entity_relation_changed",
+        "dialogue_content_changed",
+        "speaker_attribution_risk",
+        "temporal_relation_changed",
+        "causal_relation_changed"
+      ],
+      "title": "SemanticFindingCode",
+      "type": "string"
+    },
+    "SemanticParagraphVerdict": {
+      "additionalProperties": false,
+      "description": "The judge's answer for exactly one paragraph identity.",
+      "properties": {
+        "paragraph_id": {
+          "pattern": "^P\\d{4}$",
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "verdict": {
+          "$ref": "#/$defs/SemanticVerdict"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/SemanticFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "paragraph_id",
+        "verdict",
+        "confidence"
+      ],
+      "title": "SemanticParagraphVerdict",
+      "type": "object"
+    },
+    "SemanticSeverity": {
+      "description": "How much a defect costs a reader.",
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "title": "SemanticSeverity",
+      "type": "string"
+    },
+    "SemanticVerdict": {
+      "description": "What the judge concluded about one paragraph.",
+      "enum": [
+        "PASS",
+        "REVISE",
+        "INCONCLUSIVE"
+      ],
+      "title": "SemanticVerdict",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The complete structured answer to one judge request.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "judge_schema_version": {
+      "title": "Judge Schema Version",
+      "type": "string"
+    },
+    "verdicts": {
+      "items": {
+        "$ref": "#/$defs/SemanticParagraphVerdict"
+      },
+      "minItems": 1,
+      "title": "Verdicts",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "judge_schema_version",
+    "verdicts"
+  ],
+  "title": "SemanticJudgeResponse",
+  "type": "object"
+}

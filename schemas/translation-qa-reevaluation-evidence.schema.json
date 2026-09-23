@@ -1,0 +1,403 @@
+{
+  "$defs": {
+    "TerminologyEnforcement": {
+      "description": "What kind of target evidence proves a canonical decision was honored.\n\n``required`` answers whether a decision is in scope for QA at all; this answers the separate\nquestion of what counts as proof.  Collapsing the two forces every approved decision into\n\"the exact canonical string must appear\", which is correct for a name and wrong for a form the\ntarget language legitimately transforms.",
+      "enum": [
+        "exact",
+        "morphological",
+        "contextual",
+        "advisory"
+      ],
+      "title": "TerminologyEnforcement",
+      "type": "string"
+    },
+    "TerminologyFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
+        "source_term": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Term"
+        },
+        "enforcement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyEnforcement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "TerminologyFinding",
+      "type": "object"
+    },
+    "TerminologyValidationReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "checked_decisions": {
+          "minimum": 0,
+          "title": "Checked Decisions",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/TerminologyFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "valid",
+        "source_sha256",
+        "translation_sha256",
+        "checked_decisions"
+      ],
+      "title": "TerminologyValidationReport",
+      "type": "object"
+    },
+    "TranslationAcceptanceStatus": {
+      "enum": [
+        "accepted",
+        "qa_rejected"
+      ],
+      "title": "TranslationAcceptanceStatus",
+      "type": "string"
+    },
+    "TranslationQAFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "TranslationQAFinding",
+      "type": "object"
+    },
+    "TranslationQAReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "source_paragraph_count": {
+          "minimum": 0,
+          "title": "Source Paragraph Count",
+          "type": "integer"
+        },
+        "translation_paragraph_count": {
+          "minimum": 0,
+          "title": "Translation Paragraph Count",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/TranslationQAFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "valid",
+        "source_sha256",
+        "translation_sha256",
+        "source_paragraph_count",
+        "translation_paragraph_count"
+      ],
+      "title": "TranslationQAReport",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "reevaluation_engine_version": {
+      "title": "Reevaluation Engine Version",
+      "type": "string"
+    },
+    "terminology_qa_version": {
+      "title": "Terminology Qa Version",
+      "type": "string"
+    },
+    "structural_qa_version": {
+      "title": "Structural Qa Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "job_id": {
+      "title": "Job Id",
+      "type": "string"
+    },
+    "attempt_id": {
+      "title": "Attempt Id",
+      "type": "string"
+    },
+    "attempt_number": {
+      "minimum": 1,
+      "title": "Attempt Number",
+      "type": "integer"
+    },
+    "reevaluation_id": {
+      "pattern": "^qre-[0-9a-f]{24}$",
+      "title": "Reevaluation Id",
+      "type": "string"
+    },
+    "reevaluation_number": {
+      "minimum": 1,
+      "title": "Reevaluation Number",
+      "type": "integer"
+    },
+    "reevaluated_from_file": {
+      "format": "path",
+      "title": "Reevaluated From File",
+      "type": "string"
+    },
+    "reevaluated_from_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Reevaluated From Sha256",
+      "type": "string"
+    },
+    "attempt_file": {
+      "format": "path",
+      "title": "Attempt File",
+      "type": "string"
+    },
+    "attempt_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Attempt Sha256",
+      "type": "string"
+    },
+    "source_file": {
+      "format": "path",
+      "title": "Source File",
+      "type": "string"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "translation_file": {
+      "format": "path",
+      "title": "Translation File",
+      "type": "string"
+    },
+    "translation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Translation Sha256",
+      "type": "string"
+    },
+    "terminology_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology File"
+    },
+    "terminology_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Sha256"
+    },
+    "prompt_file": {
+      "format": "path",
+      "title": "Prompt File",
+      "type": "string"
+    },
+    "prompt_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Prompt Sha256",
+      "type": "string"
+    },
+    "style_file": {
+      "format": "path",
+      "title": "Style File",
+      "type": "string"
+    },
+    "style_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Style Sha256",
+      "type": "string"
+    },
+    "terminology_report": {
+      "$ref": "#/$defs/TerminologyValidationReport"
+    },
+    "structural_report": {
+      "$ref": "#/$defs/TranslationQAReport"
+    },
+    "previous_status": {
+      "$ref": "#/$defs/TranslationAcceptanceStatus"
+    },
+    "resulting_status": {
+      "$ref": "#/$defs/TranslationAcceptanceStatus"
+    },
+    "accepted": {
+      "title": "Accepted",
+      "type": "boolean"
+    },
+    "origin": {
+      "const": "qa_reevaluation",
+      "default": "qa_reevaluation",
+      "title": "Origin",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "reevaluation_engine_version",
+    "terminology_qa_version",
+    "structural_qa_version",
+    "run_id",
+    "job_id",
+    "attempt_id",
+    "attempt_number",
+    "reevaluation_id",
+    "reevaluation_number",
+    "reevaluated_from_file",
+    "reevaluated_from_sha256",
+    "attempt_file",
+    "attempt_sha256",
+    "source_file",
+    "source_sha256",
+    "translation_file",
+    "translation_sha256",
+    "prompt_file",
+    "prompt_sha256",
+    "style_file",
+    "style_sha256",
+    "terminology_report",
+    "structural_report",
+    "previous_status",
+    "resulting_status",
+    "accepted",
+    "created_at"
+  ],
+  "title": "TranslationQAReevaluationEvidence",
+  "type": "object"
+}

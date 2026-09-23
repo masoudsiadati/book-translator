@@ -1,0 +1,230 @@
+{
+  "$defs": {
+    "SourceAnomaly": {
+      "additionalProperties": false,
+      "properties": {
+        "anomaly_id": {
+          "pattern": "^sa-[0-9a-f]{24}$",
+          "title": "Anomaly Id",
+          "type": "string"
+        },
+        "book_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Book Id",
+          "type": "string"
+        },
+        "chapter_id": {
+          "pattern": "^(?:000-prologue|[0-9]{3}|999-epilogue)$",
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "page_from": {
+          "minimum": 1,
+          "title": "Page From",
+          "type": "integer"
+        },
+        "page_to": {
+          "minimum": 1,
+          "title": "Page To",
+          "type": "integer"
+        },
+        "source_location": {
+          "minLength": 1,
+          "title": "Source Location",
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/$defs/SourceAnomalyCategory"
+        },
+        "status": {
+          "$ref": "#/$defs/SourceAnomalyStatus"
+        },
+        "severity": {
+          "$ref": "#/$defs/SourceAnomalySeverity"
+        },
+        "blocking": {
+          "title": "Blocking",
+          "type": "boolean"
+        },
+        "original_text": {
+          "minLength": 1,
+          "title": "Original Text",
+          "type": "string"
+        },
+        "original_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Original Sha256",
+          "type": "string"
+        },
+        "source_file": {
+          "format": "path",
+          "title": "Source File",
+          "type": "string"
+        },
+        "source_file_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source File Sha256",
+          "type": "string"
+        },
+        "evidence": {
+          "$ref": "#/$defs/SourceAnomalyEvidence"
+        },
+        "operator_note": {
+          "title": "Operator Note",
+          "type": "string"
+        },
+        "resolution": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resolution"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "anomaly_id",
+        "book_id",
+        "chapter_id",
+        "page_from",
+        "page_to",
+        "source_location",
+        "category",
+        "status",
+        "severity",
+        "blocking",
+        "original_text",
+        "original_sha256",
+        "source_file",
+        "source_file_sha256",
+        "evidence",
+        "operator_note",
+        "created_at"
+      ],
+      "title": "SourceAnomaly",
+      "type": "object"
+    },
+    "SourceAnomalyCategory": {
+      "enum": [
+        "truncated_token",
+        "source_typo",
+        "missing_text",
+        "duplicated_text",
+        "garbled_text",
+        "layout_artifact",
+        "unknown"
+      ],
+      "title": "SourceAnomalyCategory",
+      "type": "string"
+    },
+    "SourceAnomalyEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "rendered_pdf_checked": {
+          "title": "Rendered Pdf Checked",
+          "type": "boolean"
+        },
+        "pdf_text_layer_matches": {
+          "title": "Pdf Text Layer Matches",
+          "type": "boolean"
+        },
+        "immutable_source_matches": {
+          "title": "Immutable Source Matches",
+          "type": "boolean"
+        },
+        "extraction_at_fault": {
+          "title": "Extraction At Fault",
+          "type": "boolean"
+        },
+        "replacement_known": {
+          "title": "Replacement Known",
+          "type": "boolean"
+        },
+        "evidence_files": {
+          "items": {
+            "format": "path",
+            "type": "string"
+          },
+          "title": "Evidence Files",
+          "type": "array"
+        },
+        "evidence_sha256": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Sha256",
+          "type": "array"
+        }
+      },
+      "required": [
+        "rendered_pdf_checked",
+        "pdf_text_layer_matches",
+        "immutable_source_matches",
+        "extraction_at_fault",
+        "replacement_known"
+      ],
+      "title": "SourceAnomalyEvidence",
+      "type": "object"
+    },
+    "SourceAnomalySeverity": {
+      "enum": [
+        "local",
+        "material",
+        "critical"
+      ],
+      "title": "SourceAnomalySeverity",
+      "type": "string"
+    },
+    "SourceAnomalyStatus": {
+      "enum": [
+        "confirmed_source_defect",
+        "suspected_source_defect",
+        "resolved_by_authoritative_source",
+        "accepted_as_source"
+      ],
+      "title": "SourceAnomalyStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "registry_kind": {
+      "const": "source_anomalies",
+      "default": "source_anomalies",
+      "title": "Registry Kind",
+      "type": "string"
+    },
+    "registry_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Registry Version",
+      "type": "string"
+    },
+    "anomalies": {
+      "items": {
+        "$ref": "#/$defs/SourceAnomaly"
+      },
+      "title": "Anomalies",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "registry_version"
+  ],
+  "title": "SourceAnomalyRegistry",
+  "type": "object"
+}

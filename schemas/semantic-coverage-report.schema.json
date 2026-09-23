@@ -1,0 +1,216 @@
+{
+  "additionalProperties": false,
+  "description": "The run-level summary of one semantic coverage evaluation.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "judge_engine_version": {
+      "title": "Judge Engine Version",
+      "type": "string"
+    },
+    "judge_prompt_version": {
+      "title": "Judge Prompt Version",
+      "type": "string"
+    },
+    "judge_schema_version": {
+      "title": "Judge Schema Version",
+      "type": "string"
+    },
+    "policy_version": {
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "evaluation_number": {
+      "minimum": 1,
+      "title": "Evaluation Number",
+      "type": "integer"
+    },
+    "request_identity_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Request Identity Sha256",
+      "type": "string"
+    },
+    "provider": {
+      "minLength": 1,
+      "title": "Provider",
+      "type": "string"
+    },
+    "adapter_version": {
+      "minLength": 1,
+      "title": "Adapter Version",
+      "type": "string"
+    },
+    "model_requested": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Requested"
+    },
+    "models_returned": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Models Returned",
+      "type": "array"
+    },
+    "batch_size": {
+      "minimum": 1,
+      "title": "Batch Size",
+      "type": "integer"
+    },
+    "repetitions": {
+      "minimum": 1,
+      "title": "Repetitions",
+      "type": "integer"
+    },
+    "mutated_acceptance": {
+      "const": false,
+      "default": false,
+      "title": "Mutated Acceptance",
+      "type": "boolean"
+    },
+    "chunks_selected": {
+      "minimum": 0,
+      "title": "Chunks Selected",
+      "type": "integer"
+    },
+    "chunks_judged": {
+      "minimum": 0,
+      "title": "Chunks Judged",
+      "type": "integer"
+    },
+    "chunks_skipped": {
+      "minimum": 0,
+      "title": "Chunks Skipped",
+      "type": "integer"
+    },
+    "paragraphs_judged": {
+      "minimum": 0,
+      "title": "Paragraphs Judged",
+      "type": "integer"
+    },
+    "judge_calls": {
+      "minimum": 0,
+      "title": "Judge Calls",
+      "type": "integer"
+    },
+    "failed_calls": {
+      "minimum": 0,
+      "title": "Failed Calls",
+      "type": "integer"
+    },
+    "pass_count": {
+      "minimum": 0,
+      "title": "Pass Count",
+      "type": "integer"
+    },
+    "revise_count": {
+      "minimum": 0,
+      "title": "Revise Count",
+      "type": "integer"
+    },
+    "inconclusive_count": {
+      "minimum": 0,
+      "title": "Inconclusive Count",
+      "type": "integer"
+    },
+    "input_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Input Tokens"
+    },
+    "output_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Output Tokens"
+    },
+    "finding_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Finding Counts",
+      "type": "object"
+    },
+    "severity_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Severity Counts",
+      "type": "object"
+    },
+    "skipped": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Skipped",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "judge_engine_version",
+    "judge_prompt_version",
+    "judge_schema_version",
+    "policy_version",
+    "run_id",
+    "snapshot_id",
+    "evaluation_number",
+    "request_identity_sha256",
+    "provider",
+    "adapter_version",
+    "batch_size",
+    "repetitions",
+    "chunks_selected",
+    "chunks_judged",
+    "chunks_skipped",
+    "paragraphs_judged",
+    "judge_calls",
+    "failed_calls",
+    "pass_count",
+    "revise_count",
+    "inconclusive_count",
+    "created_at"
+  ],
+  "title": "SemanticCoverageReport",
+  "type": "object"
+}

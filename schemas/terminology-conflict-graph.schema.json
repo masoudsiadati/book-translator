@@ -1,0 +1,299 @@
+{
+  "$defs": {
+    "ConflictComponent": {
+      "additionalProperties": false,
+      "description": "One connected terminology family that must be resolved as a whole.",
+      "properties": {
+        "component_id": {
+          "pattern": "^tcc-[0-9a-f]{24}$",
+          "title": "Component Id",
+          "type": "string"
+        },
+        "node_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Node Ids",
+          "type": "array"
+        },
+        "decision_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Decision Ids",
+          "type": "array"
+        },
+        "candidate_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Candidate Ids",
+          "type": "array"
+        },
+        "source_terms": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Terms",
+          "type": "array"
+        },
+        "relations": {
+          "items": {
+            "$ref": "#/$defs/ConflictRelation"
+          },
+          "title": "Relations",
+          "type": "array"
+        },
+        "unresolved_operation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Operation Ids",
+          "type": "array"
+        },
+        "unresolved_finding_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Finding Ids",
+          "type": "array"
+        },
+        "size": {
+          "minimum": 1,
+          "title": "Size",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "component_id",
+        "node_ids",
+        "size"
+      ],
+      "title": "ConflictComponent",
+      "type": "object"
+    },
+    "ConflictEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "relation": {
+          "$ref": "#/$defs/ConflictRelation"
+        },
+        "source_node_id": {
+          "minLength": 1,
+          "title": "Source Node Id",
+          "type": "string"
+        },
+        "target_node_id": {
+          "minLength": 1,
+          "title": "Target Node Id",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "relation",
+        "source_node_id",
+        "target_node_id",
+        "detail"
+      ],
+      "title": "ConflictEdge",
+      "type": "object"
+    },
+    "ConflictNode": {
+      "additionalProperties": false,
+      "properties": {
+        "node_id": {
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ConflictNodeKind"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^td-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Id"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "target_term": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Term"
+        },
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "competing_variants": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Competing Variants",
+          "type": "array"
+        },
+        "decision_source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Source"
+        },
+        "locked": {
+          "default": false,
+          "title": "Locked",
+          "type": "boolean"
+        },
+        "candidate_status": {
+          "minLength": 1,
+          "title": "Candidate Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "kind",
+        "candidate_id",
+        "source_term",
+        "candidate_status"
+      ],
+      "title": "ConflictNode",
+      "type": "object"
+    },
+    "ConflictNodeKind": {
+      "enum": [
+        "decision",
+        "candidate_without_decision"
+      ],
+      "title": "ConflictNodeKind",
+      "type": "string"
+    },
+    "ConflictRelation": {
+      "description": "Why two terminology records belong to the same conflict component.",
+      "enum": [
+        "exact_canonical_conflict",
+        "alias_relationship",
+        "canonical_subterm",
+        "competing_variant",
+        "normalization_identity",
+        "shared_target"
+      ],
+      "title": "ConflictRelation",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "graph_id": {
+      "pattern": "^tcg-[0-9a-f]{24}$",
+      "title": "Graph Id",
+      "type": "string"
+    },
+    "registry_semantic_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Registry Semantic Sha256",
+      "type": "string"
+    },
+    "plan_id": {
+      "pattern": "^trp-[0-9a-f]{24}$",
+      "title": "Plan Id",
+      "type": "string"
+    },
+    "nodes": {
+      "items": {
+        "$ref": "#/$defs/ConflictNode"
+      },
+      "title": "Nodes",
+      "type": "array"
+    },
+    "edges": {
+      "items": {
+        "$ref": "#/$defs/ConflictEdge"
+      },
+      "title": "Edges",
+      "type": "array"
+    },
+    "components": {
+      "items": {
+        "$ref": "#/$defs/ConflictComponent"
+      },
+      "title": "Components",
+      "type": "array"
+    },
+    "unresolved_operation_count": {
+      "minimum": 0,
+      "title": "Unresolved Operation Count",
+      "type": "integer"
+    },
+    "covered_operation_count": {
+      "minimum": 0,
+      "title": "Covered Operation Count",
+      "type": "integer"
+    },
+    "component_count": {
+      "minimum": 0,
+      "title": "Component Count",
+      "type": "integer"
+    },
+    "component_size_histogram": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Component Size Histogram",
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "graph_id",
+    "registry_semantic_sha256",
+    "plan_id",
+    "unresolved_operation_count",
+    "covered_operation_count",
+    "component_count"
+  ],
+  "title": "ConflictGraph",
+  "type": "object"
+}

@@ -1,0 +1,325 @@
+{
+  "$defs": {
+    "EvidenceProvenance": {
+      "description": "Where the evidence behind a question or its resolution came from.",
+      "enum": [
+        "current_book",
+        "web",
+        "other_volumes",
+        "model_prior_knowledge",
+        "user"
+      ],
+      "title": "EvidenceProvenance",
+      "type": "string"
+    },
+    "EvidenceStatus": {
+      "description": "Whether the corpus evidence gathered so far can decide the question.",
+      "enum": [
+        "not_gathered",
+        "inconclusive",
+        "sufficient",
+        "contradictory"
+      ],
+      "title": "EvidenceStatus",
+      "type": "string"
+    },
+    "OpenQuestion": {
+      "additionalProperties": false,
+      "description": "One durable, deterministically identified terminology question.",
+      "properties": {
+        "question_id": {
+          "pattern": "^tq-[0-9a-f]{24}$",
+          "title": "Question Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^td-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Id"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "provisional_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provisional Target"
+        },
+        "category": {
+          "$ref": "#/$defs/QuestionCategory"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/QuestionStatus",
+          "default": "open"
+        },
+        "blocking": {
+          "default": false,
+          "title": "Blocking",
+          "type": "boolean"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus",
+          "default": "not_gathered"
+        },
+        "chapters": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Chapters",
+          "type": "array"
+        },
+        "chunks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Chunks",
+          "type": "array"
+        },
+        "research": {
+          "$ref": "#/$defs/QuestionResearch"
+        },
+        "provenance": {
+          "$ref": "#/$defs/EvidenceProvenance",
+          "default": "current_book"
+        },
+        "evidence_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Sha256"
+        },
+        "resolution": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuestionResolution"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "superseded_by": {
+          "anyOf": [
+            {
+              "pattern": "^tq-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Superseded By"
+        }
+      },
+      "required": [
+        "question_id",
+        "candidate_id",
+        "source_term",
+        "category",
+        "question",
+        "created_at"
+      ],
+      "title": "OpenQuestion",
+      "type": "object"
+    },
+    "QuestionCategory": {
+      "description": "A general, term-agnostic classification of what is unresolved.",
+      "enum": [
+        "kinship_side",
+        "gender",
+        "identity",
+        "title_meaning",
+        "transliteration",
+        "world_term_semantics",
+        "proper_noun_classification",
+        "other"
+      ],
+      "title": "QuestionCategory",
+      "type": "string"
+    },
+    "QuestionResearch": {
+      "additionalProperties": false,
+      "description": "The research ladder for one question: current book, then web, then other volumes.",
+      "properties": {
+        "current_book": {
+          "$ref": "#/$defs/ResearchState",
+          "default": "not_checked"
+        },
+        "web": {
+          "$ref": "#/$defs/ResearchState",
+          "default": "not_checked"
+        },
+        "other_volumes": {
+          "$ref": "#/$defs/ResearchState",
+          "default": "not_checked"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        }
+      },
+      "title": "QuestionResearch",
+      "type": "object"
+    },
+    "QuestionResolution": {
+      "additionalProperties": false,
+      "description": "The eventual answer, recorded only when a question actually closes.",
+      "properties": {
+        "resolved_target": {
+          "minLength": 1,
+          "title": "Resolved Target",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/EvidenceProvenance"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "evidence_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Sha256"
+        },
+        "resolved_at": {
+          "format": "date-time",
+          "title": "Resolved At",
+          "type": "string"
+        },
+        "supersedes_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes Target"
+        }
+      },
+      "required": [
+        "resolved_target",
+        "provenance",
+        "rationale",
+        "resolved_at"
+      ],
+      "title": "QuestionResolution",
+      "type": "object"
+    },
+    "QuestionStatus": {
+      "enum": [
+        "open",
+        "resolved",
+        "superseded"
+      ],
+      "title": "QuestionStatus",
+      "type": "string"
+    },
+    "ResearchState": {
+      "description": "How far one research channel has been taken for a question.\n\n``unavailable`` records that a channel could not be consulted (no network, no other volumes)\nrather than silently leaving it ``not_checked``; readiness must never require it.",
+      "enum": [
+        "not_checked",
+        "checked_inconclusive",
+        "checked_resolved",
+        "unavailable"
+      ],
+      "title": "ResearchState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The committed, deterministically ordered set of terminology questions.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "registry_kind": {
+      "const": "terminology_questions",
+      "default": "terminology_questions",
+      "title": "Registry Kind",
+      "type": "string"
+    },
+    "version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Version",
+      "type": "string"
+    },
+    "book_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/OpenQuestion"
+      },
+      "title": "Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "version",
+    "book_id"
+  ],
+  "title": "OpenQuestionRegistry",
+  "type": "object"
+}

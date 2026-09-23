@@ -1,0 +1,663 @@
+{
+  "$defs": {
+    "ReferenceCorpusIdentity": {
+      "additionalProperties": false,
+      "description": "The verified identity of one external corpus at retrieval time.",
+      "properties": {
+        "corpus_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Corpus Id",
+          "type": "string"
+        },
+        "book_number": {
+          "minimum": 1,
+          "title": "Book Number",
+          "type": "integer"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "corpus_version": {
+          "minLength": 1,
+          "title": "Corpus Version",
+          "type": "string"
+        },
+        "freeze_manifest_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Freeze Manifest Sha256"
+        }
+      },
+      "required": [
+        "corpus_id",
+        "book_number",
+        "label",
+        "path",
+        "sha256",
+        "corpus_version"
+      ],
+      "title": "ReferenceCorpusIdentity",
+      "type": "object"
+    },
+    "SnapshotBookReference": {
+      "additionalProperties": false,
+      "properties": {
+        "book_id": {
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Book Id",
+          "type": "string"
+        },
+        "title_en": {
+          "title": "Title En",
+          "type": "string"
+        },
+        "title_fa": {
+          "title": "Title Fa",
+          "type": "string"
+        },
+        "author": {
+          "default": "",
+          "title": "Author",
+          "type": "string"
+        },
+        "source_language": {
+          "minLength": 2,
+          "title": "Source Language",
+          "type": "string"
+        },
+        "target_language": {
+          "minLength": 2,
+          "title": "Target Language",
+          "type": "string"
+        },
+        "series_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Name"
+        },
+        "series_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Index"
+        },
+        "source_pdf": {
+          "format": "path",
+          "title": "Source Pdf",
+          "type": "string"
+        },
+        "source_pdf_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Pdf Sha256",
+          "type": "string"
+        },
+        "metadata_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Metadata File"
+        },
+        "metadata_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Metadata Sha256"
+        },
+        "metadata_version": {
+          "anyOf": [
+            {
+              "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Metadata Version"
+        },
+        "frozen_metadata_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frozen Metadata File"
+        },
+        "toc_file": {
+          "format": "path",
+          "title": "Toc File",
+          "type": "string"
+        },
+        "toc_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Toc Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "book_id",
+        "title_en",
+        "title_fa",
+        "source_language",
+        "target_language",
+        "source_pdf",
+        "source_pdf_sha256",
+        "toc_file",
+        "toc_sha256"
+      ],
+      "title": "SnapshotBookReference",
+      "type": "object"
+    },
+    "SnapshotChapterReference": {
+      "additionalProperties": false,
+      "properties": {
+        "chapter_id": {
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/TocKind"
+        },
+        "number": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Number"
+        },
+        "title_en": {
+          "title": "Title En",
+          "type": "string"
+        },
+        "title_fa": {
+          "title": "Title Fa",
+          "type": "string"
+        },
+        "cleaned_file": {
+          "format": "path",
+          "title": "Cleaned File",
+          "type": "string"
+        },
+        "cleaned_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Cleaned Sha256",
+          "type": "string"
+        },
+        "normalization_version": {
+          "minLength": 1,
+          "title": "Normalization Version",
+          "type": "string"
+        },
+        "chunk_engine_version": {
+          "minLength": 1,
+          "title": "Chunk Engine Version",
+          "type": "string"
+        },
+        "chunk_count": {
+          "minimum": 1,
+          "title": "Chunk Count",
+          "type": "integer"
+        },
+        "chunks": {
+          "items": {
+            "$ref": "#/$defs/SnapshotChunkReference"
+          },
+          "title": "Chunks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "chapter_id",
+        "kind",
+        "title_en",
+        "title_fa",
+        "cleaned_file",
+        "cleaned_sha256",
+        "normalization_version",
+        "chunk_engine_version",
+        "chunk_count",
+        "chunks"
+      ],
+      "title": "SnapshotChapterReference",
+      "type": "object"
+    },
+    "SnapshotChunkReference": {
+      "additionalProperties": false,
+      "properties": {
+        "chunk_id": {
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "chapter_id": {
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "source_file": {
+          "format": "path",
+          "title": "Source File",
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "source_word_count": {
+          "minimum": 0,
+          "title": "Source Word Count",
+          "type": "integer"
+        },
+        "source_paragraph_count": {
+          "minimum": 0,
+          "title": "Source Paragraph Count",
+          "type": "integer"
+        },
+        "context_file": {
+          "format": "path",
+          "title": "Context File",
+          "type": "string"
+        },
+        "context_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Context Sha256",
+          "type": "string"
+        },
+        "context_word_count": {
+          "minimum": 0,
+          "title": "Context Word Count",
+          "type": "integer"
+        },
+        "oversize": {
+          "title": "Oversize",
+          "type": "boolean"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "chunk_id",
+        "chapter_id",
+        "sequence",
+        "source_file",
+        "source_sha256",
+        "source_word_count",
+        "source_paragraph_count",
+        "context_file",
+        "context_sha256",
+        "context_word_count",
+        "oversize"
+      ],
+      "title": "SnapshotChunkReference",
+      "type": "object"
+    },
+    "SnapshotReferenceCorpusReference": {
+      "additionalProperties": false,
+      "description": "The frozen reference-corpus configuration plus the verified external corpus identities.\n\nThe corpora themselves are external frozen evidence and are never copied into the workspace;\nwhat the snapshot pins is their identity, so lineage can prove which bytes were retrieved\nfrom without owning them.",
+      "properties": {
+        "resource_kind": {
+          "$ref": "#/$defs/SnapshotResourceKind"
+        },
+        "file": {
+          "format": "path",
+          "title": "File",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+          "title": "Version",
+          "type": "string"
+        },
+        "frozen_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frozen File"
+        },
+        "retriever_path": {
+          "minLength": 1,
+          "title": "Retriever Path",
+          "type": "string"
+        },
+        "retriever_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Retriever Sha256",
+          "type": "string"
+        },
+        "retriever_schema_version": {
+          "minLength": 1,
+          "title": "Retriever Schema Version",
+          "type": "string"
+        },
+        "corpora": {
+          "items": {
+            "$ref": "#/$defs/ReferenceCorpusIdentity"
+          },
+          "minItems": 1,
+          "title": "Corpora",
+          "type": "array"
+        }
+      },
+      "required": [
+        "resource_kind",
+        "file",
+        "sha256",
+        "version",
+        "retriever_path",
+        "retriever_sha256",
+        "retriever_schema_version",
+        "corpora"
+      ],
+      "title": "SnapshotReferenceCorpusReference",
+      "type": "object"
+    },
+    "SnapshotResourceKind": {
+      "enum": [
+        "prompt",
+        "glossary",
+        "style_guide",
+        "terminology",
+        "source_anomalies",
+        "open_questions",
+        "series_terminology",
+        "reference_corpus",
+        "reference_context",
+        "terminology_exemptions"
+      ],
+      "title": "SnapshotResourceKind",
+      "type": "string"
+    },
+    "SnapshotResourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "resource_kind": {
+          "$ref": "#/$defs/SnapshotResourceKind"
+        },
+        "file": {
+          "format": "path",
+          "title": "File",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+          "title": "Version",
+          "type": "string"
+        },
+        "frozen_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frozen File"
+        }
+      },
+      "required": [
+        "resource_kind",
+        "file",
+        "sha256",
+        "version"
+      ],
+      "title": "SnapshotResourceReference",
+      "type": "object"
+    },
+    "TocKind": {
+      "enum": [
+        "front_matter",
+        "prologue",
+        "chapter",
+        "epilogue",
+        "appendix",
+        "unknown"
+      ],
+      "title": "TocKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot_kind": {
+      "const": "translation",
+      "default": "translation",
+      "title": "Snapshot Kind",
+      "type": "string"
+    },
+    "workflow": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Workflow",
+      "type": "string"
+    },
+    "selection_mode": {
+      "enum": [
+        "full",
+        "subset"
+      ],
+      "title": "Selection Mode",
+      "type": "string"
+    },
+    "book": {
+      "$ref": "#/$defs/SnapshotBookReference"
+    },
+    "chapters": {
+      "items": {
+        "$ref": "#/$defs/SnapshotChapterReference"
+      },
+      "title": "Chapters",
+      "type": "array"
+    },
+    "prompt": {
+      "$ref": "#/$defs/SnapshotResourceReference"
+    },
+    "glossary": {
+      "$ref": "#/$defs/SnapshotResourceReference"
+    },
+    "style_guide": {
+      "$ref": "#/$defs/SnapshotResourceReference"
+    },
+    "terminology": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SnapshotResourceReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "source_anomalies": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SnapshotResourceReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "open_questions": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SnapshotResourceReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "series_terminology": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SnapshotResourceReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "reference_corpus": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SnapshotReferenceCorpusReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "reference_context": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SnapshotResourceReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "terminology_context_contract_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Context Contract Version"
+    },
+    "terminology_exemptions": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SnapshotResourceReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "schema_version",
+    "workflow",
+    "selection_mode",
+    "book",
+    "chapters",
+    "prompt",
+    "glossary",
+    "style_guide"
+  ],
+  "title": "TranslationManifest",
+  "type": "object"
+}

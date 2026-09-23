@@ -1,0 +1,312 @@
+{
+  "$defs": {
+    "StructuralDefectClass": {
+      "description": "Why a source and its translation disagree about block structure.",
+      "enum": [
+        "none",
+        "blank_line_geometry",
+        "translation_line_split",
+        "translation_line_merge",
+        "line_count_divergence",
+        "content_divergence"
+      ],
+      "title": "StructuralDefectClass",
+      "type": "string"
+    },
+    "StructuralOperationKind": {
+      "description": "What one aligned group of lines says happened to the source lines it covers.",
+      "enum": [
+        "aligned",
+        "join_translation_lines",
+        "split_translation_line"
+      ],
+      "title": "StructuralOperationKind",
+      "type": "string"
+    },
+    "StructuralOperationRecord": {
+      "additionalProperties": false,
+      "description": "One non-identity correspondence, named precisely enough to re-derive by hand.",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/StructuralOperationKind"
+        },
+        "source_index": {
+          "minimum": 0,
+          "title": "Source Index",
+          "type": "integer"
+        },
+        "source_lines": {
+          "minimum": 1,
+          "title": "Source Lines",
+          "type": "integer"
+        },
+        "translation_index": {
+          "minimum": 0,
+          "title": "Translation Index",
+          "type": "integer"
+        },
+        "translation_lines": {
+          "minimum": 1,
+          "title": "Translation Lines",
+          "type": "integer"
+        },
+        "cost_milli": {
+          "minimum": 0,
+          "title": "Cost Milli",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "source_index",
+        "source_lines",
+        "translation_index",
+        "translation_lines",
+        "cost_milli"
+      ],
+      "title": "StructuralOperationRecord",
+      "type": "object"
+    },
+    "StructuralRepairDiagnosis": {
+      "additionalProperties": false,
+      "description": "The complete structural answer for one translation, before anything is changed.\n\nCosts and margins are recorded in thousandths as integers rather than as floats, because a\npersisted contract that has to round-trip byte-for-byte cannot depend on float formatting.",
+      "properties": {
+        "structural_repair_engine_version": {
+          "minLength": 1,
+          "title": "Structural Repair Engine Version",
+          "type": "string"
+        },
+        "defect_class": {
+          "$ref": "#/$defs/StructuralDefectClass"
+        },
+        "source_paragraphs": {
+          "minimum": 0,
+          "title": "Source Paragraphs",
+          "type": "integer"
+        },
+        "translation_paragraphs": {
+          "minimum": 0,
+          "title": "Translation Paragraphs",
+          "type": "integer"
+        },
+        "paragraph_delta": {
+          "title": "Paragraph Delta",
+          "type": "integer"
+        },
+        "source_lines": {
+          "minimum": 0,
+          "title": "Source Lines",
+          "type": "integer"
+        },
+        "translation_lines": {
+          "minimum": 0,
+          "title": "Translation Lines",
+          "type": "integer"
+        },
+        "line_delta": {
+          "title": "Line Delta",
+          "type": "integer"
+        },
+        "blank_line_artifact": {
+          "title": "Blank Line Artifact",
+          "type": "boolean"
+        },
+        "deterministic": {
+          "title": "Deterministic",
+          "type": "boolean"
+        },
+        "alignment_cost_milli": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alignment Cost Milli"
+        },
+        "alignment_margin_milli": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alignment Margin Milli"
+        },
+        "operations": {
+          "items": {
+            "$ref": "#/$defs/StructuralOperationRecord"
+          },
+          "title": "Operations",
+          "type": "array"
+        },
+        "refusals": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Refusals",
+          "type": "array"
+        }
+      },
+      "required": [
+        "structural_repair_engine_version",
+        "defect_class",
+        "source_paragraphs",
+        "translation_paragraphs",
+        "paragraph_delta",
+        "source_lines",
+        "translation_lines",
+        "line_delta",
+        "blank_line_artifact",
+        "deterministic"
+      ],
+      "title": "StructuralRepairDiagnosis",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An explicit, bounded, one-shot grant of extra provider attempts to one job.\n\nA job whose repair budget is exhausted is *finished* as far as ordinary policy is concerned,\nand that has to stay true by default: silently topping the budget up would make the bound\ndecorative. This record is the only way past it. It names the original bound it is widening,\nhow many attempts it grants, and the blocking findings that justified the grant, and it is\nrefused unless every one of those findings is mechanically repairable.\n\nIt never resets a counter. ``attempt_count`` and the immutable attempts stay exactly as they\nare; only the ceiling moves, and only once.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "repair_escalation_version": {
+      "minLength": 1,
+      "title": "Repair Escalation Version",
+      "type": "string"
+    },
+    "final_qa_resolution_policy_version": {
+      "minLength": 1,
+      "title": "Final Qa Resolution Policy Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "job_id": {
+      "minLength": 1,
+      "title": "Job Id",
+      "type": "string"
+    },
+    "escalation_number": {
+      "minimum": 1,
+      "title": "Escalation Number",
+      "type": "integer"
+    },
+    "original_max_attempts": {
+      "minimum": 1,
+      "title": "Original Max Attempts",
+      "type": "integer"
+    },
+    "granted_attempts": {
+      "minimum": 1,
+      "title": "Granted Attempts",
+      "type": "integer"
+    },
+    "resulting_max_attempts": {
+      "minimum": 2,
+      "title": "Resulting Max Attempts",
+      "type": "integer"
+    },
+    "provider_attempts_used": {
+      "minimum": 1,
+      "title": "Provider Attempts Used",
+      "type": "integer"
+    },
+    "repair_attempts_used": {
+      "minimum": 0,
+      "title": "Repair Attempts Used",
+      "type": "integer"
+    },
+    "triggering_codes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Triggering Codes",
+      "type": "array"
+    },
+    "rejection_evidence_file": {
+      "format": "path",
+      "title": "Rejection Evidence File",
+      "type": "string"
+    },
+    "rejection_evidence_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Rejection Evidence Sha256",
+      "type": "string"
+    },
+    "authorized_attempt_number": {
+      "minimum": 2,
+      "title": "Authorized Attempt Number",
+      "type": "integer"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "structural_diagnosis": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/StructuralRepairDiagnosis"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "deterministic_repair_available": {
+      "default": false,
+      "title": "Deterministic Repair Available",
+      "type": "boolean"
+    },
+    "provider_contacted": {
+      "const": false,
+      "default": false,
+      "title": "Provider Contacted",
+      "type": "boolean"
+    },
+    "authorized_by": {
+      "const": "operator",
+      "title": "Authorized By",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "repair_escalation_version",
+    "final_qa_resolution_policy_version",
+    "run_id",
+    "job_id",
+    "escalation_number",
+    "original_max_attempts",
+    "granted_attempts",
+    "resulting_max_attempts",
+    "provider_attempts_used",
+    "repair_attempts_used",
+    "rejection_evidence_file",
+    "rejection_evidence_sha256",
+    "authorized_attempt_number",
+    "reason",
+    "authorized_by",
+    "created_at"
+  ],
+  "title": "TranslationRepairEscalation",
+  "type": "object"
+}

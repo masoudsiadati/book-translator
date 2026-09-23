@@ -8,17 +8,61 @@ from pydantic import BaseModel, ValidationError
 
 from book_translator.hashing import sha256_file
 from book_translator.models import (
+    BOOK_METADATA_FIELDS,
     SCHEMA_VERSION,
+    BlindComparisonAnswerKey,
+    BlindComparisonArtifact,
+    BookIdentityMigration,
+    BookLiteraryProfile,
+    BookMetadataFieldProvenance,
+    BookMetadataProvenance,
     BookWorkspaceMetadata,
     ChapterMetadata,
     ChapterStatus,
+    ChapterTitleDocument,
+    ChapterTitleManifest,
+    ChapterTitleProvenance,
     ChunkMetadata,
     ChunkStatus,
+    ContinuityReviewResponse,
+    ExecutionReservationResolution,
     ExtractionSnapshot,
+    LiteraryChapterArtifact,
+    LiteraryCorrectionResponse,
+    LiteraryEditorResponse,
+    LiteraryRunArtifact,
+    LiterarySemanticEvidence,
+    PersianLiteraryStyleContract,
     PipelineRunStatus,
+    ReleaseLineageDocument,
+    ReleaseManifest,
+    ReleaseTranslationReport,
+    ReleaseVerificationReport,
+    SourceAnomalyRegistry,
+    TerminologyAnalysisRun,
+    TerminologyAnalysisValidationReport,
+    TerminologyApplicationResult,
+    TerminologyCandidateOutput,
+    TerminologyDiscoveryResponse,
+    TerminologyProposalResponse,
+    TerminologyRegistry,
+    TerminologyValidationReport,
     TocDocument,
     TocEntry,
     TocKind,
+    TranslationAttempt,
+    TranslationAttemptValidationReport,
+    TranslationJob,
+    TranslationManifest,
+    TranslationQAReevaluationEvidence,
+    TranslationQAReport,
+    TranslationQueueReport,
+    TranslationQueueValidation,
+    TranslationReuseEvidence,
+    TranslationRun,
+    TranslationSnapshot,
+    TranslationSnapshotValidationReport,
+    VersionedResourceMetadata,
 )
 from book_translator.models.snapshot import ChapterSnapshotHashes
 from book_translator.paths import ProjectPaths, chapter_directory_name, chunk_directory_name
@@ -26,6 +70,25 @@ from book_translator.status_transitions import can_transition_chapter, can_trans
 
 NOW = datetime(2026, 1, 2, 3, 4, tzinfo=UTC)
 HASH = "a" * 64
+
+_RESOLVED_TEST_FIELDS = {"author", "book_id", "source_language", "target_language", "title_en"}
+
+
+def _provenance() -> list[BookMetadataFieldProvenance]:
+    """Provenance covering every contract field; title_fa is resolved in these fixtures."""
+    resolved = _RESOLVED_TEST_FIELDS | {"title_fa"}
+    return [
+        BookMetadataFieldProvenance(
+            field=name,
+            provenance=(
+                BookMetadataProvenance.CONFIGURATION
+                if name in resolved
+                else BookMetadataProvenance.UNRESOLVED
+            ),
+            evidence="synthetic fixture",
+        )
+        for name in BOOK_METADATA_FIELDS
+    ]
 
 
 def test_canonical_directory_names() -> None:
@@ -63,6 +126,27 @@ def test_paths_are_deterministic_and_have_no_creation_side_effect(tmp_path: Path
         paths.chapter_chunking_report(42)
         == tmp_path / "workspace/chapters/042/chunking-report.yaml"
     )
+    assert paths.translation_execution_resolution("tr-0123456789ab-001", "001-002", 1) == (
+        tmp_path / "workspace/translation-runs/tr-0123456789ab-001/jobs/001-002/resolutions/001"
+    )
+    with pytest.raises(ValueError, match="attempt number"):
+        paths.translation_execution_resolution("tr-0123456789ab-001", "001-002", 0)
+    assert paths.chapter_title_artifacts == tmp_path / "workspace/resources/chapter-titles"
+    assert paths.chapter_title_artifact("ct-" + "a" * 24) == (
+        tmp_path / "workspace/resources/chapter-titles" / ("ct-" + "a" * 24)
+    )
+    with pytest.raises(ValueError, match="chapter title artifact"):
+        paths.chapter_title_artifact("ct-nope")
+    assert paths.releases == tmp_path / "workspace/releases"
+    assert paths.release("book5-fa-v1") == tmp_path / "workspace/releases/book5-fa-v1"
+    with pytest.raises(ValueError, match="release ID"):
+        paths.release("Book5/../escape")
+    assert paths.literary_runs == tmp_path / "workspace/literary-runs"
+    assert paths.literary_run("lr-" + "a" * 24) == (
+        tmp_path / "workspace/literary-runs" / ("lr-" + "a" * 24)
+    )
+    with pytest.raises(ValueError, match="literary run ID"):
+        paths.literary_run("lr-../escape")
     assert not paths.workspace.exists()
 
 
@@ -131,8 +215,10 @@ def test_forbidden_chunk_transitions(current: ChunkStatus, target: ChunkStatus) 
 def test_model_serialization_round_trip_preserves_persian() -> None:
     model = BookWorkspaceMetadata(
         schema_version=SCHEMA_VERSION,
+        metadata_version="1.0.0",
         book_id="test-book",
         source_pdf=Path("input/book.pdf"),
+        source_pdf_name="book.pdf",
         source_pdf_sha256=HASH,
         title_en="Test Book",
         title_fa="کتاب آزمایشی",
@@ -140,6 +226,7 @@ def test_model_serialization_round_trip_preserves_persian() -> None:
         source_language="en",
         target_language="fa",
         expected_output_format="epub3",
+        provenance=_provenance(),
         created_at=NOW,
         updated_at=NOW,
     )
@@ -253,10 +340,51 @@ def test_enums_have_frozen_values() -> None:
 def test_committed_json_schemas_match_models() -> None:
     schemas: dict[str, type[BaseModel]] = {
         "book-metadata.schema.json": BookWorkspaceMetadata,
+        "book-identity-migration.schema.json": BookIdentityMigration,
         "toc.schema.json": TocDocument,
         "chapter-metadata.schema.json": ChapterMetadata,
         "chunk-metadata.schema.json": ChunkMetadata,
         "snapshot.schema.json": ExtractionSnapshot,
+        "source-anomaly-registry.schema.json": SourceAnomalyRegistry,
+        "translation-manifest.schema.json": TranslationManifest,
+        "translation-attempt.schema.json": TranslationAttempt,
+        "execution-reservation-resolution.schema.json": ExecutionReservationResolution,
+        "translation-attempt-validation-report.schema.json": TranslationAttemptValidationReport,
+        "translation-qa-reevaluation-evidence.schema.json": TranslationQAReevaluationEvidence,
+        "translation-reuse-evidence.schema.json": TranslationReuseEvidence,
+        "translation-job.schema.json": TranslationJob,
+        "translation-queue-report.schema.json": TranslationQueueReport,
+        "translation-queue-validation.schema.json": TranslationQueueValidation,
+        "translation-run.schema.json": TranslationRun,
+        "translation-snapshot.schema.json": TranslationSnapshot,
+        "translation-snapshot-validation-report.schema.json": TranslationSnapshotValidationReport,
+        "versioned-resource-metadata.schema.json": VersionedResourceMetadata,
+        "terminology-registry.schema.json": TerminologyRegistry,
+        "terminology-analysis-run.schema.json": TerminologyAnalysisRun,
+        "terminology-analysis-validation-report.schema.json": TerminologyAnalysisValidationReport,
+        "terminology-application-result.schema.json": TerminologyApplicationResult,
+        "terminology-candidate-output.schema.json": TerminologyCandidateOutput,
+        "terminology-discovery-response.schema.json": TerminologyDiscoveryResponse,
+        "terminology-proposal-response.schema.json": TerminologyProposalResponse,
+        "terminology-validation-report.schema.json": TerminologyValidationReport,
+        "translation-qa-report.schema.json": TranslationQAReport,
+        "chapter-titles.schema.json": ChapterTitleDocument,
+        "chapter-titles-manifest.schema.json": ChapterTitleManifest,
+        "chapter-titles-provenance.schema.json": ChapterTitleProvenance,
+        "release-manifest.schema.json": ReleaseManifest,
+        "release-translation-lineage.schema.json": ReleaseLineageDocument,
+        "release-translation-report.schema.json": ReleaseTranslationReport,
+        "release-verification-report.schema.json": ReleaseVerificationReport,
+        "persian-literary-style-contract.schema.json": PersianLiteraryStyleContract,
+        "book-literary-profile.schema.json": BookLiteraryProfile,
+        "literary-editor-response.schema.json": LiteraryEditorResponse,
+        "literary-correction-response.schema.json": LiteraryCorrectionResponse,
+        "literary-continuity-response.schema.json": ContinuityReviewResponse,
+        "literary-semantic-evidence.schema.json": LiterarySemanticEvidence,
+        "literary-chapter-artifact.schema.json": LiteraryChapterArtifact,
+        "literary-run-artifact.schema.json": LiteraryRunArtifact,
+        "blind-comparison-artifact.schema.json": BlindComparisonArtifact,
+        "blind-comparison-answer-key.schema.json": BlindComparisonAnswerKey,
     }
     root = Path(__file__).parents[1]
     for filename, model in schemas.items():
@@ -278,8 +406,10 @@ def test_naive_timestamps_are_rejected() -> None:
     with pytest.raises(ValidationError):
         BookWorkspaceMetadata(
             schema_version=SCHEMA_VERSION,
+            metadata_version="1.0.0",
             book_id="test-book",
             source_pdf=Path("input/book.pdf"),
+            source_pdf_name="book.pdf",
             source_pdf_sha256=HASH,
             title_en="Test",
             title_fa="آزمایش",
@@ -287,6 +417,7 @@ def test_naive_timestamps_are_rejected() -> None:
             source_language="en",
             target_language="fa",
             expected_output_format="epub3",
+            provenance=_provenance(),
             created_at=datetime(2026, 1, 1),
             updated_at=NOW,
         )

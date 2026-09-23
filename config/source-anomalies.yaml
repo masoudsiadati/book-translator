@@ -1,0 +1,31 @@
+schema_version: '1.0'
+registry_kind: source_anomalies
+registry_version: 1.0.0
+anomalies:
+  - anomaly_id: sa-537780f0f7f564dc3bd0f237
+    book_id: the-fires-of-heaven-en-fa
+    chapter_id: '008'
+    page_from: 179
+    page_to: 180
+    source_location: page-boundary:179-180
+    category: truncated_token
+    status: confirmed_source_defect
+    severity: local
+    blocking: false
+    original_text: "We barely esc —\""
+    original_sha256: efe54ca87e57c18212e05a46a0c7e8568fcc6f61b57114d34d83ce1585a6ce0d
+    source_file: workspace/chapters/008/source.md
+    source_file_sha256: 5ad2c4fb70669ae00803c02fe5d3f518fe4edf60e5834e9ab9402ee36886684f
+    evidence:
+      rendered_pdf_checked: true
+      pdf_text_layer_matches: true
+      immutable_source_matches: true
+      extraction_at_fault: false
+      replacement_known: false
+      evidence_files: []
+      evidence_sha256: []
+    operator_note: >-
+      All three source layers agree. The paragraph boundary is legitimate and the next
+      paragraph begins a new speaker. Preserve the unknown truncation without repair.
+    resolution: null
+    created_at: '2026-08-13T00:00:00+03:30'

@@ -1,0 +1,92 @@
+{
+  "$defs": {
+    "TerminologyAcceptancePolicy": {
+      "enum": [
+        "manual",
+        "high-confidence",
+        "automatic"
+      ],
+      "title": "TerminologyAcceptancePolicy",
+      "type": "string"
+    },
+    "TerminologyApplicationFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "proposal_id": {
+          "title": "Proposal Id",
+          "type": "string"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "proposal_id",
+        "code",
+        "message"
+      ],
+      "title": "TerminologyApplicationFinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "policy": {
+      "$ref": "#/$defs/TerminologyAcceptancePolicy"
+    },
+    "threshold": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Threshold",
+      "type": "number"
+    },
+    "considered": {
+      "minimum": 0,
+      "title": "Considered",
+      "type": "integer"
+    },
+    "applied": {
+      "minimum": 0,
+      "title": "Applied",
+      "type": "integer"
+    },
+    "skipped": {
+      "minimum": 0,
+      "title": "Skipped",
+      "type": "integer"
+    },
+    "conflicts": {
+      "minimum": 0,
+      "title": "Conflicts",
+      "type": "integer"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/TerminologyApplicationFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "policy",
+    "threshold",
+    "considered",
+    "applied",
+    "skipped",
+    "conflicts"
+  ],
+  "title": "TerminologyApplicationResult",
+  "type": "object"
+}

@@ -1,0 +1,83 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "valid": {
+      "title": "Valid",
+      "type": "boolean"
+    },
+    "checks_performed": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Checks Performed",
+      "type": "array"
+    },
+    "selected_chapter_count": {
+      "minimum": 0,
+      "title": "Selected Chapter Count",
+      "type": "integer"
+    },
+    "selected_chunk_count": {
+      "minimum": 0,
+      "title": "Selected Chunk Count",
+      "type": "integer"
+    },
+    "artifact_hashes_validated": {
+      "minimum": 0,
+      "title": "Artifact Hashes Validated",
+      "type": "integer"
+    },
+    "conservation_checks": {
+      "minimum": 0,
+      "title": "Conservation Checks",
+      "type": "integer"
+    },
+    "stale_artifact_checks": {
+      "minimum": 0,
+      "title": "Stale Artifact Checks",
+      "type": "integer"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "errors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Errors",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "valid",
+    "checks_performed",
+    "selected_chapter_count",
+    "selected_chunk_count",
+    "artifact_hashes_validated",
+    "conservation_checks",
+    "stale_artifact_checks",
+    "created_at"
+  ],
+  "title": "TranslationSnapshotValidationReport",
+  "type": "object"
+}

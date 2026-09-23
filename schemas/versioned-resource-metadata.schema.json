@@ -1,0 +1,49 @@
+{
+  "$defs": {
+    "SnapshotResourceKind": {
+      "enum": [
+        "prompt",
+        "glossary",
+        "style_guide",
+        "terminology",
+        "source_anomalies",
+        "open_questions",
+        "series_terminology",
+        "reference_corpus",
+        "reference_context",
+        "terminology_exemptions"
+      ],
+      "title": "SnapshotResourceKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "resource_kind": {
+      "$ref": "#/$defs/SnapshotResourceKind"
+    },
+    "resource_file": {
+      "format": "path",
+      "title": "Resource File",
+      "type": "string"
+    },
+    "version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "resource_kind",
+    "resource_file",
+    "version"
+  ],
+  "title": "VersionedResourceMetadata",
+  "type": "object"
+}

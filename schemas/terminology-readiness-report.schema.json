@@ -1,0 +1,95 @@
+{
+  "additionalProperties": false,
+  "description": "Read-only translation readiness split by decision state and question severity.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "registry_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Registry Sha256",
+      "type": "string"
+    },
+    "questions_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Questions Sha256",
+      "type": "string"
+    },
+    "confirmed_decisions": {
+      "minimum": 0,
+      "title": "Confirmed Decisions",
+      "type": "integer"
+    },
+    "provisional_decisions": {
+      "minimum": 0,
+      "title": "Provisional Decisions",
+      "type": "integer"
+    },
+    "total_decisions": {
+      "minimum": 0,
+      "title": "Total Decisions",
+      "type": "integer"
+    },
+    "open_questions": {
+      "minimum": 0,
+      "title": "Open Questions",
+      "type": "integer"
+    },
+    "open_blocking_questions": {
+      "minimum": 0,
+      "title": "Open Blocking Questions",
+      "type": "integer"
+    },
+    "open_non_blocking_questions": {
+      "minimum": 0,
+      "title": "Open Non Blocking Questions",
+      "type": "integer"
+    },
+    "resolved_questions": {
+      "minimum": 0,
+      "title": "Resolved Questions",
+      "type": "integer"
+    },
+    "superseded_questions": {
+      "minimum": 0,
+      "title": "Superseded Questions",
+      "type": "integer"
+    },
+    "provisional_without_question": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Provisional Without Question",
+      "type": "array"
+    },
+    "ready": {
+      "title": "Ready",
+      "type": "boolean"
+    },
+    "blocking_reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Blocking Reasons",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "registry_sha256",
+    "questions_sha256",
+    "confirmed_decisions",
+    "provisional_decisions",
+    "total_decisions",
+    "open_questions",
+    "open_blocking_questions",
+    "open_non_blocking_questions",
+    "resolved_questions",
+    "superseded_questions",
+    "ready"
+  ],
+  "title": "TerminologyReadinessReport",
+  "type": "object"
+}

@@ -1,0 +1,136 @@
+{
+  "additionalProperties": false,
+  "description": "Generic, versioned Persian prose rules; book-specific voice is not stored here.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "contract_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "target_language": {
+      "const": "fa",
+      "default": "fa",
+      "title": "Target Language",
+      "type": "string"
+    },
+    "literary_naturalness": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Literary Naturalness",
+      "type": "array"
+    },
+    "dialogue_register": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Dialogue Register",
+      "type": "array"
+    },
+    "punctuation": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Punctuation",
+      "type": "array"
+    },
+    "quotation_style": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Quotation Style",
+      "type": "array"
+    },
+    "orthography_and_zwnj": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Orthography And Zwnj",
+      "type": "array"
+    },
+    "english_syntax": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "English Syntax",
+      "type": "array"
+    },
+    "narrator_consistency": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Narrator Consistency",
+      "type": "array"
+    },
+    "proper_names": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Proper Names",
+      "type": "array"
+    },
+    "terminology_flexibility": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Terminology Flexibility",
+      "type": "array"
+    },
+    "inner_monologue": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Inner Monologue",
+      "type": "array"
+    },
+    "emphasis": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Emphasis",
+      "type": "array"
+    },
+    "prohibitions": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Prohibitions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "contract_version",
+    "literary_naturalness",
+    "dialogue_register",
+    "punctuation",
+    "quotation_style",
+    "orthography_and_zwnj",
+    "english_syntax",
+    "narrator_consistency",
+    "proper_names",
+    "terminology_flexibility",
+    "inner_monologue",
+    "emphasis",
+    "prohibitions"
+  ],
+  "title": "PersianLiteraryStyleContract",
+  "type": "object"
+}

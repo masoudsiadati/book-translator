@@ -29,6 +29,7 @@ def build_report(
         "source_physical_line_count": result.document.source_physical_line_count,
         "cleaned_paragraph_count": len(result.document.blocks),
         "page_markers_removed": result.page_markers_removed,
+        "page_continuation_joins": result.page_continuation_joins,
         "page_transitions": list(result.document.page_transitions),
         "wrapped_line_joins": result.wrapped_line_joins,
         "hyphen_repairs": result.hyphen_repairs,

@@ -1,0 +1,345 @@
+{
+  "$defs": {
+    "ReleaseSemanticWaiverReference": {
+      "additionalProperties": false,
+      "description": "What a release states, in its own bytes, about the coverage it was published without.",
+      "properties": {
+        "waiver_id": {
+          "pattern": "^rw-[0-9a-f]{24}$",
+          "title": "Waiver Id",
+          "type": "string"
+        },
+        "waiver_file": {
+          "format": "path",
+          "title": "Waiver File",
+          "type": "string"
+        },
+        "waiver_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Waiver Sha256",
+          "type": "string"
+        },
+        "semantic_gate_policy_version": {
+          "minLength": 1,
+          "title": "Semantic Gate Policy Version",
+          "type": "string"
+        },
+        "judged_pass": {
+          "minimum": 0,
+          "title": "Judged Pass",
+          "type": "integer"
+        },
+        "not_judged": {
+          "minimum": 1,
+          "title": "Not Judged",
+          "type": "integer"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "decided_by": {
+          "const": "user",
+          "default": "user",
+          "title": "Decided By",
+          "type": "string"
+        },
+        "semantic_coverage": {
+          "const": "waived_not_judged",
+          "default": "waived_not_judged",
+          "title": "Semantic Coverage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "waiver_id",
+        "waiver_file",
+        "waiver_sha256",
+        "semantic_gate_policy_version",
+        "judged_pass",
+        "not_judged",
+        "reason"
+      ],
+      "title": "ReleaseSemanticWaiverReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "What the run that produced this release actually cost and how it was resolved.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "release_assembly_engine_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Release Assembly Engine Version",
+      "type": "string"
+    },
+    "release_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Release Id",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "snapshot_manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Snapshot Manifest Sha256",
+      "type": "string"
+    },
+    "queue_engine_version": {
+      "title": "Queue Engine Version",
+      "type": "string"
+    },
+    "run_status": {
+      "title": "Run Status",
+      "type": "string"
+    },
+    "source_language": {
+      "minLength": 2,
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "minLength": 2,
+      "title": "Target Language",
+      "type": "string"
+    },
+    "chapter_count": {
+      "minimum": 1,
+      "title": "Chapter Count",
+      "type": "integer"
+    },
+    "total_chunks": {
+      "minimum": 1,
+      "title": "Total Chunks",
+      "type": "integer"
+    },
+    "accepted_chunks": {
+      "minimum": 1,
+      "title": "Accepted Chunks",
+      "type": "integer"
+    },
+    "qa_rejected_chunks": {
+      "const": 0,
+      "default": 0,
+      "title": "Qa Rejected Chunks",
+      "type": "integer"
+    },
+    "provider_attempts": {
+      "minimum": 0,
+      "title": "Provider Attempts",
+      "type": "integer"
+    },
+    "abandoned_attempts": {
+      "minimum": 0,
+      "title": "Abandoned Attempts",
+      "type": "integer"
+    },
+    "provider_repairs": {
+      "minimum": 0,
+      "title": "Provider Repairs",
+      "type": "integer"
+    },
+    "provider_recoveries": {
+      "minimum": 0,
+      "title": "Provider Recoveries",
+      "type": "integer"
+    },
+    "repair_escalations": {
+      "minimum": 0,
+      "title": "Repair Escalations",
+      "type": "integer"
+    },
+    "structural_repairs": {
+      "minimum": 0,
+      "title": "Structural Repairs",
+      "type": "integer"
+    },
+    "qa_reevaluations": {
+      "minimum": 0,
+      "title": "Qa Reevaluations",
+      "type": "integer"
+    },
+    "cross_run_reuses": {
+      "minimum": 0,
+      "title": "Cross Run Reuses",
+      "type": "integer"
+    },
+    "historical_carry_forwards": {
+      "minimum": 0,
+      "title": "Historical Carry Forwards",
+      "type": "integer"
+    },
+    "acceptance_origins": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Acceptance Origins",
+      "type": "object"
+    },
+    "providers": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Providers",
+      "type": "object"
+    },
+    "models": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Models",
+      "type": "object"
+    },
+    "terminology_qa_versions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Terminology Qa Versions",
+      "type": "array"
+    },
+    "structural_qa_versions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Structural Qa Versions",
+      "type": "array"
+    },
+    "prompt_version": {
+      "title": "Prompt Version",
+      "type": "string"
+    },
+    "glossary_version": {
+      "title": "Glossary Version",
+      "type": "string"
+    },
+    "style_guide_version": {
+      "title": "Style Guide Version",
+      "type": "string"
+    },
+    "terminology_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Version"
+    },
+    "source_anomalies_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Anomalies Version"
+    },
+    "open_questions_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Open Questions Version"
+    },
+    "semantic_gate_policy_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Semantic Gate Policy Version"
+    },
+    "semantic_judged_pass": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Semantic Judged Pass",
+      "type": "integer"
+    },
+    "semantic_not_judged": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Semantic Not Judged",
+      "type": "integer"
+    },
+    "semantic_waiver": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ReleaseSemanticWaiverReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "final_status": {
+      "const": "released",
+      "default": "released",
+      "title": "Final Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "release_assembly_engine_version",
+    "release_id",
+    "run_id",
+    "snapshot_id",
+    "snapshot_manifest_sha256",
+    "queue_engine_version",
+    "run_status",
+    "source_language",
+    "target_language",
+    "chapter_count",
+    "total_chunks",
+    "accepted_chunks",
+    "provider_attempts",
+    "abandoned_attempts",
+    "provider_repairs",
+    "provider_recoveries",
+    "repair_escalations",
+    "structural_repairs",
+    "qa_reevaluations",
+    "cross_run_reuses",
+    "historical_carry_forwards",
+    "acceptance_origins",
+    "providers",
+    "models",
+    "terminology_qa_versions",
+    "structural_qa_versions",
+    "prompt_version",
+    "glossary_version",
+    "style_guide_version"
+  ],
+  "title": "ReleaseTranslationReport",
+  "type": "object"
+}

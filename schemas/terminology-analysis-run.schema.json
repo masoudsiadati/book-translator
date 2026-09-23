@@ -1,0 +1,349 @@
+{
+  "$defs": {
+    "TerminologyAnalysisStage": {
+      "enum": [
+        "discovery",
+        "proposal",
+        "review"
+      ],
+      "title": "TerminologyAnalysisStage",
+      "type": "string"
+    },
+    "TerminologyAnalysisStatus": {
+      "enum": [
+        "validated",
+        "failed"
+      ],
+      "title": "TerminologyAnalysisStatus",
+      "type": "string"
+    },
+    "TerminologySourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "chapter_id": {
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "chunk_id": {
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "source_file": {
+          "title": "Source File",
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "context_file": {
+          "title": "Context File",
+          "type": "string"
+        },
+        "context_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Context Sha256",
+          "type": "string"
+        },
+        "source_word_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Word Count"
+        }
+      },
+      "required": [
+        "chapter_id",
+        "chunk_id",
+        "source_file",
+        "source_sha256",
+        "context_file",
+        "context_sha256"
+      ],
+      "title": "TerminologySourceReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^ta-[0-9a-f]{24}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "stage": {
+      "$ref": "#/$defs/TerminologyAnalysisStage"
+    },
+    "engine_version": {
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "snapshot_manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Snapshot Manifest Sha256",
+      "type": "string"
+    },
+    "source_lineage_kind": {
+      "default": "translation_snapshot",
+      "enum": [
+        "translation_snapshot",
+        "translation_ready_corpus"
+      ],
+      "title": "Source Lineage Kind",
+      "type": "string"
+    },
+    "source_audit_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Audit Id"
+    },
+    "source_anomalies_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Anomalies Sha256"
+    },
+    "source_language": {
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "title": "Target Language",
+      "type": "string"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/TerminologySourceReference"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "discovery_run_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Discovery Run Id"
+    },
+    "proposal_run_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Proposal Run Id"
+    },
+    "proposal_output_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Proposal Output Sha256"
+    },
+    "registry_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Registry Sha256"
+    },
+    "canonical_view_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Canonical View Sha256"
+    },
+    "style_resource_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Style Resource Sha256"
+    },
+    "target_style_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Style Version"
+    },
+    "provider": {
+      "title": "Provider",
+      "type": "string"
+    },
+    "provider_adapter_version": {
+      "title": "Provider Adapter Version",
+      "type": "string"
+    },
+    "model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model"
+    },
+    "request_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Request Sha256",
+      "type": "string"
+    },
+    "output_file": {
+      "title": "Output File",
+      "type": "string"
+    },
+    "output_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Output Sha256",
+      "type": "string"
+    },
+    "validation_file": {
+      "title": "Validation File",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/TerminologyAnalysisStatus"
+    },
+    "contacted": {
+      "default": true,
+      "title": "Contacted",
+      "type": "boolean"
+    },
+    "failure_code": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Failure Code"
+    },
+    "failure_message": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Failure Message"
+    },
+    "retry_of": {
+      "anyOf": [
+        {
+          "pattern": "^ta-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retry Of"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "stage",
+    "engine_version",
+    "snapshot_id",
+    "snapshot_manifest_sha256",
+    "source_language",
+    "target_language",
+    "provider",
+    "provider_adapter_version",
+    "request_sha256",
+    "output_file",
+    "output_sha256",
+    "validation_file",
+    "status",
+    "created_at"
+  ],
+  "title": "TerminologyAnalysisRun",
+  "type": "object"
+}

@@ -1,0 +1,4 @@
+schema_version: '1.0'
+resource_kind: reference_corpus
+resource_file: config/series/wheel-of-time/reference-corpus.yaml
+version: 1.0.0

@@ -1,0 +1,862 @@
+{
+  "$defs": {
+    "CompetingVariantClass": {
+      "description": "Why a ``competing_variant`` finding exists, decided from governed evidence alone.\n\nThe classes are ordered from \"the finding is an artefact\" to \"only a person can answer this\",\nand every one of them is derived from the registry, the frozen resources, and the immutable\nattempt — never from a provider and never from a guess.",
+      "enum": [
+        "canonical_identity",
+        "retired_competitor",
+        "historical_output_only",
+        "canonical_absent",
+        "locked_canonical_conflict",
+        "rival_ai_decisions",
+        "genuine_canonical_conflict",
+        "insufficient_evidence"
+      ],
+      "title": "CompetingVariantClass",
+      "type": "string"
+    },
+    "DecisionSource": {
+      "description": "Who owns a canonical decision.\n\n``imported`` is the legacy provenance carried by pre-registry glossary entries.  Ownership is\ndeliberately independent of :class:`DecisionState` and of ``locked``: an AI may hold a\nconfirmed decision, and a user-owned decision may still be provisional.",
+      "enum": [
+        "ai",
+        "user",
+        "imported",
+        "inferred"
+      ],
+      "title": "DecisionSource",
+      "type": "string"
+    },
+    "DecisionState": {
+      "description": "Whether a canonical decision is settled or a working choice pending evidence.\n\n``provisional`` means the target is a translation choice made to keep the pipeline moving, not\na factual claim about the source.  It is enforced exactly like a confirmed decision so that a\nbook stays internally consistent, but it remains revisable and must carry an open question.",
+      "enum": [
+        "confirmed",
+        "provisional"
+      ],
+      "title": "DecisionState",
+      "type": "string"
+    },
+    "FinalQABudgetRecord": {
+      "additionalProperties": false,
+      "description": "The attempt budget one job still has, and whether an escalation was ever granted.",
+      "properties": {
+        "repair_attempts_used": {
+          "minimum": 0,
+          "title": "Repair Attempts Used",
+          "type": "integer"
+        },
+        "max_repair_attempts": {
+          "minimum": 0,
+          "title": "Max Repair Attempts",
+          "type": "integer"
+        },
+        "provider_attempts_used": {
+          "minimum": 0,
+          "title": "Provider Attempts Used",
+          "type": "integer"
+        },
+        "max_provider_attempts": {
+          "minimum": 1,
+          "title": "Max Provider Attempts",
+          "type": "integer"
+        },
+        "remaining": {
+          "minimum": 0,
+          "title": "Remaining",
+          "type": "integer"
+        },
+        "escalations_granted": {
+          "minimum": 0,
+          "title": "Escalations Granted",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "repair_attempts_used",
+        "max_repair_attempts",
+        "provider_attempts_used",
+        "max_provider_attempts",
+        "remaining",
+        "escalations_granted"
+      ],
+      "title": "FinalQABudgetRecord",
+      "type": "object"
+    },
+    "FinalQACompetingVariantRecord": {
+      "additionalProperties": false,
+      "description": "One classified ``competing_variant`` finding with the evidence that classified it.",
+      "properties": {
+        "candidate_id": {
+          "minLength": 1,
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "decision_id": {
+          "minLength": 1,
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "canonical_target": {
+          "minLength": 1,
+          "title": "Canonical Target",
+          "type": "string"
+        },
+        "competing_variant": {
+          "minLength": 1,
+          "title": "Competing Variant",
+          "type": "string"
+        },
+        "variant_class": {
+          "$ref": "#/$defs/CompetingVariantClass"
+        },
+        "decision_state": {
+          "$ref": "#/$defs/DecisionState"
+        },
+        "decision_source": {
+          "$ref": "#/$defs/DecisionSource"
+        },
+        "candidate_provenance": {
+          "$ref": "#/$defs/DecisionSource"
+        },
+        "enforcement": {
+          "$ref": "#/$defs/TerminologyEnforcement"
+        },
+        "locked": {
+          "title": "Locked",
+          "type": "boolean"
+        },
+        "canonical_present": {
+          "title": "Canonical Present",
+          "type": "boolean"
+        },
+        "variant_present": {
+          "title": "Variant Present",
+          "type": "boolean"
+        },
+        "source_occurrences": {
+          "minimum": 0,
+          "title": "Source Occurrences",
+          "type": "integer"
+        },
+        "canonical_occurrences": {
+          "minimum": 0,
+          "title": "Canonical Occurrences",
+          "type": "integer"
+        },
+        "variant_occurrences": {
+          "minimum": 0,
+          "title": "Variant Occurrences",
+          "type": "integer"
+        },
+        "recorded_in_effective_registry": {
+          "title": "Recorded In Effective Registry",
+          "type": "boolean"
+        },
+        "rival_candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rival Candidate Id"
+        },
+        "rival_locked": {
+          "default": false,
+          "title": "Rival Locked",
+          "type": "boolean"
+        },
+        "reproduces_under_current_qa": {
+          "title": "Reproduces Under Current Qa",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "decision_id",
+        "source_term",
+        "canonical_target",
+        "competing_variant",
+        "variant_class",
+        "decision_state",
+        "decision_source",
+        "candidate_provenance",
+        "enforcement",
+        "locked",
+        "canonical_present",
+        "variant_present",
+        "source_occurrences",
+        "canonical_occurrences",
+        "variant_occurrences",
+        "recorded_in_effective_registry",
+        "reproduces_under_current_qa"
+      ],
+      "title": "FinalQACompetingVariantRecord",
+      "type": "object"
+    },
+    "FinalQAFindingRecord": {
+      "additionalProperties": false,
+      "description": "One blocking QA finding as the final-QA policy sees it.",
+      "properties": {
+        "origin": {
+          "enum": [
+            "terminology",
+            "structural"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "historical": {
+          "title": "Historical",
+          "type": "boolean"
+        },
+        "current": {
+          "title": "Current",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "origin",
+        "code",
+        "severity",
+        "historical",
+        "current"
+      ],
+      "title": "FinalQAFindingRecord",
+      "type": "object"
+    },
+    "FinalQAJobDiagnosis": {
+      "additionalProperties": false,
+      "description": "The complete, self-contained answer for one QA-rejected job.",
+      "properties": {
+        "job_id": {
+          "minLength": 1,
+          "title": "Job Id",
+          "type": "string"
+        },
+        "chapter_id": {
+          "minLength": 1,
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "chunk_id": {
+          "minLength": 1,
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "effective_attempt": {
+          "minimum": 1,
+          "title": "Effective Attempt",
+          "type": "integer"
+        },
+        "acceptance_origin": {
+          "$ref": "#/$defs/TranslationAcceptanceOrigin"
+        },
+        "evidence_file": {
+          "format": "path",
+          "title": "Evidence File",
+          "type": "string"
+        },
+        "evidence_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Evidence Sha256",
+          "type": "string"
+        },
+        "attempt_file": {
+          "format": "path",
+          "title": "Attempt File",
+          "type": "string"
+        },
+        "attempt_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Attempt Sha256",
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "recorded_terminology_qa_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recorded Terminology Qa Version"
+        },
+        "recorded_structural_qa_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recorded Structural Qa Version"
+        },
+        "installed_terminology_qa_version": {
+          "minLength": 1,
+          "title": "Installed Terminology Qa Version",
+          "type": "string"
+        },
+        "installed_structural_qa_version": {
+          "minLength": 1,
+          "title": "Installed Structural Qa Version",
+          "type": "string"
+        },
+        "historical_blocking_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Historical Blocking Codes",
+          "type": "array"
+        },
+        "current_blocking_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Current Blocking Codes",
+          "type": "array"
+        },
+        "reproduces_under_current_qa": {
+          "title": "Reproduces Under Current Qa",
+          "type": "boolean"
+        },
+        "current_terminology_valid": {
+          "title": "Current Terminology Valid",
+          "type": "boolean"
+        },
+        "current_structural_valid": {
+          "title": "Current Structural Valid",
+          "type": "boolean"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/FinalQAFindingRecord"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "competing_variants": {
+          "items": {
+            "$ref": "#/$defs/FinalQACompetingVariantRecord"
+          },
+          "title": "Competing Variants",
+          "type": "array"
+        },
+        "structural": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FinalQAStructuralRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "budget": {
+          "$ref": "#/$defs/FinalQABudgetRecord"
+        },
+        "verdict": {
+          "$ref": "#/$defs/FinalQAVerdict"
+        },
+        "verdict_reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Verdict Reasons",
+          "type": "array"
+        },
+        "accepts_without_provider": {
+          "title": "Accepts Without Provider",
+          "type": "boolean"
+        },
+        "locked_terminology_involved": {
+          "title": "Locked Terminology Involved",
+          "type": "boolean"
+        },
+        "provider_recovery_required": {
+          "default": false,
+          "title": "Provider Recovery Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "job_id",
+        "chapter_id",
+        "chunk_id",
+        "effective_attempt",
+        "acceptance_origin",
+        "evidence_file",
+        "evidence_sha256",
+        "attempt_file",
+        "attempt_sha256",
+        "source_sha256",
+        "translation_sha256",
+        "installed_terminology_qa_version",
+        "installed_structural_qa_version",
+        "reproduces_under_current_qa",
+        "current_terminology_valid",
+        "current_structural_valid",
+        "budget",
+        "verdict",
+        "accepts_without_provider",
+        "locked_terminology_involved"
+      ],
+      "title": "FinalQAJobDiagnosis",
+      "type": "object"
+    },
+    "FinalQAStructuralRecord": {
+      "additionalProperties": false,
+      "description": "The structural half of one rejection, diagnosed before any provider attempt is spent.",
+      "properties": {
+        "source_paragraphs": {
+          "minimum": 0,
+          "title": "Source Paragraphs",
+          "type": "integer"
+        },
+        "translation_paragraphs": {
+          "minimum": 0,
+          "title": "Translation Paragraphs",
+          "type": "integer"
+        },
+        "paragraph_delta": {
+          "title": "Paragraph Delta",
+          "type": "integer"
+        },
+        "blank_line_artifact": {
+          "title": "Blank Line Artifact",
+          "type": "boolean"
+        },
+        "deterministically_normalizable": {
+          "title": "Deterministically Normalizable",
+          "type": "boolean"
+        },
+        "codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Codes",
+          "type": "array"
+        },
+        "diagnosis": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StructuralRepairDiagnosis"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "source_paragraphs",
+        "translation_paragraphs",
+        "paragraph_delta",
+        "blank_line_artifact",
+        "deterministically_normalizable"
+      ],
+      "title": "FinalQAStructuralRecord",
+      "type": "object"
+    },
+    "FinalQAVerdict": {
+      "description": "What the final-QA policy says should happen to one QA-rejected job.",
+      "enum": [
+        "accepted_no_change",
+        "reevaluate",
+        "repair_structure",
+        "repair_translation",
+        "resolve_terminology_then_reevaluate",
+        "resolve_terminology_then_repair",
+        "exhausted",
+        "operator_required"
+      ],
+      "title": "FinalQAVerdict",
+      "type": "string"
+    },
+    "StructuralDefectClass": {
+      "description": "Why a source and its translation disagree about block structure.",
+      "enum": [
+        "none",
+        "blank_line_geometry",
+        "translation_line_split",
+        "translation_line_merge",
+        "line_count_divergence",
+        "content_divergence"
+      ],
+      "title": "StructuralDefectClass",
+      "type": "string"
+    },
+    "StructuralOperationKind": {
+      "description": "What one aligned group of lines says happened to the source lines it covers.",
+      "enum": [
+        "aligned",
+        "join_translation_lines",
+        "split_translation_line"
+      ],
+      "title": "StructuralOperationKind",
+      "type": "string"
+    },
+    "StructuralOperationRecord": {
+      "additionalProperties": false,
+      "description": "One non-identity correspondence, named precisely enough to re-derive by hand.",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/StructuralOperationKind"
+        },
+        "source_index": {
+          "minimum": 0,
+          "title": "Source Index",
+          "type": "integer"
+        },
+        "source_lines": {
+          "minimum": 1,
+          "title": "Source Lines",
+          "type": "integer"
+        },
+        "translation_index": {
+          "minimum": 0,
+          "title": "Translation Index",
+          "type": "integer"
+        },
+        "translation_lines": {
+          "minimum": 1,
+          "title": "Translation Lines",
+          "type": "integer"
+        },
+        "cost_milli": {
+          "minimum": 0,
+          "title": "Cost Milli",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "source_index",
+        "source_lines",
+        "translation_index",
+        "translation_lines",
+        "cost_milli"
+      ],
+      "title": "StructuralOperationRecord",
+      "type": "object"
+    },
+    "StructuralRepairDiagnosis": {
+      "additionalProperties": false,
+      "description": "The complete structural answer for one translation, before anything is changed.\n\nCosts and margins are recorded in thousandths as integers rather than as floats, because a\npersisted contract that has to round-trip byte-for-byte cannot depend on float formatting.",
+      "properties": {
+        "structural_repair_engine_version": {
+          "minLength": 1,
+          "title": "Structural Repair Engine Version",
+          "type": "string"
+        },
+        "defect_class": {
+          "$ref": "#/$defs/StructuralDefectClass"
+        },
+        "source_paragraphs": {
+          "minimum": 0,
+          "title": "Source Paragraphs",
+          "type": "integer"
+        },
+        "translation_paragraphs": {
+          "minimum": 0,
+          "title": "Translation Paragraphs",
+          "type": "integer"
+        },
+        "paragraph_delta": {
+          "title": "Paragraph Delta",
+          "type": "integer"
+        },
+        "source_lines": {
+          "minimum": 0,
+          "title": "Source Lines",
+          "type": "integer"
+        },
+        "translation_lines": {
+          "minimum": 0,
+          "title": "Translation Lines",
+          "type": "integer"
+        },
+        "line_delta": {
+          "title": "Line Delta",
+          "type": "integer"
+        },
+        "blank_line_artifact": {
+          "title": "Blank Line Artifact",
+          "type": "boolean"
+        },
+        "deterministic": {
+          "title": "Deterministic",
+          "type": "boolean"
+        },
+        "alignment_cost_milli": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alignment Cost Milli"
+        },
+        "alignment_margin_milli": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alignment Margin Milli"
+        },
+        "operations": {
+          "items": {
+            "$ref": "#/$defs/StructuralOperationRecord"
+          },
+          "title": "Operations",
+          "type": "array"
+        },
+        "refusals": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Refusals",
+          "type": "array"
+        }
+      },
+      "required": [
+        "structural_repair_engine_version",
+        "defect_class",
+        "source_paragraphs",
+        "translation_paragraphs",
+        "paragraph_delta",
+        "source_lines",
+        "translation_lines",
+        "line_delta",
+        "blank_line_artifact",
+        "deterministic"
+      ],
+      "title": "StructuralRepairDiagnosis",
+      "type": "object"
+    },
+    "TerminologyEnforcement": {
+      "description": "What kind of target evidence proves a canonical decision was honored.\n\n``required`` answers whether a decision is in scope for QA at all; this answers the separate\nquestion of what counts as proof.  Collapsing the two forces every approved decision into\n\"the exact canonical string must appear\", which is correct for a name and wrong for a form the\ntarget language legitimately transforms.",
+      "enum": [
+        "exact",
+        "morphological",
+        "contextual",
+        "advisory"
+      ],
+      "title": "TerminologyEnforcement",
+      "type": "string"
+    },
+    "TranslationAcceptanceOrigin": {
+      "enum": [
+        "initial_qa",
+        "qa_reevaluation",
+        "reuse_qa",
+        "historical_reevaluation",
+        "structural_repair"
+      ],
+      "title": "TranslationAcceptanceOrigin",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The read-only audit of every QA-rejected job in one run.\n\nProducing it mutates nothing. It is the artifact an operator reads before authorizing any\npart of the cleanup, and the artifact a later reader uses to check that what happened matches\nwhat was planned.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "final_qa_audit_engine_version": {
+      "minLength": 1,
+      "title": "Final Qa Audit Engine Version",
+      "type": "string"
+    },
+    "final_qa_resolution_policy_version": {
+      "minLength": 1,
+      "title": "Final Qa Resolution Policy Version",
+      "type": "string"
+    },
+    "terminology_qa_version": {
+      "minLength": 1,
+      "title": "Terminology Qa Version",
+      "type": "string"
+    },
+    "structural_qa_version": {
+      "minLength": 1,
+      "title": "Structural Qa Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Manifest Sha256",
+      "type": "string"
+    },
+    "terminology_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology File"
+    },
+    "terminology_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Sha256"
+    },
+    "effective_registry_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Effective Registry File"
+    },
+    "effective_registry_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Effective Registry Sha256"
+    },
+    "frozen_registry_is_current": {
+      "title": "Frozen Registry Is Current",
+      "type": "boolean"
+    },
+    "job_count": {
+      "minimum": 0,
+      "title": "Job Count",
+      "type": "integer"
+    },
+    "accepted_count": {
+      "minimum": 0,
+      "title": "Accepted Count",
+      "type": "integer"
+    },
+    "qa_rejected_count": {
+      "minimum": 0,
+      "title": "Qa Rejected Count",
+      "type": "integer"
+    },
+    "verdict_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Verdict Counts",
+      "type": "object"
+    },
+    "variant_class_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Variant Class Counts",
+      "type": "object"
+    },
+    "jobs": {
+      "items": {
+        "$ref": "#/$defs/FinalQAJobDiagnosis"
+      },
+      "title": "Jobs",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "final_qa_audit_engine_version",
+    "final_qa_resolution_policy_version",
+    "terminology_qa_version",
+    "structural_qa_version",
+    "run_id",
+    "snapshot_id",
+    "manifest_sha256",
+    "frozen_registry_is_current",
+    "job_count",
+    "accepted_count",
+    "qa_rejected_count",
+    "created_at"
+  ],
+  "title": "FinalQAAuditReport",
+  "type": "object"
+}

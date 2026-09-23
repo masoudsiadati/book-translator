@@ -1,0 +1,377 @@
+{
+  "$defs": {
+    "ImportedPolicySource": {
+      "additionalProperties": false,
+      "description": "A governed input the policy import consumed, pinned by hash for provenance.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "registry",
+            "glossary",
+            "reference_corpus",
+            "prior_volume_registry"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "file": {
+          "minLength": 1,
+          "title": "File",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "file",
+        "sha256"
+      ],
+      "title": "ImportedPolicySource",
+      "type": "object"
+    },
+    "ObservedVariant": {
+      "additionalProperties": false,
+      "properties": {
+        "target_form": {
+          "minLength": 1,
+          "title": "Target Form",
+          "type": "string"
+        },
+        "support": {
+          "items": {
+            "$ref": "#/$defs/ObservedVariantSupport"
+          },
+          "minItems": 1,
+          "title": "Support",
+          "type": "array"
+        }
+      },
+      "required": [
+        "target_form",
+        "support"
+      ],
+      "title": "ObservedVariant",
+      "type": "object"
+    },
+    "ObservedVariantSupport": {
+      "additionalProperties": false,
+      "description": "One independent piece of support for a target form, with its provenance.",
+      "properties": {
+        "corpus_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Corpus Id",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/ReferenceEvidenceSource"
+        },
+        "quality": {
+          "$ref": "#/$defs/ReferenceEvidenceQuality"
+        },
+        "observation_count": {
+          "minimum": 0,
+          "title": "Observation Count",
+          "type": "integer"
+        },
+        "reference_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Id"
+        },
+        "observed_surfaces": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Observed Surfaces",
+          "type": "object"
+        }
+      },
+      "required": [
+        "corpus_id",
+        "source",
+        "quality",
+        "observation_count"
+      ],
+      "title": "ObservedVariantSupport",
+      "type": "object"
+    },
+    "ReferenceEvidenceQuality": {
+      "enum": [
+        "clean",
+        "ocr_suspect",
+        "uncertain"
+      ],
+      "title": "ReferenceEvidenceQuality",
+      "type": "string"
+    },
+    "ReferenceEvidenceSource": {
+      "enum": [
+        "narrative",
+        "printed_glossary",
+        "project_glossary",
+        "user_decision",
+        "prior_volume_registry"
+      ],
+      "title": "ReferenceEvidenceSource",
+      "type": "string"
+    },
+    "SeriesProvenanceKind": {
+      "description": "Why a term holds its status.",
+      "enum": [
+        "explicit_user",
+        "explicit_project",
+        "promoted_reference",
+        "prior_volume",
+        "unresolved"
+      ],
+      "title": "SeriesProvenanceKind",
+      "type": "string"
+    },
+    "SeriesTerm": {
+      "additionalProperties": false,
+      "properties": {
+        "concept_id": {
+          "pattern": "^sc-[0-9a-f]{24}$",
+          "title": "Concept Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "classification": {
+          "$ref": "#/$defs/TerminologyType"
+        },
+        "status": {
+          "$ref": "#/$defs/SeriesTermStatus"
+        },
+        "target_term": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Term"
+        },
+        "allowed_target_forms": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Target Forms",
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/$defs/SeriesTermProvenance"
+        },
+        "variants": {
+          "items": {
+            "$ref": "#/$defs/ObservedVariant"
+          },
+          "title": "Variants",
+          "type": "array"
+        },
+        "conflicts": {
+          "items": {
+            "$ref": "#/$defs/SeriesTermConflict"
+          },
+          "title": "Conflicts",
+          "type": "array"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "concept_id",
+        "source_term",
+        "classification",
+        "status",
+        "provenance"
+      ],
+      "title": "SeriesTerm",
+      "type": "object"
+    },
+    "SeriesTermConflict": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/SeriesTermConflictKind"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "competing_forms": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Competing Forms",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "detail"
+      ],
+      "title": "SeriesTermConflict",
+      "type": "object"
+    },
+    "SeriesTermConflictKind": {
+      "enum": [
+        "corpus_disagrees_with_explicit_decision",
+        "prior_volume_disagrees",
+        "explicit_sources_disagree"
+      ],
+      "title": "SeriesTermConflictKind",
+      "type": "string"
+    },
+    "SeriesTermProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/SeriesProvenanceKind"
+        },
+        "origin": {
+          "minLength": 1,
+          "title": "Origin",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "evidence_summary": {
+          "default": "",
+          "title": "Evidence Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "origin",
+        "rationale"
+      ],
+      "title": "SeriesTermProvenance",
+      "type": "object"
+    },
+    "SeriesTermStatus": {
+      "description": "The force a series decision carries for the current book.",
+      "enum": [
+        "LOCKED",
+        "STRONG_REFERENCE",
+        "OBSERVED_VARIANTS"
+      ],
+      "title": "SeriesTermStatus",
+      "type": "string"
+    },
+    "TerminologyType": {
+      "enum": [
+        "person",
+        "place",
+        "organization",
+        "title",
+        "people",
+        "invented",
+        "artifact",
+        "historical_event",
+        "story_term",
+        "recurring_phrase",
+        "context_sensitive"
+      ],
+      "title": "TerminologyType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "registry_kind": {
+      "const": "series_terminology_policy",
+      "default": "series_terminology_policy",
+      "title": "Registry Kind",
+      "type": "string"
+    },
+    "version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Version",
+      "type": "string"
+    },
+    "series_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Series Id",
+      "type": "string"
+    },
+    "source_language": {
+      "minLength": 2,
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "minLength": 2,
+      "title": "Target Language",
+      "type": "string"
+    },
+    "promotion_rule_version": {
+      "minLength": 1,
+      "title": "Promotion Rule Version",
+      "type": "string"
+    },
+    "imported_sources": {
+      "items": {
+        "$ref": "#/$defs/ImportedPolicySource"
+      },
+      "title": "Imported Sources",
+      "type": "array"
+    },
+    "terms": {
+      "items": {
+        "$ref": "#/$defs/SeriesTerm"
+      },
+      "title": "Terms",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "version",
+    "series_id",
+    "source_language",
+    "target_language",
+    "promotion_rule_version"
+  ],
+  "title": "SeriesTerminologyPolicy",
+  "type": "object"
+}

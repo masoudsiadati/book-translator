@@ -1,0 +1,428 @@
+{
+  "$defs": {
+    "LiteraryCallRole": {
+      "description": "Provider roles whose cost and provenance must remain separate.",
+      "enum": [
+        "literary_editor",
+        "semantic_rejudge",
+        "literary_correction",
+        "continuity_reviewer"
+      ],
+      "title": "LiteraryCallRole",
+      "type": "string"
+    },
+    "LiteraryProviderCall": {
+      "additionalProperties": false,
+      "description": "Prose-free, role-separated provider provenance and cost evidence.",
+      "properties": {
+        "role": {
+          "$ref": "#/$defs/LiteraryCallRole"
+        },
+        "request_id": {
+          "pattern": "^(leq|lcq|crq|sjq)-[0-9a-f]{24}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "adapter_version": {
+          "minLength": 1,
+          "title": "Adapter Version",
+          "type": "string"
+        },
+        "model_requested": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Requested"
+        },
+        "model_returned": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Returned"
+        },
+        "system_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "System Message Sha256",
+          "type": "string"
+        },
+        "user_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "User Message Sha256",
+          "type": "string"
+        },
+        "input_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Tokens"
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Tokens"
+        },
+        "total_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Tokens"
+        },
+        "latency_milliseconds": {
+          "minimum": 0,
+          "title": "Latency Milliseconds",
+          "type": "integer"
+        },
+        "prompt_version": {
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "schema_version_used": {
+          "title": "Schema Version Used",
+          "type": "string"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "status": {
+          "default": "completed",
+          "enum": [
+            "completed",
+            "output_rejected"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Code"
+        },
+        "reused_from_literary_run_id": {
+          "anyOf": [
+            {
+              "pattern": "^lr-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reused From Literary Run Id"
+        }
+      },
+      "required": [
+        "role",
+        "request_id",
+        "provider",
+        "adapter_version",
+        "system_message_sha256",
+        "user_message_sha256",
+        "latency_milliseconds",
+        "prompt_version",
+        "schema_version_used",
+        "policy_version"
+      ],
+      "title": "LiteraryProviderCall",
+      "type": "object"
+    },
+    "LiterarySemanticParagraphEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "paragraph_id": {
+          "pattern": "^P\\d{4}$",
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "candidate_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Candidate Sha256",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/SemanticParagraphOutcome"
+        }
+      },
+      "required": [
+        "paragraph_id",
+        "source_sha256",
+        "candidate_sha256",
+        "outcome"
+      ],
+      "title": "LiterarySemanticParagraphEvidence",
+      "type": "object"
+    },
+    "SemanticFinding": {
+      "additionalProperties": false,
+      "description": "One fidelity defect the judge claims, with the evidence a repair stage would need.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/SemanticFindingCode"
+        },
+        "severity": {
+          "$ref": "#/$defs/SemanticSeverity"
+        },
+        "source_evidence": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Source Evidence",
+          "type": "string"
+        },
+        "explanation": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "source_evidence",
+        "explanation",
+        "confidence"
+      ],
+      "title": "SemanticFinding",
+      "type": "object"
+    },
+    "SemanticFindingCode": {
+      "description": "The closed vocabulary of fidelity defects the judge may report.\n\nIt is closed on purpose. An open vocabulary would let a provider invent a category nothing\ndownstream can classify, and the acceptance policy would then have to guess how serious an\nunknown code is. A code outside this set fails the response.",
+      "enum": [
+        "meaning_omitted",
+        "meaning_added",
+        "factual_change",
+        "action_changed",
+        "negation_changed",
+        "modality_changed",
+        "number_changed",
+        "entity_relation_changed",
+        "dialogue_content_changed",
+        "speaker_attribution_risk",
+        "temporal_relation_changed",
+        "causal_relation_changed"
+      ],
+      "title": "SemanticFindingCode",
+      "type": "string"
+    },
+    "SemanticParagraphOutcome": {
+      "additionalProperties": false,
+      "description": "One paragraph's judged verdict after the acceptance policy has read it.\n\nThe judge's verdict and the policy's outcome are recorded separately and never collapsed. A\njudge that reports a defect the policy considers immaterial is not wrong, and a record that\noverwrote its answer would make the policy impossible to recalibrate against real evidence.",
+      "properties": {
+        "paragraph_id": {
+          "pattern": "^P\\d{4}$",
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "paragraph_index": {
+          "minimum": 1,
+          "title": "Paragraph Index",
+          "type": "integer"
+        },
+        "judge_verdict": {
+          "$ref": "#/$defs/SemanticVerdict"
+        },
+        "policy_outcome": {
+          "$ref": "#/$defs/SemanticVerdict"
+        },
+        "judge_confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Judge Confidence",
+          "type": "number"
+        },
+        "source_word_count": {
+          "minimum": 0,
+          "title": "Source Word Count",
+          "type": "integer"
+        },
+        "target_word_count": {
+          "minimum": 0,
+          "title": "Target Word Count",
+          "type": "integer"
+        },
+        "material_findings": {
+          "items": {
+            "$ref": "#/$defs/SemanticFinding"
+          },
+          "title": "Material Findings",
+          "type": "array"
+        },
+        "advisory_findings": {
+          "items": {
+            "$ref": "#/$defs/SemanticFinding"
+          },
+          "title": "Advisory Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "paragraph_id",
+        "paragraph_index",
+        "judge_verdict",
+        "policy_outcome",
+        "judge_confidence",
+        "source_word_count",
+        "target_word_count"
+      ],
+      "title": "SemanticParagraphOutcome",
+      "type": "object"
+    },
+    "SemanticSeverity": {
+      "description": "How much a defect costs a reader.",
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "title": "SemanticSeverity",
+      "type": "string"
+    },
+    "SemanticVerdict": {
+      "description": "What the judge concluded about one paragraph.",
+      "enum": [
+        "PASS",
+        "REVISE",
+        "INCONCLUSIVE"
+      ],
+      "title": "SemanticVerdict",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One immutable post-literary judge call, hash-linked at paragraph granularity.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "literary_run_id": {
+      "pattern": "^lr-[0-9a-f]{24}$",
+      "title": "Literary Run Id",
+      "type": "string"
+    },
+    "input_translation_run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Input Translation Run Id",
+      "type": "string"
+    },
+    "chapter_id": {
+      "minLength": 1,
+      "title": "Chapter Id",
+      "type": "string"
+    },
+    "evidence_number": {
+      "minimum": 1,
+      "title": "Evidence Number",
+      "type": "integer"
+    },
+    "correction_round": {
+      "minimum": 0,
+      "title": "Correction Round",
+      "type": "integer"
+    },
+    "look": {
+      "enum": [
+        "first",
+        "second",
+        "suspicious"
+      ],
+      "title": "Look",
+      "type": "string"
+    },
+    "candidate_chapter_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Candidate Chapter Sha256",
+      "type": "string"
+    },
+    "call": {
+      "$ref": "#/$defs/LiteraryProviderCall"
+    },
+    "paragraphs": {
+      "items": {
+        "$ref": "#/$defs/LiterarySemanticParagraphEvidence"
+      },
+      "minItems": 1,
+      "title": "Paragraphs",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "literary_run_id",
+    "input_translation_run_id",
+    "chapter_id",
+    "evidence_number",
+    "correction_round",
+    "look",
+    "candidate_chapter_sha256",
+    "call",
+    "paragraphs",
+    "created_at"
+  ],
+  "title": "LiterarySemanticEvidence",
+  "type": "object"
+}

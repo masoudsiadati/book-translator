@@ -1,0 +1,103 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "package_id": {
+      "title": "Package Id",
+      "type": "string"
+    },
+    "valid": {
+      "title": "Valid",
+      "type": "boolean"
+    },
+    "checks_performed": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Checks Performed",
+      "type": "array"
+    },
+    "snapshot_valid": {
+      "title": "Snapshot Valid",
+      "type": "boolean"
+    },
+    "queue_job_valid": {
+      "title": "Queue Job Valid",
+      "type": "boolean"
+    },
+    "resources_valid": {
+      "title": "Resources Valid",
+      "type": "boolean"
+    },
+    "system_hash_valid": {
+      "title": "System Hash Valid",
+      "type": "boolean"
+    },
+    "user_hash_valid": {
+      "title": "User Hash Valid",
+      "type": "boolean"
+    },
+    "source_conserved": {
+      "title": "Source Conserved",
+      "type": "boolean"
+    },
+    "context_conserved": {
+      "title": "Context Conserved",
+      "type": "boolean"
+    },
+    "placeholders_valid": {
+      "title": "Placeholders Valid",
+      "type": "boolean"
+    },
+    "delimiters_valid": {
+      "title": "Delimiters Valid",
+      "type": "boolean"
+    },
+    "paths_valid": {
+      "title": "Paths Valid",
+      "type": "boolean"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "errors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Errors",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "package_id",
+    "valid",
+    "checks_performed",
+    "snapshot_valid",
+    "queue_job_valid",
+    "resources_valid",
+    "system_hash_valid",
+    "user_hash_valid",
+    "source_conserved",
+    "context_conserved",
+    "placeholders_valid",
+    "delimiters_valid",
+    "paths_valid",
+    "created_at"
+  ],
+  "title": "PromptPackageValidationReport",
+  "type": "object"
+}

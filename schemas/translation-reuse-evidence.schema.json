@@ -1,0 +1,278 @@
+{
+  "$defs": {
+    "ReuseCompatibilityTier": {
+      "description": "How strongly a carried-forward translation's provider-facing request was proven.",
+      "enum": [
+        "exact_rendered_request",
+        "incompatible"
+      ],
+      "title": "ReuseCompatibilityTier",
+      "type": "string"
+    },
+    "TranslationAcceptanceOrigin": {
+      "enum": [
+        "initial_qa",
+        "qa_reevaluation",
+        "reuse_qa",
+        "historical_reevaluation",
+        "structural_repair"
+      ],
+      "title": "TranslationAcceptanceOrigin",
+      "type": "string"
+    },
+    "TranslationReuseCompatibility": {
+      "additionalProperties": false,
+      "description": "Effective-request identity proof recorded alongside a carried-forward translation.",
+      "properties": {
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "tier": {
+          "$ref": "#/$defs/ReuseCompatibilityTier"
+        },
+        "provider_contacted": {
+          "const": false,
+          "default": false,
+          "title": "Provider Contacted",
+          "type": "boolean"
+        },
+        "source_snapshot_id": {
+          "title": "Source Snapshot Id",
+          "type": "string"
+        },
+        "target_snapshot_id": {
+          "title": "Target Snapshot Id",
+          "type": "string"
+        },
+        "source_prompt_package_id": {
+          "pattern": "^pp-[0-9a-f]{24}$",
+          "title": "Source Prompt Package Id",
+          "type": "string"
+        },
+        "target_prompt_package_id": {
+          "pattern": "^pp-[0-9a-f]{24}$",
+          "title": "Target Prompt Package Id",
+          "type": "string"
+        },
+        "source_system_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source System Message Sha256",
+          "type": "string"
+        },
+        "target_system_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Target System Message Sha256",
+          "type": "string"
+        },
+        "source_user_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source User Message Sha256",
+          "type": "string"
+        },
+        "target_user_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Target User Message Sha256",
+          "type": "string"
+        },
+        "verified_identity_checks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Verified Identity Checks",
+          "type": "array"
+        },
+        "waived_resource_drift": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Waived Resource Drift",
+          "type": "array"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "policy_version",
+        "tier",
+        "source_snapshot_id",
+        "target_snapshot_id",
+        "source_prompt_package_id",
+        "target_prompt_package_id",
+        "source_system_message_sha256",
+        "target_system_message_sha256",
+        "source_user_message_sha256",
+        "target_user_message_sha256",
+        "verified_identity_checks",
+        "rationale"
+      ],
+      "title": "TranslationReuseCompatibility",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable new-run provenance for one carried-forward translation.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "reuse_engine_version": {
+      "title": "Reuse Engine Version",
+      "type": "string"
+    },
+    "execution_kind": {
+      "const": "reuse",
+      "default": "reuse",
+      "title": "Execution Kind",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "job_id": {
+      "title": "Job Id",
+      "type": "string"
+    },
+    "reuse_number": {
+      "minimum": 1,
+      "title": "Reuse Number",
+      "type": "integer"
+    },
+    "source_run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Source Run Id",
+      "type": "string"
+    },
+    "source_job_id": {
+      "title": "Source Job Id",
+      "type": "string"
+    },
+    "source_attempt_number": {
+      "minimum": 1,
+      "title": "Source Attempt Number",
+      "type": "integer"
+    },
+    "source_attempt_file": {
+      "format": "path",
+      "title": "Source Attempt File",
+      "type": "string"
+    },
+    "source_attempt_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Attempt Sha256",
+      "type": "string"
+    },
+    "source_translation_file": {
+      "format": "path",
+      "title": "Source Translation File",
+      "type": "string"
+    },
+    "source_translation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Translation Sha256",
+      "type": "string"
+    },
+    "source_acceptance_file": {
+      "format": "path",
+      "title": "Source Acceptance File",
+      "type": "string"
+    },
+    "source_acceptance_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Acceptance Sha256",
+      "type": "string"
+    },
+    "source_acceptance_origin": {
+      "$ref": "#/$defs/TranslationAcceptanceOrigin"
+    },
+    "source_reevaluation_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Reevaluation File"
+    },
+    "source_reevaluation_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Reevaluation Sha256"
+    },
+    "compatibility": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Compatibility",
+      "type": "object"
+    },
+    "rendered_request_compatibility": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TranslationReuseCompatibility"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "translation_file": {
+      "format": "path",
+      "title": "Translation File",
+      "type": "string"
+    },
+    "translation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Translation Sha256",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "reuse_engine_version",
+    "run_id",
+    "job_id",
+    "reuse_number",
+    "source_run_id",
+    "source_job_id",
+    "source_attempt_number",
+    "source_attempt_file",
+    "source_attempt_sha256",
+    "source_translation_file",
+    "source_translation_sha256",
+    "source_acceptance_file",
+    "source_acceptance_sha256",
+    "source_acceptance_origin",
+    "compatibility",
+    "translation_file",
+    "translation_sha256",
+    "created_at"
+  ],
+  "title": "TranslationReuseEvidence",
+  "type": "object"
+}

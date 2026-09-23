@@ -1,0 +1,177 @@
+{
+  "$defs": {
+    "CandidateStatus": {
+      "enum": [
+        "candidate",
+        "approved",
+        "rejected"
+      ],
+      "title": "CandidateStatus",
+      "type": "string"
+    },
+    "DecisionSource": {
+      "description": "Who owns a canonical decision.\n\n``imported`` is the legacy provenance carried by pre-registry glossary entries.  Ownership is\ndeliberately independent of :class:`DecisionState` and of ``locked``: an AI may hold a\nconfirmed decision, and a user-owned decision may still be provisional.",
+      "enum": [
+        "ai",
+        "user",
+        "imported",
+        "inferred"
+      ],
+      "title": "DecisionSource",
+      "type": "string"
+    },
+    "TerminologyCandidate": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "classification": {
+          "$ref": "#/$defs/TerminologyType"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "status": {
+          "$ref": "#/$defs/CandidateStatus",
+          "default": "candidate"
+        },
+        "provenance": {
+          "$ref": "#/$defs/DecisionSource"
+        },
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "occurrences": {
+          "items": {
+            "$ref": "#/$defs/TerminologyOccurrence"
+          },
+          "title": "Occurrences",
+          "type": "array"
+        },
+        "context_sensitive": {
+          "default": false,
+          "title": "Context Sensitive",
+          "type": "boolean"
+        },
+        "classification_conflicts": {
+          "items": {
+            "$ref": "#/$defs/TerminologyType"
+          },
+          "title": "Classification Conflicts",
+          "type": "array"
+        },
+        "evidence_notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Notes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "source_term",
+        "classification",
+        "confidence",
+        "provenance"
+      ],
+      "title": "TerminologyCandidate",
+      "type": "object"
+    },
+    "TerminologyOccurrence": {
+      "additionalProperties": false,
+      "properties": {
+        "chapter_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "chunk_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9._-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Chunk Id"
+        },
+        "location": {
+          "default": "source",
+          "enum": [
+            "source",
+            "context"
+          ],
+          "title": "Location",
+          "type": "string"
+        },
+        "count": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "chapter_id"
+      ],
+      "title": "TerminologyOccurrence",
+      "type": "object"
+    },
+    "TerminologyType": {
+      "enum": [
+        "person",
+        "place",
+        "organization",
+        "title",
+        "people",
+        "invented",
+        "artifact",
+        "historical_event",
+        "story_term",
+        "recurring_phrase",
+        "context_sensitive"
+      ],
+      "title": "TerminologyType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "candidates": {
+      "items": {
+        "$ref": "#/$defs/TerminologyCandidate"
+      },
+      "title": "Candidates",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version"
+  ],
+  "title": "TerminologyCandidateOutput",
+  "type": "object"
+}

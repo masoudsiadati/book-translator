@@ -1,0 +1,4 @@
+schema_version: "1.0"
+resource_kind: prompt
+resource_file: config/translation-prompt.md
+version: 1.0.0

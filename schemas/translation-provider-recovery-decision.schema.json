@@ -1,0 +1,618 @@
+{
+  "$defs": {
+    "ProviderErrorCategory": {
+      "enum": [
+        "authentication",
+        "authorization",
+        "rate_limit",
+        "timeout_pre_send",
+        "timeout_ambiguous",
+        "connection_pre_send",
+        "connection_ambiguous",
+        "invalid_request",
+        "unsupported_model_or_parameter",
+        "context_length",
+        "content_policy",
+        "server_error",
+        "malformed_response",
+        "empty_response",
+        "output_truncated",
+        "package_invalid",
+        "claim_invalid",
+        "lease_invalid",
+        "local_io",
+        "executable_not_found",
+        "timeout",
+        "nonzero_exit",
+        "empty_output",
+        "invocation_error",
+        "interrupted",
+        "unknown"
+      ],
+      "title": "ProviderErrorCategory",
+      "type": "string"
+    },
+    "ProviderFailureClass": {
+      "description": "Provider-neutral family a historical failure belongs to.\n\nThe executor's ``ProviderErrorCategory`` is deliberately fine-grained and partly adapter\nshaped. Recovery reasons about families instead, because the question it answers — may a new\nattempt be spent, and what has to be re-proved first — has the same answer for every category\ninside a family and must keep having it when a new adapter adds categories.",
+      "enum": [
+        "transient",
+        "rate_limit",
+        "authentication",
+        "provider_unavailable",
+        "malformed_response",
+        "contract_violation",
+        "content_policy",
+        "local_environment",
+        "ambiguous_execution",
+        "unknown"
+      ],
+      "title": "ProviderFailureClass",
+      "type": "string"
+    },
+    "ProviderName": {
+      "enum": [
+        "fake",
+        "openai",
+        "codex-cli",
+        "claude-code"
+      ],
+      "title": "ProviderName",
+      "type": "string"
+    },
+    "ProviderPreflightDetail": {
+      "additionalProperties": false,
+      "description": "One structural name/value pair reported by a provider preflight.",
+      "properties": {
+        "name": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "ProviderPreflightDetail",
+      "type": "object"
+    },
+    "ProviderPreflightRecord": {
+      "additionalProperties": false,
+      "description": "Durable evidence of one provider preflight, carrying no credential material.\n\nThe preflight itself establishes local readiness without a model call, so this record proves\nthe provider was reachable and logged in — never *how* it was logged in.",
+      "properties": {
+        "provider": {
+          "$ref": "#/$defs/ProviderName"
+        },
+        "provider_preflight_version": {
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "title": "Provider Preflight Version",
+          "type": "string"
+        },
+        "provider_implementation": {
+          "minLength": 1,
+          "title": "Provider Implementation",
+          "type": "string"
+        },
+        "performed_at": {
+          "format": "date-time",
+          "title": "Performed At",
+          "type": "string"
+        },
+        "supported": {
+          "title": "Supported",
+          "type": "boolean"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "authenticated": {
+          "title": "Authenticated",
+          "type": "boolean"
+        },
+        "auth_method": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Auth Method"
+        },
+        "executable": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Executable"
+        },
+        "executable_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Executable Version"
+        },
+        "api_key_used": {
+          "default": false,
+          "title": "Api Key Used",
+          "type": "boolean"
+        },
+        "failure_category": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProviderErrorCategory"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "failure_message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Message"
+        },
+        "details": {
+          "items": {
+            "$ref": "#/$defs/ProviderPreflightDetail"
+          },
+          "title": "Details",
+          "type": "array"
+        }
+      },
+      "required": [
+        "provider",
+        "provider_preflight_version",
+        "provider_implementation",
+        "performed_at",
+        "supported",
+        "passed",
+        "authenticated"
+      ],
+      "title": "ProviderPreflightRecord",
+      "type": "object"
+    },
+    "ProviderRecoveryInitiator": {
+      "description": "Who decided that a recovery attempt should be spent.",
+      "enum": [
+        "automatic",
+        "operator"
+      ],
+      "title": "ProviderRecoveryInitiator",
+      "type": "string"
+    },
+    "ProviderRecoveryVerdict": {
+      "description": "The recovery policy's complete answer for one provider-failed job.",
+      "enum": [
+        "recoverable_now",
+        "wait_for_backoff",
+        "preflight_required",
+        "operator_required",
+        "unsafe_to_replay",
+        "exhausted"
+      ],
+      "title": "ProviderRecoveryVerdict",
+      "type": "string"
+    },
+    "ProviderReplaySafety": {
+      "description": "Why replaying the failed attempt slot cannot duplicate or overwrite anything.",
+      "enum": [
+        "failure_is_conclusive",
+        "reservation_resolved",
+        "unsafe"
+      ],
+      "title": "ProviderReplaySafety",
+      "type": "string"
+    },
+    "TranslationAcceptanceOrigin": {
+      "enum": [
+        "initial_qa",
+        "qa_reevaluation",
+        "reuse_qa",
+        "historical_reevaluation",
+        "structural_repair"
+      ],
+      "title": "TranslationAcceptanceOrigin",
+      "type": "string"
+    },
+    "TranslationExecutionKind": {
+      "enum": [
+        "translation",
+        "repair"
+      ],
+      "title": "TranslationExecutionKind",
+      "type": "string"
+    },
+    "TranslationRepairRecoveryLineage": {
+      "additionalProperties": false,
+      "description": "Proof that a recovered repair reproduces the exact repair the provider failed to deliver.\n\nA translation recovery only has to identify the job; the frozen chunk and the rendered prompt\npackage already define what will be sent. A repair has no package: its request is *derived*\nfrom the rejected draft and the QA findings that rejected it, so recovering one is only safe\nif that derivation can be shown to land on the same bytes it landed on before. This block is\nthat showing, and every field in it is a hash or an integer — the derived request itself\ncontains book prose and is never recorded here.\n\nThe lineage deliberately points at the **repair root** — the QA-rejected translation attempt\nthe repair answers — and not at the failed repair attempt. A failed repair produced no\ntranslation, so nothing can be repaired *from* it; treating the numerically previous attempt\nas the repair target would silently redefine what the provider is being asked to fix.",
+      "properties": {
+        "recovered_execution_kind": {
+          "$ref": "#/$defs/TranslationExecutionKind"
+        },
+        "repair_root_attempt": {
+          "minimum": 1,
+          "title": "Repair Root Attempt",
+          "type": "integer"
+        },
+        "failed_repair_attempt": {
+          "minimum": 2,
+          "title": "Failed Repair Attempt",
+          "type": "integer"
+        },
+        "repair_decision_file": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Repair Decision File"
+        },
+        "repair_decision_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Repair Decision Sha256"
+        },
+        "rejection_origin": {
+          "$ref": "#/$defs/TranslationAcceptanceOrigin"
+        },
+        "rejection_evidence_file": {
+          "format": "path",
+          "title": "Rejection Evidence File",
+          "type": "string"
+        },
+        "rejection_evidence_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Rejection Evidence Sha256",
+          "type": "string"
+        },
+        "triggering_codes": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Triggering Codes",
+          "type": "array"
+        },
+        "rejected_attempt_file": {
+          "format": "path",
+          "title": "Rejected Attempt File",
+          "type": "string"
+        },
+        "rejected_attempt_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Rejected Attempt Sha256",
+          "type": "string"
+        },
+        "rejected_translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Rejected Translation Sha256",
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "context_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Context Sha256",
+          "type": "string"
+        },
+        "prompt_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Prompt Sha256",
+          "type": "string"
+        },
+        "style_guide_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Style Guide Sha256",
+          "type": "string"
+        },
+        "terminology_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Terminology Sha256"
+        },
+        "repair_prompt_version": {
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "title": "Repair Prompt Version",
+          "type": "string"
+        },
+        "output_contract": {
+          "minLength": 1,
+          "title": "Output Contract",
+          "type": "string"
+        },
+        "repair_request_system_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Repair Request System Sha256",
+          "type": "string"
+        },
+        "repair_request_user_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Repair Request User Sha256",
+          "type": "string"
+        },
+        "repair_request_identity_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Repair Request Identity Sha256",
+          "type": "string"
+        },
+        "request_reproduced_exactly": {
+          "title": "Request Reproduced Exactly",
+          "type": "boolean"
+        },
+        "repair_decisions_used": {
+          "minimum": 1,
+          "title": "Repair Decisions Used",
+          "type": "integer"
+        },
+        "max_repair_attempts": {
+          "minimum": 1,
+          "title": "Max Repair Attempts",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "recovered_execution_kind",
+        "repair_root_attempt",
+        "failed_repair_attempt",
+        "rejection_origin",
+        "rejection_evidence_file",
+        "rejection_evidence_sha256",
+        "triggering_codes",
+        "rejected_attempt_file",
+        "rejected_attempt_sha256",
+        "rejected_translation_sha256",
+        "source_sha256",
+        "context_sha256",
+        "prompt_sha256",
+        "style_guide_sha256",
+        "repair_prompt_version",
+        "output_contract",
+        "repair_request_system_sha256",
+        "repair_request_user_sha256",
+        "repair_request_identity_sha256",
+        "request_reproduced_exactly",
+        "repair_decisions_used",
+        "max_repair_attempts"
+      ],
+      "title": "TranslationRepairRecoveryLineage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable authorization for exactly one bounded provider-recovery attempt.\n\nIt is neither a transport retry, a queue retry, nor a QA repair: it authorizes re-entering a\njob that a provider failure ended, on the strength of provider health established *after*\nthat failure.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "provider_recovery_engine_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Provider Recovery Engine Version",
+      "type": "string"
+    },
+    "provider_recovery_policy_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Provider Recovery Policy Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "job_id": {
+      "title": "Job Id",
+      "type": "string"
+    },
+    "initiator": {
+      "$ref": "#/$defs/ProviderRecoveryInitiator"
+    },
+    "verdict": {
+      "$ref": "#/$defs/ProviderRecoveryVerdict"
+    },
+    "provider": {
+      "$ref": "#/$defs/ProviderName"
+    },
+    "failure_class": {
+      "$ref": "#/$defs/ProviderFailureClass"
+    },
+    "failed_attempt_number": {
+      "minimum": 1,
+      "title": "Failed Attempt Number",
+      "type": "integer"
+    },
+    "failed_attempt_id": {
+      "title": "Failed Attempt Id",
+      "type": "string"
+    },
+    "failed_attempt_file": {
+      "format": "path",
+      "title": "Failed Attempt File",
+      "type": "string"
+    },
+    "failed_attempt_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Failed Attempt Sha256",
+      "type": "string"
+    },
+    "failed_at": {
+      "format": "date-time",
+      "title": "Failed At",
+      "type": "string"
+    },
+    "historical_error_category": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ProviderErrorCategory"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "historical_retryable": {
+      "title": "Historical Retryable",
+      "type": "boolean"
+    },
+    "historical_ambiguous": {
+      "title": "Historical Ambiguous",
+      "type": "boolean"
+    },
+    "replay_safety": {
+      "$ref": "#/$defs/ProviderReplaySafety"
+    },
+    "recovered_execution_kind": {
+      "$ref": "#/$defs/TranslationExecutionKind",
+      "default": "translation"
+    },
+    "repair": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TranslationRepairRecoveryLineage"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "provider_recovery_attempts_used": {
+      "minimum": 0,
+      "title": "Provider Recovery Attempts Used",
+      "type": "integer"
+    },
+    "max_provider_recovery_attempts": {
+      "minimum": 1,
+      "title": "Max Provider Recovery Attempts",
+      "type": "integer"
+    },
+    "remaining_provider_recovery_attempts": {
+      "minimum": 1,
+      "title": "Remaining Provider Recovery Attempts",
+      "type": "integer"
+    },
+    "provider_attempts_used": {
+      "minimum": 1,
+      "title": "Provider Attempts Used",
+      "type": "integer"
+    },
+    "max_provider_attempts": {
+      "minimum": 1,
+      "title": "Max Provider Attempts",
+      "type": "integer"
+    },
+    "preflight_required": {
+      "title": "Preflight Required",
+      "type": "boolean"
+    },
+    "preflight": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ProviderPreflightRecord"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "authorized_attempt_number": {
+      "minimum": 2,
+      "title": "Authorized Attempt Number",
+      "type": "integer"
+    },
+    "retry_eligible_at": {
+      "format": "date-time",
+      "title": "Retry Eligible At",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "provider_recovery_engine_version",
+    "provider_recovery_policy_version",
+    "run_id",
+    "job_id",
+    "initiator",
+    "verdict",
+    "provider",
+    "failure_class",
+    "failed_attempt_number",
+    "failed_attempt_id",
+    "failed_attempt_file",
+    "failed_attempt_sha256",
+    "failed_at",
+    "historical_retryable",
+    "historical_ambiguous",
+    "replay_safety",
+    "provider_recovery_attempts_used",
+    "max_provider_recovery_attempts",
+    "remaining_provider_recovery_attempts",
+    "provider_attempts_used",
+    "max_provider_attempts",
+    "preflight_required",
+    "authorized_attempt_number",
+    "retry_eligible_at",
+    "created_at"
+  ],
+  "title": "TranslationProviderRecoveryDecision",
+  "type": "object"
+}

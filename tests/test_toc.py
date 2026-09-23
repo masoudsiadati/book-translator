@@ -61,6 +61,68 @@ def test_normalizes_classifications_symbols_titles_and_ranges() -> None:
     assert entries[-1].end_page == 12
 
 
+def test_book_five_style_level_two_chapters_remain_unchanged() -> None:
+    entries = normalize_toc_entries(
+        [
+            RawTocEntry(1, "Contents", 1),
+            RawTocEntry(2, "Prologue (Wheel) First Light", 2),
+            RawTocEntry(2, "Chapter 1 (Lion) Hilltop", 4),
+            RawTocEntry(2, "Chapter 2 New Arrival", 7),
+        ],
+        9,
+    )
+
+    assert [entry.kind for entry in entries] == [
+        TocKind.FRONT_MATTER,
+        TocKind.PROLOGUE,
+        TocKind.CHAPTER,
+        TocKind.CHAPTER,
+    ]
+    assert [entry.level for entry in entries] == [1, 2, 2, 2]
+    assert [entry.number for entry in entries] == [None, 0, 1, 2]
+    assert [entry.title_en for entry in entries[1:]] == ["First Light", "Hilltop", "New Arrival"]
+    assert [entry.symbol for entry in entries[1:]] == ["Wheel", "Lion", None]
+
+
+def test_book_six_style_level_one_entries_are_classified_by_title_prefix() -> None:
+    entries = normalize_toc_entries(
+        [
+            RawTocEntry(1, "Contents", 1),
+            RawTocEntry(1, "Prologue: First Message", 2),
+            RawTocEntry(1, "1 Lion on the Ridge", 4),
+            RawTocEntry(1, "2 A New Visitor", 7),
+            RawTocEntry(1, "55 Wells at Dusk", 10),
+            RawTocEntry(1, "Epilogue: The Reply", 12),
+        ],
+        13,
+    )
+
+    assert [entry.kind for entry in entries] == [
+        TocKind.FRONT_MATTER,
+        TocKind.PROLOGUE,
+        TocKind.CHAPTER,
+        TocKind.CHAPTER,
+        TocKind.CHAPTER,
+        TocKind.EPILOGUE,
+    ]
+    assert [entry.level for entry in entries] == [1, 1, 1, 1, 1, 1]
+    assert [entry.entry_id for entry in entries[1:]] == [
+        "prologue",
+        "chapter-001",
+        "chapter-002",
+        "chapter-055",
+        "epilogue",
+    ]
+    assert [entry.number for entry in entries[1:]] == [0, 1, 2, 55, None]
+    assert [entry.title_en for entry in entries[1:]] == [
+        "First Message",
+        "Lion on the Ridge",
+        "A New Visitor",
+        "Wells at Dusk",
+        "The Reply",
+    ]
+
+
 @pytest.mark.parametrize(
     ("raw_title", "title", "symbol"),
     [

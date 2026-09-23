@@ -1,0 +1,108 @@
+{
+  "$defs": {
+    "TerminologyAnalysisStage": {
+      "enum": [
+        "discovery",
+        "proposal",
+        "review"
+      ],
+      "title": "TerminologyAnalysisStage",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "valid": {
+      "title": "Valid",
+      "type": "boolean"
+    },
+    "stage": {
+      "$ref": "#/$defs/TerminologyAnalysisStage"
+    },
+    "source_count": {
+      "minimum": 0,
+      "title": "Source Count",
+      "type": "integer"
+    },
+    "chapter_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Chapter Count",
+      "type": "integer"
+    },
+    "source_word_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Source Word Count",
+      "type": "integer"
+    },
+    "raw_occurrence_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Raw Occurrence Count",
+      "type": "integer"
+    },
+    "provider_call_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Provider Call Count",
+      "type": "integer"
+    },
+    "item_count": {
+      "minimum": 0,
+      "title": "Item Count",
+      "type": "integer"
+    },
+    "merged_duplicate_count": {
+      "minimum": 0,
+      "title": "Merged Duplicate Count",
+      "type": "integer"
+    },
+    "conflict_count": {
+      "minimum": 0,
+      "title": "Conflict Count",
+      "type": "integer"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "errors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Errors",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "valid",
+    "stage",
+    "source_count",
+    "item_count",
+    "merged_duplicate_count",
+    "conflict_count",
+    "created_at"
+  ],
+  "title": "TerminologyAnalysisValidationReport",
+  "type": "object"
+}

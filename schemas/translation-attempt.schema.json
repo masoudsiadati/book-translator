@@ -1,0 +1,550 @@
+{
+  "$defs": {
+    "ParagraphAlignmentFinding": {
+      "additionalProperties": false,
+      "description": "One alignment or marker-contract defect, recorded without any translated content.",
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "error",
+            "warning"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "source_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Paragraph Index"
+        },
+        "related_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Related Paragraph Index"
+        },
+        "expected_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Marker"
+        },
+        "observed_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Marker"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "ParagraphAlignmentFinding",
+      "type": "object"
+    },
+    "ProviderErrorCategory": {
+      "enum": [
+        "authentication",
+        "authorization",
+        "rate_limit",
+        "timeout_pre_send",
+        "timeout_ambiguous",
+        "connection_pre_send",
+        "connection_ambiguous",
+        "invalid_request",
+        "unsupported_model_or_parameter",
+        "context_length",
+        "content_policy",
+        "server_error",
+        "malformed_response",
+        "empty_response",
+        "output_truncated",
+        "package_invalid",
+        "claim_invalid",
+        "lease_invalid",
+        "local_io",
+        "executable_not_found",
+        "timeout",
+        "nonzero_exit",
+        "empty_output",
+        "invocation_error",
+        "interrupted",
+        "unknown"
+      ],
+      "title": "ProviderErrorCategory",
+      "type": "string"
+    },
+    "ProviderName": {
+      "enum": [
+        "fake",
+        "openai",
+        "codex-cli",
+        "claude-code"
+      ],
+      "title": "ProviderName",
+      "type": "string"
+    },
+    "TranslationAttemptStatus": {
+      "enum": [
+        "prepared",
+        "requesting",
+        "succeeded",
+        "failed",
+        "ambiguous",
+        "invalid"
+      ],
+      "title": "TranslationAttemptStatus",
+      "type": "string"
+    },
+    "TranslationExecutionKind": {
+      "enum": [
+        "translation",
+        "repair"
+      ],
+      "title": "TranslationExecutionKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "attempt_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]*__attempt-\\d{3,}$",
+      "title": "Attempt Id",
+      "type": "string"
+    },
+    "attempt_number": {
+      "minimum": 1,
+      "title": "Attempt Number",
+      "type": "integer"
+    },
+    "execution_kind": {
+      "$ref": "#/$defs/TranslationExecutionKind",
+      "default": "translation"
+    },
+    "repaired_from_attempt": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Repaired From Attempt"
+    },
+    "repaired_from_carry_forward": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Repaired From Carry Forward"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "job_id": {
+      "title": "Job Id",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "prompt_package_id": {
+      "title": "Prompt Package Id",
+      "type": "string"
+    },
+    "provider": {
+      "$ref": "#/$defs/ProviderName"
+    },
+    "provider_adapter_version": {
+      "title": "Provider Adapter Version",
+      "type": "string"
+    },
+    "provider_executor_version": {
+      "title": "Provider Executor Version",
+      "type": "string"
+    },
+    "model_requested": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Model Requested"
+    },
+    "model_returned": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Returned"
+    },
+    "provider_response_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Provider Response Id"
+    },
+    "request_file": {
+      "format": "path",
+      "title": "Request File",
+      "type": "string"
+    },
+    "request_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Request Sha256",
+      "type": "string"
+    },
+    "response_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Response File"
+    },
+    "response_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Response Sha256"
+    },
+    "raw_response_stored": {
+      "title": "Raw Response Stored",
+      "type": "boolean"
+    },
+    "translation_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Translation File"
+    },
+    "translation_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Translation Sha256"
+    },
+    "output_contract": {
+      "title": "Output Contract",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/TranslationAttemptStatus"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "completed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Completed At"
+    },
+    "latency_milliseconds": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Latency Milliseconds"
+    },
+    "input_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Input Tokens"
+    },
+    "output_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Output Tokens"
+    },
+    "total_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Total Tokens"
+    },
+    "estimated_input_tokens": {
+      "minimum": 0,
+      "title": "Estimated Input Tokens",
+      "type": "integer"
+    },
+    "max_output_tokens": {
+      "exclusiveMinimum": 0,
+      "title": "Max Output Tokens",
+      "type": "integer"
+    },
+    "sdk_retry_count": {
+      "minimum": 0,
+      "title": "Sdk Retry Count",
+      "type": "integer"
+    },
+    "stop_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Stop Reason"
+    },
+    "error_category": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ProviderErrorCategory"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "retryable": {
+      "default": false,
+      "title": "Retryable",
+      "type": "boolean"
+    },
+    "ambiguous": {
+      "default": false,
+      "title": "Ambiguous",
+      "type": "boolean"
+    },
+    "sanitized_error_message": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sanitized Error Message"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "rejected_output_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rejected Output File"
+    },
+    "rejected_output_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rejected Output Sha256"
+    },
+    "marker_findings": {
+      "items": {
+        "$ref": "#/$defs/ParagraphAlignmentFinding"
+      },
+      "title": "Marker Findings",
+      "type": "array"
+    },
+    "expected_marker_count": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Marker Count"
+    },
+    "observed_marker_count": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Observed Marker Count"
+    }
+  },
+  "required": [
+    "schema_version",
+    "attempt_id",
+    "attempt_number",
+    "run_id",
+    "job_id",
+    "snapshot_id",
+    "prompt_package_id",
+    "provider",
+    "provider_adapter_version",
+    "provider_executor_version",
+    "model_requested",
+    "request_file",
+    "request_sha256",
+    "raw_response_stored",
+    "output_contract",
+    "status",
+    "started_at",
+    "estimated_input_tokens",
+    "max_output_tokens",
+    "sdk_retry_count"
+  ],
+  "title": "TranslationAttempt",
+  "type": "object"
+}

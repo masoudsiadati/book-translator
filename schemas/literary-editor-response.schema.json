@@ -1,0 +1,126 @@
+{
+  "$defs": {
+    "GovernedMultiParagraphEditRequest": {
+      "additionalProperties": false,
+      "description": "An explicit refusal to move content silently across paragraph identities.",
+      "properties": {
+        "paragraph_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2,
+          "title": "Paragraph Ids",
+          "type": "array"
+        },
+        "reason": {
+          "enum": [
+            "cross_paragraph_syntax",
+            "dialogue_ownership",
+            "reference_continuity",
+            "other_governed_restructure"
+          ],
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "paragraph_ids",
+        "reason"
+      ],
+      "title": "GovernedMultiParagraphEditRequest",
+      "type": "object"
+    },
+    "LiteraryEditReason": {
+      "description": "Closed, non-explanatory vocabulary for the kind of prose edit made.",
+      "enum": [
+        "literal_syntax",
+        "awkward_wording",
+        "dialogue_naturalness",
+        "flow",
+        "repetition",
+        "pronoun_clarity",
+        "register",
+        "rhythm",
+        "punctuation",
+        "no_change"
+      ],
+      "title": "LiteraryEditReason",
+      "type": "string"
+    },
+    "LiteraryEditedParagraph": {
+      "additionalProperties": false,
+      "description": "One editor output paragraph, still subject to independent fidelity verification.",
+      "properties": {
+        "paragraph_id": {
+          "pattern": "^P\\d{4}$",
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "edited_text": {
+          "minLength": 1,
+          "title": "Edited Text",
+          "type": "string"
+        },
+        "changed": {
+          "title": "Changed",
+          "type": "boolean"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/LiteraryEditReason"
+          },
+          "maxItems": 9,
+          "title": "Reasons",
+          "type": "array"
+        },
+        "changed_flag_normalized": {
+          "default": false,
+          "title": "Changed Flag Normalized",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "paragraph_id",
+        "edited_text",
+        "changed"
+      ],
+      "title": "LiteraryEditedParagraph",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Strict provider response; it deliberately contains no fidelity verdict.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "editor_schema_version": {
+      "title": "Editor Schema Version",
+      "type": "string"
+    },
+    "paragraphs": {
+      "items": {
+        "$ref": "#/$defs/LiteraryEditedParagraph"
+      },
+      "minItems": 1,
+      "title": "Paragraphs",
+      "type": "array"
+    },
+    "multi_paragraph_edit_requests": {
+      "items": {
+        "$ref": "#/$defs/GovernedMultiParagraphEditRequest"
+      },
+      "title": "Multi Paragraph Edit Requests",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "editor_schema_version",
+    "paragraphs"
+  ],
+  "title": "LiteraryEditorResponse",
+  "type": "object"
+}

@@ -1,0 +1,323 @@
+{
+  "$defs": {
+    "AuditCategory": {
+      "enum": [
+        "page_boundary_continuation",
+        "joined_token",
+        "split_token",
+        "dialogue_boundary",
+        "paragraph_boundary",
+        "heading_structure",
+        "chunk_boundary",
+        "duplication",
+        "conservation"
+      ],
+      "title": "AuditCategory",
+      "type": "string"
+    },
+    "AuditConfidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "AuditConfidence",
+      "type": "string"
+    },
+    "AuditResolutionStatus": {
+      "enum": [
+        "unresolved",
+        "resolved_by_normalization",
+        "resolved_by_chunking",
+        "not_applicable_downstream",
+        "cannot_evaluate",
+        "known_source_anomaly"
+      ],
+      "title": "AuditResolutionStatus",
+      "type": "string"
+    },
+    "AuditSeverity": {
+      "enum": [
+        "error",
+        "warning",
+        "info"
+      ],
+      "title": "AuditSeverity",
+      "type": "string"
+    },
+    "AuditSourceLayer": {
+      "enum": [
+        "immutable_extraction",
+        "normalization",
+        "chunking",
+        "manual_source_review"
+      ],
+      "title": "AuditSourceLayer",
+      "type": "string"
+    },
+    "SourceAuditFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "finding_id": {
+          "pattern": "^sqf-[0-9a-f]{24}$",
+          "title": "Finding Id",
+          "type": "string"
+        },
+        "chapter_id": {
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "chunk_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Chunk Id"
+        },
+        "page_from": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page From"
+        },
+        "page_to": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page To"
+        },
+        "category": {
+          "$ref": "#/$defs/AuditCategory"
+        },
+        "severity": {
+          "$ref": "#/$defs/AuditSeverity"
+        },
+        "confidence": {
+          "$ref": "#/$defs/AuditConfidence"
+        },
+        "source_layer": {
+          "$ref": "#/$defs/AuditSourceLayer"
+        },
+        "resolution_status": {
+          "$ref": "#/$defs/AuditResolutionStatus"
+        },
+        "blocking": {
+          "title": "Blocking",
+          "type": "boolean"
+        },
+        "anomaly_id": {
+          "anyOf": [
+            {
+              "pattern": "^sa-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Anomaly Id"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "evidence": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Evidence",
+          "type": "object"
+        },
+        "suggested_action": {
+          "title": "Suggested Action",
+          "type": "string"
+        }
+      },
+      "required": [
+        "finding_id",
+        "chapter_id",
+        "category",
+        "severity",
+        "confidence",
+        "source_layer",
+        "resolution_status",
+        "blocking",
+        "message",
+        "suggested_action"
+      ],
+      "title": "SourceAuditFinding",
+      "type": "object"
+    },
+    "SourceAuditIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "audit_engine_version": {
+          "title": "Audit Engine Version",
+          "type": "string"
+        },
+        "extraction_lineage_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Extraction Lineage Sha256",
+          "type": "string"
+        },
+        "normalization_lineage_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Normalization Lineage Sha256",
+          "type": "string"
+        },
+        "chunk_lineage_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Chunk Lineage Sha256",
+          "type": "string"
+        },
+        "normalization_versions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Normalization Versions",
+          "type": "array"
+        },
+        "chunk_engine_versions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Chunk Engine Versions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "audit_engine_version",
+        "extraction_lineage_sha256",
+        "normalization_lineage_sha256",
+        "chunk_lineage_sha256",
+        "normalization_versions",
+        "chunk_engine_versions"
+      ],
+      "title": "SourceAuditIdentity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "audit_id": {
+      "pattern": "^source-quality-[0-9a-f]{24}$",
+      "title": "Audit Id",
+      "type": "string"
+    },
+    "identity": {
+      "$ref": "#/$defs/SourceAuditIdentity"
+    },
+    "chapters_scanned": {
+      "minimum": 0,
+      "title": "Chapters Scanned",
+      "type": "integer"
+    },
+    "pages_inspected": {
+      "minimum": 0,
+      "title": "Pages Inspected",
+      "type": "integer"
+    },
+    "blocks_inspected": {
+      "minimum": 0,
+      "title": "Blocks Inspected",
+      "type": "integer"
+    },
+    "chunks_inspected": {
+      "minimum": 0,
+      "title": "Chunks Inspected",
+      "type": "integer"
+    },
+    "blocking_findings": {
+      "minimum": 0,
+      "title": "Blocking Findings",
+      "type": "integer"
+    },
+    "unresolved_high_confidence_findings": {
+      "minimum": 0,
+      "title": "Unresolved High Confidence Findings",
+      "type": "integer"
+    },
+    "resolved_high_confidence_findings": {
+      "minimum": 0,
+      "title": "Resolved High Confidence Findings",
+      "type": "integer"
+    },
+    "chapters_missing_normalization": {
+      "minimum": 0,
+      "title": "Chapters Missing Normalization",
+      "type": "integer"
+    },
+    "chapters_missing_chunks": {
+      "minimum": 0,
+      "title": "Chapters Missing Chunks",
+      "type": "integer"
+    },
+    "chapters_translation_ready": {
+      "minimum": 0,
+      "title": "Chapters Translation Ready",
+      "type": "integer"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/SourceAuditFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "audit_id",
+    "identity",
+    "chapters_scanned",
+    "pages_inspected",
+    "blocks_inspected",
+    "chunks_inspected",
+    "blocking_findings",
+    "unresolved_high_confidence_findings",
+    "resolved_high_confidence_findings",
+    "chapters_missing_normalization",
+    "chapters_missing_chunks",
+    "chapters_translation_ready",
+    "findings"
+  ],
+  "title": "SourceAuditReport",
+  "type": "object"
+}

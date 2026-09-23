@@ -10,7 +10,7 @@ from book_translator.atomic_write import atomic_write_text
 from book_translator.cli import app
 from book_translator.models import ChapterMetadata, ChapterStatus, TocKind
 from book_translator.normalization.engine import NORMALIZATION_VERSION, PASS_ORDER, normalize_text
-from book_translator.normalization.markers import MarkerError
+from book_translator.normalization.markers import MarkerError, parse_source
 from book_translator.normalization.workflow import (
     ChapterNormalizationError,
     execute_normalization,
@@ -126,16 +126,184 @@ def test_blocks_headings_and_paragraph_boundaries_are_preserved() -> None:
     assert "Prologue (Serpent" not in result.cleaned_text
 
 
-def test_page_boundary_never_joins_and_counts_physical_lines() -> None:
+def test_clear_page_boundary_continuation_joins_and_counts_physical_lines() -> None:
     source = (
-        "<!-- source-page: 1 -->\n\nEnd of one page\n"
-        "<!-- source-page: 2 -->\ncontinued on another\n"
+        "<!-- source-page: 1 -->\n\nA synthetic sentence wraps\n"
+        "across the end of one page\n"
+        "<!-- source-page: 2 -->\ncontinued on the next physical\npage.\n"
     )
     result = normalize_text(source)
-    assert result.cleaned_text == "End of one page\n\ncontinued on another\n"
-    assert result.document.source_physical_line_count == 2
-    assert result.wrapped_line_joins == 0
+    assert result.cleaned_text == (
+        "A synthetic sentence wraps across the end of one page continued on the next "
+        "physical page.\n"
+    )
+    assert result.document.source_physical_line_count == 4
+    assert result.wrapped_line_joins == 2
+    assert result.page_continuation_joins == 1
     assert result.page_markers_removed == 2
+
+
+def test_reviewed_real_page_boundaries_follow_structural_classification() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    reviewed = (
+        ("002", 87, False),
+        ("008", 180, False),
+        ("015", 267, False),
+        ("024", 398, True),
+        ("034", 525, True),
+        ("039", 577, False),
+        ("039", 578, False),
+        ("043", 650, False),
+        ("050", 806, True),
+    )
+    for chapter_id, right_page, expected_join in reviewed:
+        source = (project_root / "workspace/chapters" / chapter_id / "source.md").read_text(
+            encoding="utf-8"
+        )
+        parsed, _ = parse_source(source)
+        right = next(block for block in parsed.blocks if block.source_page == right_page)
+        result = normalize_text(source)
+        joins = {
+            (change.source_page, change.block_index)
+            for change in result.changes
+            if change.change_type == "page_boundary_continuation_join"
+        }
+        assert ((right_page, right.block_index) in joins) is expected_join
+
+
+@pytest.mark.parametrize(
+    ("left", "right"),
+    [
+        ("A face held what might have been smile or", "grimace before it faded away."),
+        ("Light crossed the floor of", "polished redstone beneath them."),
+    ],
+)
+def test_prologue_page_boundary_regressions_join(left: str, right: str) -> None:
+    source = (
+        f"<!-- source-page: 7 -->\n\nSynthetic lead-in wraps\n{left}\n"
+        f"<!-- source-page: 8 -->\n{right}\nand continues here.\n"
+    )
+
+    result = normalize_text(source)
+
+    assert f"{left} {right}" in result.cleaned_text
+    assert "\n\n" not in result.cleaned_text
+    assert result.page_continuation_joins == 1
+
+
+def test_balanced_dialogue_and_narration_split_inside_sentence_joins() -> None:
+    source = (
+        '<!-- source-page: 56 -->\n\n"I agree." A speaker answered\n'
+        'evenly. "We can continue with\n'
+        '<!-- source-page: 57 -->\nlowercase prose across the page\nboundary."\n'
+    )
+
+    result = normalize_text(source)
+
+    assert "with lowercase prose" in result.cleaned_text
+    assert "\n\n" not in result.cleaned_text
+    assert result.page_continuation_joins == 1
+
+
+def test_chapter_style_mixed_dialogue_page_split_joins() -> None:
+    source = (
+        '<!-- source-page: 913 -->\n\n"A short reply." The speaker said it\n'
+        'calmly. "The wider statement continues for\n'
+        "<!-- source-page: 914 -->\nstructural reasons, then finishes. A new sentence\n"
+        "continues within the extracted block.\n"
+    )
+
+    result = normalize_text(source)
+
+    assert "for structural reasons" in result.cleaned_text
+    assert len(result.document.blocks) == 1
+    assert result.page_continuation_joins == 1
+
+
+def test_unclosed_dialogue_with_prior_sentence_and_incomplete_clause_joins() -> None:
+    source = (
+        '<!-- source-page: 10 -->\n\n"A question? If the guardian learns\n'
+        "that we lost the traveler, she may begin\n"
+        '<!-- source-page: 11 -->\nto ask more questions about\nthe missing party, yes?"\n'
+    )
+
+    result = normalize_text(source)
+
+    assert "may begin to ask" in result.cleaned_text
+    assert result.page_continuation_joins == 1
+
+
+def test_capitalized_proper_name_split_across_page_joins() -> None:
+    source = (
+        "<!-- source-page: 20 -->\n\nThe synthetic description ends with the name\n"
+        "of the ancient ruler Lews\n"
+        "<!-- source-page: 21 -->\nTherin's standard remained above\nthe distant tower.\n"
+    )
+
+    result = normalize_text(source)
+
+    assert "Lews Therin's standard" in result.cleaned_text
+    assert result.page_continuation_joins == 1
+
+
+def test_one_line_tail_of_later_unclosed_dialogue_clause_joins() -> None:
+    source = (
+        '<!-- source-page: 30 -->\n\n"A complete thought." The speaker paused and said,\n'
+        '"There is still something to\nconsider before we decide to l\n'
+        '<!-- source-page: 31 -->\nleave now?"\n'
+    )
+
+    result = normalize_text(source)
+
+    assert "decide to l leave now?" in result.cleaned_text
+    assert result.page_continuation_joins == 1
+
+
+def test_separate_capitalized_prose_paragraph_does_not_join() -> None:
+    source = (
+        "<!-- source-page: 40 -->\n\nA deliberately unfinished synthetic phrase\n"
+        "ending in an ordinary Word\n"
+        "<!-- source-page: 41 -->\nSeparate prose begins on\nthe following page.\n"
+    )
+
+    result = normalize_text(source)
+
+    assert result.page_continuation_joins == 0
+
+
+@pytest.mark.parametrize("prefix", ["- ", "* ", "+ ", "1. ", "2) "])
+def test_capitalized_possessive_list_block_does_not_join(prefix: str) -> None:
+    source = (
+        "<!-- source-page: 40 -->\n\nA deliberately unfinished synthetic phrase\n"
+        "ending with the name Lews\n"
+        f"<!-- source-page: 41 -->\n{prefix}Therin's listed item wraps\n"
+        "onto another physical line.\n"
+    )
+
+    result = normalize_text(source)
+
+    assert result.page_continuation_joins == 0
+
+
+@pytest.mark.parametrize(
+    ("left", "right"),
+    [
+        ("A complete synthetic paragraph\nends here.", "lowercase is intentional\nhere."),
+        ("An intentionally unfinished label\nfor context", "Separate Paragraph\nstarts here."),
+        ('"A dialogue block continues\nwithout a closing mark', "quietly on the next\npage."),
+        ("“A curly dialogue block continues\nwithout a closing mark", "quietly next\npage."),
+        ("A complete paragraph\nends here.", '"New dialogue starts\non the next page."'),
+        ("A synthetic paragraph ends\nbefore the marker", "***"),
+        ("A synthetic boundary hyphen\nremains-", "unchanged across the\nnext page."),
+    ],
+)
+def test_genuine_or_structural_page_boundaries_remain_separate(left: str, right: str) -> None:
+    source = f"<!-- source-page: 1 -->\n\n{left}\n<!-- source-page: 2 -->\n{right}\n"
+
+    result = normalize_text(source)
+
+    assert "\n\n" in result.cleaned_text
+    assert result.page_continuation_joins == 0
 
 
 def test_poetry_like_lines_are_preserved_and_ambiguous_blocks_warn() -> None:
@@ -254,6 +422,22 @@ def test_force_replacement_and_downstream_refusal(tmp_path: Path) -> None:
         execute_normalization(conflict)
 
 
+def test_valid_normalization_skips_after_chapter_advances_to_chunked(tmp_path: Path) -> None:
+    directory = make_chapter(tmp_path, 1, "Synthetic prose.")
+    execute_normalization(plan_normalization(project_root=tmp_path), now=lambda: NOW)
+    metadata_path = directory / "metadata.yaml"
+    metadata = ChapterMetadata.model_validate(yaml.safe_load(metadata_path.read_text()))
+    advanced = metadata.model_copy(update={"status": ChapterStatus.CHUNKED, "chunk_count": 1})
+    metadata_path.write_text(
+        yaml.safe_dump(advanced.model_dump(mode="json"), sort_keys=False), encoding="utf-8"
+    )
+    directory.joinpath("chunks/001").mkdir(parents=True)
+
+    plan = plan_normalization(project_root=tmp_path, selector="1")
+
+    assert plan.chapters[0].action == "skip"
+
+
 def test_dry_run_cli_writes_nothing_and_prints_no_prose(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -305,3 +489,59 @@ def test_runtime_failure_preserves_completed_and_leaves_failed_metadata_unclaime
     assert second.joinpath("cleaned.md").exists()
     rerun = plan_normalization(project_root=tmp_path)
     assert [item.action for item in rerun.chapters] == ["skip", "conflict"]
+
+
+def test_lowercase_edge_continues_into_capitalized_possessive_name_across_page() -> None:
+    source = (
+        "<!-- source-page: 377 -->\n\nThe synthetic clause wraps across lines,\n"
+        "pausing for a moment to finger\n"
+        "<!-- source-page: 378 -->\nAldan’s heavy ring. Another sentence\n"
+        "continues within the extracted block.\n"
+    )
+
+    result = normalize_text(source)
+
+    assert "to finger Aldan’s heavy ring" in result.cleaned_text
+    assert len(result.document.blocks) == 1
+    assert result.page_continuation_joins == 1
+    assert [
+        change.description
+        for change in result.changes
+        if change.change_type == "page_boundary_continuation_join"
+    ] == ["lowercase-possessive-name-continuation"]
+
+
+@pytest.mark.parametrize(
+    ("left", "right"),
+    [
+        # A terminal left edge keeps a possessive-led new paragraph separate.
+        ("A complete synthetic paragraph\nends here.", "Aldan's tone was cold\nand level."),
+        # Trailing punctuation on the left edge is not a bare unfinished word.
+        ("A synthetic clause pauses,\nthen stops here,", "Aldan's tone was cold\nand level."),
+        # A closing quotation mark ends the left edge even without a full stop.
+        ('"A synthetic dialogue line ends\nwith a closing mark"', "Aldan's reply\nwas curt."),
+        # A capitalized non-possessive right edge stays a plain paragraph boundary.
+        ("A synthetic clause wraps and\nstops on the word", "Aldan turned toward\nthe door."),
+        # A one-line right block is structural and stays protected.
+        ("A synthetic clause wraps and\nstops on the word", "Aldan's ring."),
+    ],
+)
+def test_possessive_name_rule_keeps_genuine_boundaries_separate(left: str, right: str) -> None:
+    source = f"<!-- source-page: 1 -->\n\n{left}\n<!-- source-page: 2 -->\n{right}\n"
+
+    result = normalize_text(source)
+
+    assert result.page_continuation_joins == 0
+    assert len(result.document.blocks) == 2
+
+
+def test_possessive_name_rule_requires_different_canonical_pages() -> None:
+    source = (
+        "<!-- source-page: 1 -->\n\nA synthetic clause wraps and\nstops on the word\n\n"
+        "Aldan's ring glowed on\nthe table.\n"
+    )
+
+    result = normalize_text(source)
+
+    assert result.page_continuation_joins == 0
+    assert len(result.document.blocks) == 2

@@ -1,0 +1,266 @@
+{
+  "$defs": {
+    "SemanticGateJobRecord": {
+      "additionalProperties": false,
+      "description": "What the gate did to one job, in counts.",
+      "properties": {
+        "job_id": {
+          "minLength": 1,
+          "title": "Job Id",
+          "type": "string"
+        },
+        "chunk_id": {
+          "minLength": 1,
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "initial_status": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SemanticGateStatus"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "final_status": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SemanticGateStatus"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "judge_calls": {
+          "minimum": 0,
+          "title": "Judge Calls",
+          "type": "integer"
+        },
+        "second_looks": {
+          "minimum": 0,
+          "title": "Second Looks",
+          "type": "integer"
+        },
+        "revisions_attempted": {
+          "minimum": 0,
+          "title": "Revisions Attempted",
+          "type": "integer"
+        },
+        "revisions_adopted": {
+          "minimum": 0,
+          "title": "Revisions Adopted",
+          "type": "integer"
+        },
+        "resegmentations": {
+          "minimum": 0,
+          "title": "Resegmentations",
+          "type": "integer"
+        },
+        "paragraphs_judged": {
+          "minimum": 0,
+          "title": "Paragraphs Judged",
+          "type": "integer"
+        },
+        "unresolved_paragraphs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Paragraphs",
+          "type": "array"
+        },
+        "failures": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Failures",
+          "type": "array"
+        }
+      },
+      "required": [
+        "job_id",
+        "chunk_id",
+        "judge_calls",
+        "second_looks",
+        "revisions_attempted",
+        "revisions_adopted",
+        "resegmentations",
+        "paragraphs_judged"
+      ],
+      "title": "SemanticGateJobRecord",
+      "type": "object"
+    },
+    "SemanticGateStatus": {
+      "description": "The governed semantic state of one job. Absent means not judged.",
+      "enum": [
+        "pass",
+        "revise",
+        "inconclusive",
+        "unresolved"
+      ],
+      "title": "SemanticGateStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One invocation of the production semantic gate over a run.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "gate_engine_version": {
+      "title": "Gate Engine Version",
+      "type": "string"
+    },
+    "gate_policy_version": {
+      "title": "Gate Policy Version",
+      "type": "string"
+    },
+    "judge_prompt_version": {
+      "title": "Judge Prompt Version",
+      "type": "string"
+    },
+    "judge_schema_version": {
+      "title": "Judge Schema Version",
+      "type": "string"
+    },
+    "judge_policy_version": {
+      "title": "Judge Policy Version",
+      "type": "string"
+    },
+    "second_look_policy_version": {
+      "title": "Second Look Policy Version",
+      "type": "string"
+    },
+    "revision_prompt_version": {
+      "title": "Revision Prompt Version",
+      "type": "string"
+    },
+    "revision_policy_version": {
+      "title": "Revision Policy Version",
+      "type": "string"
+    },
+    "displacement_classifier_version": {
+      "title": "Displacement Classifier Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "provider": {
+      "minLength": 1,
+      "title": "Provider",
+      "type": "string"
+    },
+    "adapter_version": {
+      "minLength": 1,
+      "title": "Adapter Version",
+      "type": "string"
+    },
+    "models_returned": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Models Returned",
+      "type": "array"
+    },
+    "dry_run": {
+      "title": "Dry Run",
+      "type": "boolean"
+    },
+    "jobs_selected": {
+      "minimum": 0,
+      "title": "Jobs Selected",
+      "type": "integer"
+    },
+    "jobs_processed": {
+      "minimum": 0,
+      "title": "Jobs Processed",
+      "type": "integer"
+    },
+    "judge_calls": {
+      "minimum": 0,
+      "title": "Judge Calls",
+      "type": "integer"
+    },
+    "reviser_calls": {
+      "minimum": 0,
+      "title": "Reviser Calls",
+      "type": "integer"
+    },
+    "second_looks": {
+      "minimum": 0,
+      "title": "Second Looks",
+      "type": "integer"
+    },
+    "resegmentations": {
+      "minimum": 0,
+      "title": "Resegmentations",
+      "type": "integer"
+    },
+    "revisions_adopted": {
+      "minimum": 0,
+      "title": "Revisions Adopted",
+      "type": "integer"
+    },
+    "revisions_refused": {
+      "minimum": 0,
+      "title": "Revisions Refused",
+      "type": "integer"
+    },
+    "status_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Status Counts",
+      "type": "object"
+    },
+    "jobs": {
+      "items": {
+        "$ref": "#/$defs/SemanticGateJobRecord"
+      },
+      "title": "Jobs",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "gate_engine_version",
+    "gate_policy_version",
+    "judge_prompt_version",
+    "judge_schema_version",
+    "judge_policy_version",
+    "second_look_policy_version",
+    "revision_prompt_version",
+    "revision_policy_version",
+    "displacement_classifier_version",
+    "run_id",
+    "provider",
+    "adapter_version",
+    "dry_run",
+    "jobs_selected",
+    "jobs_processed",
+    "judge_calls",
+    "reviser_calls",
+    "second_looks",
+    "resegmentations",
+    "revisions_adopted",
+    "revisions_refused",
+    "created_at"
+  ],
+  "title": "SemanticGateReport",
+  "type": "object"
+}

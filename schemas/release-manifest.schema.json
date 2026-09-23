@@ -1,0 +1,460 @@
+{
+  "$defs": {
+    "ReleaseArtifactReference": {
+      "additionalProperties": false,
+      "description": "One published release file, addressed by its own bytes.",
+      "properties": {
+        "file": {
+          "format": "path",
+          "title": "File",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/ReleaseArtifactRole"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "byte_count": {
+          "minimum": 0,
+          "title": "Byte Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "file",
+        "role",
+        "sha256",
+        "byte_count"
+      ],
+      "title": "ReleaseArtifactReference",
+      "type": "object"
+    },
+    "ReleaseArtifactRole": {
+      "description": "What one file in a release directory is.",
+      "enum": [
+        "book",
+        "chapter",
+        "metadata",
+        "terminology",
+        "translation_report",
+        "lineage"
+      ],
+      "title": "ReleaseArtifactRole",
+      "type": "string"
+    },
+    "ReleaseChapterRecord": {
+      "additionalProperties": false,
+      "description": "One assembled chapter, and the frozen chapter it was assembled from.",
+      "properties": {
+        "chapter_id": {
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "chapter_sequence": {
+          "minimum": 1,
+          "title": "Chapter Sequence",
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/TocKind"
+        },
+        "number": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Number"
+        },
+        "title_en": {
+          "title": "Title En",
+          "type": "string"
+        },
+        "title_fa": {
+          "title": "Title Fa",
+          "type": "string"
+        },
+        "heading": {
+          "minLength": 1,
+          "title": "Heading",
+          "type": "string"
+        },
+        "heading_source": {
+          "$ref": "#/$defs/ReleaseHeadingSource"
+        },
+        "file": {
+          "format": "path",
+          "title": "File",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "chunk_count": {
+          "minimum": 1,
+          "title": "Chunk Count",
+          "type": "integer"
+        },
+        "paragraph_count": {
+          "minimum": 1,
+          "title": "Paragraph Count",
+          "type": "integer"
+        },
+        "word_count": {
+          "minimum": 0,
+          "title": "Word Count",
+          "type": "integer"
+        },
+        "source_cleaned_file": {
+          "format": "path",
+          "title": "Source Cleaned File",
+          "type": "string"
+        },
+        "source_cleaned_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Cleaned Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "chapter_id",
+        "chapter_sequence",
+        "kind",
+        "title_en",
+        "title_fa",
+        "heading",
+        "heading_source",
+        "file",
+        "sha256",
+        "chunk_count",
+        "paragraph_count",
+        "word_count",
+        "source_cleaned_file",
+        "source_cleaned_sha256"
+      ],
+      "title": "ReleaseChapterRecord",
+      "type": "object"
+    },
+    "ReleaseHeadingSource": {
+      "description": "Which recorded chapter title the assembled heading was taken from.\n\nThe assembly never invents or translates a title. When the target-language title is still\nblank the source-language one is used verbatim and that substitution is recorded, because a\nreader of the release is entitled to know which headings are not yet translated.",
+      "enum": [
+        "title_target",
+        "title_target_artifact",
+        "title_source"
+      ],
+      "title": "ReleaseHeadingSource",
+      "type": "string"
+    },
+    "ReleaseSemanticWaiverReference": {
+      "additionalProperties": false,
+      "description": "What a release states, in its own bytes, about the coverage it was published without.",
+      "properties": {
+        "waiver_id": {
+          "pattern": "^rw-[0-9a-f]{24}$",
+          "title": "Waiver Id",
+          "type": "string"
+        },
+        "waiver_file": {
+          "format": "path",
+          "title": "Waiver File",
+          "type": "string"
+        },
+        "waiver_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Waiver Sha256",
+          "type": "string"
+        },
+        "semantic_gate_policy_version": {
+          "minLength": 1,
+          "title": "Semantic Gate Policy Version",
+          "type": "string"
+        },
+        "judged_pass": {
+          "minimum": 0,
+          "title": "Judged Pass",
+          "type": "integer"
+        },
+        "not_judged": {
+          "minimum": 1,
+          "title": "Not Judged",
+          "type": "integer"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "decided_by": {
+          "const": "user",
+          "default": "user",
+          "title": "Decided By",
+          "type": "string"
+        },
+        "semantic_coverage": {
+          "const": "waived_not_judged",
+          "default": "waived_not_judged",
+          "title": "Semantic Coverage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "waiver_id",
+        "waiver_file",
+        "waiver_sha256",
+        "semantic_gate_policy_version",
+        "judged_pass",
+        "not_judged",
+        "reason"
+      ],
+      "title": "ReleaseSemanticWaiverReference",
+      "type": "object"
+    },
+    "TocKind": {
+      "enum": [
+        "front_matter",
+        "prologue",
+        "chapter",
+        "epilogue",
+        "appendix",
+        "unknown"
+      ],
+      "title": "TocKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The content-addressed index of one release directory.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "release_assembly_engine_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Release Assembly Engine Version",
+      "type": "string"
+    },
+    "release_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Release Id",
+      "type": "string"
+    },
+    "book_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "source_language": {
+      "minLength": 2,
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "minLength": 2,
+      "title": "Target Language",
+      "type": "string"
+    },
+    "source_translation_run": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Source Translation Run",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "snapshot_manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Snapshot Manifest Sha256",
+      "type": "string"
+    },
+    "book_metadata_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Book Metadata File"
+    },
+    "book_metadata_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Book Metadata Sha256"
+    },
+    "terminology_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology File"
+    },
+    "terminology_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Sha256"
+    },
+    "terminology_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Version"
+    },
+    "chapter_title_artifact_id": {
+      "anyOf": [
+        {
+          "pattern": "^ct-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Chapter Title Artifact Id"
+    },
+    "chapter_title_artifact_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Chapter Title Artifact Sha256"
+    },
+    "semantic_waiver": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ReleaseSemanticWaiverReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "chapter_count": {
+      "minimum": 1,
+      "title": "Chapter Count",
+      "type": "integer"
+    },
+    "chunk_count": {
+      "minimum": 1,
+      "title": "Chunk Count",
+      "type": "integer"
+    },
+    "accepted_translation_count": {
+      "minimum": 1,
+      "title": "Accepted Translation Count",
+      "type": "integer"
+    },
+    "paragraph_count": {
+      "minimum": 1,
+      "title": "Paragraph Count",
+      "type": "integer"
+    },
+    "word_count": {
+      "minimum": 0,
+      "title": "Word Count",
+      "type": "integer"
+    },
+    "chapters": {
+      "items": {
+        "$ref": "#/$defs/ReleaseChapterRecord"
+      },
+      "title": "Chapters",
+      "type": "array"
+    },
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/ReleaseArtifactReference"
+      },
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "content_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Content Sha256",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "release_assembly_engine_version",
+    "release_id",
+    "book_id",
+    "source_language",
+    "target_language",
+    "source_translation_run",
+    "snapshot_id",
+    "snapshot_manifest_sha256",
+    "chapter_count",
+    "chunk_count",
+    "accepted_translation_count",
+    "paragraph_count",
+    "word_count",
+    "chapters",
+    "artifacts",
+    "content_sha256",
+    "created_at"
+  ],
+  "title": "ReleaseManifest",
+  "type": "object"
+}

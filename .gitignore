@@ -30,7 +30,59 @@ output/*.epub
 logs/**
 !logs/.gitkeep
 
+# Sensitive provider-ready prompt packages contain copyrighted source/context text.
+workspace/translation-runs/*/jobs/*/prompt-package/**
+workspace/books/*/translation-runs/*/jobs/*/prompt-package/**
+# Provider attempts contain sensitive responses and translated text.
+workspace/translation-runs/*/jobs/*/attempts/**
+workspace/books/*/translation-runs/*/jobs/*/attempts/**
+# Assembled releases contain the complete translated book.
+workspace/releases/**
+workspace/books/*/releases/**
+# Semantic coverage evidence quotes short source fragments as defect evidence, which a repair
+# stage needs and a repository must not accumulate.
+workspace/audits/semantic-coverage/**
+workspace/books/*/audits/semantic-coverage/**
+# A semantic judgement records outcomes, versions, hashes and bounded findings evidence, and a
+# staged job.yaml points at it, so the record is tracked; anything else the directory ever holds
+# (prompts, provider payloads, translated or source prose) is not.
+workspace/**/translation-runs/**/semantic-qa/**
+!workspace/**/translation-runs/**/semantic-qa/**/
+!workspace/**/translation-runs/**/semantic-qa/**/evidence.yaml
+# An adopted semantic revision publishes translated text beside its evidence record. The record
+# itself carries identity, lineage, hashes, the adoption decision and bounded findings, and a
+# staged job.yaml points at it, so it is tracked and everything else under the directory is not.
+workspace/**/translation-runs/**/semantic-revision/**
+!workspace/**/translation-runs/**/semantic-revision/**/
+!workspace/**/translation-runs/**/semantic-revision/**/revision.yaml
+# Literary runs contain chapter source context, edited Persian, post-edit semantic evidence,
+# continuity findings, and blind-reading passages.
+workspace/literary-runs/**
+workspace/books/*/literary-runs/**
+
 # Editor and OS files
 .DS_Store
 .idea/
 .vscode/
+
+# Per-chunk cross-book reference packages quote bilingual prose from the published reference
+# translations; the index beside them carries only identities and stays tracked.
+workspace/resources/reference-context/**
+workspace/books/*/resources/reference-context/**
+
+# Generated translated prose must never enter Git.
+workspace/**/translation-runs/**/translation.md
+
+# Final/draft assembled books are release artifacts, not source.
+output/**
+!output/.gitkeep
+
+# Runtime state.
+**/.queue.lock
+
+# Local Book 6 operational scratch.
+/book6-*.log
+/run004-final.sha256
+
+# Experimental pilot runs may contain prose/provider payloads.
+workspace/pilot-runs/**

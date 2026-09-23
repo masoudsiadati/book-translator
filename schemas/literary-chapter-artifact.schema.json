@@ -1,0 +1,1162 @@
+{
+  "$defs": {
+    "ContinuityFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ContinuityFindingCode"
+        },
+        "severity": {
+          "enum": [
+            "advisory",
+            "warning"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "paragraph_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4,
+          "minItems": 1,
+          "title": "Paragraph Ids",
+          "type": "array"
+        },
+        "observation": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Observation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "paragraph_ids",
+        "observation"
+      ],
+      "title": "ContinuityFinding",
+      "type": "object"
+    },
+    "ContinuityFindingCode": {
+      "description": "Closed vocabulary for a read-only chapter continuity review.",
+      "enum": [
+        "unnatural_persian",
+        "inconsistent_narrator_register",
+        "inconsistent_character_voice",
+        "dialogue_tone_inconsistency",
+        "pronoun_reference_ambiguity",
+        "repeated_translationese",
+        "awkward_paragraph_transition",
+        "terminology_inconsistency",
+        "local_stylistic_discontinuity"
+      ],
+      "title": "ContinuityFindingCode",
+      "type": "string"
+    },
+    "LiteraryCallRole": {
+      "description": "Provider roles whose cost and provenance must remain separate.",
+      "enum": [
+        "literary_editor",
+        "semantic_rejudge",
+        "literary_correction",
+        "continuity_reviewer"
+      ],
+      "title": "LiteraryCallRole",
+      "type": "string"
+    },
+    "LiteraryChapterStatus": {
+      "enum": [
+        "complete",
+        "complete_with_fallbacks"
+      ],
+      "title": "LiteraryChapterStatus",
+      "type": "string"
+    },
+    "LiteraryDiffClass": {
+      "description": "Governance class for the breadth of one attempted paragraph edit.",
+      "enum": [
+        "normal_edit",
+        "broad_edit",
+        "suspicious_rewrite"
+      ],
+      "title": "LiteraryDiffClass",
+      "type": "string"
+    },
+    "LiteraryEditReason": {
+      "description": "Closed, non-explanatory vocabulary for the kind of prose edit made.",
+      "enum": [
+        "literal_syntax",
+        "awkward_wording",
+        "dialogue_naturalness",
+        "flow",
+        "repetition",
+        "pronoun_clarity",
+        "register",
+        "rhythm",
+        "punctuation",
+        "no_change"
+      ],
+      "title": "LiteraryEditReason",
+      "type": "string"
+    },
+    "LiteraryEvidenceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "existing_semantic_gate",
+            "literary_semantic_rejudge",
+            "literary_semantic_second_look"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "file": {
+          "format": "path",
+          "title": "File",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "file",
+        "sha256"
+      ],
+      "title": "LiteraryEvidenceReference",
+      "type": "object"
+    },
+    "LiteraryParagraphFidelity": {
+      "description": "How the final literary paragraph earned its fidelity status.",
+      "enum": [
+        "reused_semantic_evidence",
+        "fresh_semantic_pass",
+        "literary_edit_fallback"
+      ],
+      "title": "LiteraryParagraphFidelity",
+      "type": "string"
+    },
+    "LiteraryParagraphRecord": {
+      "additionalProperties": false,
+      "description": "Governance and fidelity lineage for one final chapter paragraph.",
+      "properties": {
+        "paragraph_id": {
+          "pattern": "^P\\d{4}$",
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "paragraph_index": {
+          "minimum": 1,
+          "title": "Paragraph Index",
+          "type": "integer"
+        },
+        "chunk_id": {
+          "minLength": 1,
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "chunk_paragraph_id": {
+          "pattern": "^P\\d{4}$",
+          "title": "Chunk Paragraph Id",
+          "type": "string"
+        },
+        "chunk_paragraph_index": {
+          "minimum": 1,
+          "title": "Chunk Paragraph Index",
+          "type": "integer"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "faithful_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Faithful Sha256",
+          "type": "string"
+        },
+        "final_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Final Sha256",
+          "type": "string"
+        },
+        "changed": {
+          "title": "Changed",
+          "type": "boolean"
+        },
+        "attempted_change": {
+          "title": "Attempted Change",
+          "type": "boolean"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/LiteraryEditReason"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "diff_class": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LiteraryDiffClass"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "character_delta": {
+          "default": 0,
+          "title": "Character Delta",
+          "type": "integer"
+        },
+        "word_delta": {
+          "default": 0,
+          "title": "Word Delta",
+          "type": "integer"
+        },
+        "character_change_ratio": {
+          "default": 0.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Character Change Ratio",
+          "type": "number"
+        },
+        "fidelity": {
+          "$ref": "#/$defs/LiteraryParagraphFidelity"
+        },
+        "correction_rounds": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Correction Rounds",
+          "type": "integer"
+        },
+        "fallback_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fallback Reason"
+        },
+        "semantic_evidence": {
+          "items": {
+            "$ref": "#/$defs/LiteraryEvidenceReference"
+          },
+          "minItems": 1,
+          "title": "Semantic Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "paragraph_id",
+        "paragraph_index",
+        "chunk_id",
+        "chunk_paragraph_id",
+        "chunk_paragraph_index",
+        "source_sha256",
+        "faithful_sha256",
+        "final_sha256",
+        "changed",
+        "attempted_change",
+        "fidelity",
+        "semantic_evidence"
+      ],
+      "title": "LiteraryParagraphRecord",
+      "type": "object"
+    },
+    "LiteraryProviderCall": {
+      "additionalProperties": false,
+      "description": "Prose-free, role-separated provider provenance and cost evidence.",
+      "properties": {
+        "role": {
+          "$ref": "#/$defs/LiteraryCallRole"
+        },
+        "request_id": {
+          "pattern": "^(leq|lcq|crq|sjq)-[0-9a-f]{24}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "adapter_version": {
+          "minLength": 1,
+          "title": "Adapter Version",
+          "type": "string"
+        },
+        "model_requested": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Requested"
+        },
+        "model_returned": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Returned"
+        },
+        "system_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "System Message Sha256",
+          "type": "string"
+        },
+        "user_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "User Message Sha256",
+          "type": "string"
+        },
+        "input_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Tokens"
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Tokens"
+        },
+        "total_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Tokens"
+        },
+        "latency_milliseconds": {
+          "minimum": 0,
+          "title": "Latency Milliseconds",
+          "type": "integer"
+        },
+        "prompt_version": {
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "schema_version_used": {
+          "title": "Schema Version Used",
+          "type": "string"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "status": {
+          "default": "completed",
+          "enum": [
+            "completed",
+            "output_rejected"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Code"
+        },
+        "reused_from_literary_run_id": {
+          "anyOf": [
+            {
+              "pattern": "^lr-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reused From Literary Run Id"
+        }
+      },
+      "required": [
+        "role",
+        "request_id",
+        "provider",
+        "adapter_version",
+        "system_message_sha256",
+        "user_message_sha256",
+        "latency_milliseconds",
+        "prompt_version",
+        "schema_version_used",
+        "policy_version"
+      ],
+      "title": "LiteraryProviderCall",
+      "type": "object"
+    },
+    "LiteraryTerminologyDifference": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "decision_id": {
+          "pattern": "^td-[0-9a-f]{24}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "enforcement": {
+          "title": "Enforcement",
+          "type": "string"
+        },
+        "before_count": {
+          "minimum": 0,
+          "title": "Before Count",
+          "type": "integer"
+        },
+        "after_count": {
+          "minimum": 0,
+          "title": "After Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "decision_id",
+        "enforcement",
+        "before_count",
+        "after_count"
+      ],
+      "title": "LiteraryTerminologyDifference",
+      "type": "object"
+    },
+    "LiteraryTextLayerReference": {
+      "additionalProperties": false,
+      "properties": {
+        "layer": {
+          "enum": [
+            "v1_published",
+            "v2_fidelity_only",
+            "v2_literary_edited"
+          ],
+          "title": "Layer",
+          "type": "string"
+        },
+        "files": {
+          "items": {
+            "format": "path",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Files",
+          "type": "array"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "layer",
+        "files",
+        "sha256"
+      ],
+      "title": "LiteraryTextLayerReference",
+      "type": "object"
+    },
+    "ParagraphAlignmentFinding": {
+      "additionalProperties": false,
+      "description": "One alignment or marker-contract defect, recorded without any translated content.",
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "error",
+            "warning"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "source_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Paragraph Index"
+        },
+        "related_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Related Paragraph Index"
+        },
+        "expected_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Marker"
+        },
+        "observed_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Marker"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "ParagraphAlignmentFinding",
+      "type": "object"
+    },
+    "TerminologyEnforcement": {
+      "description": "What kind of target evidence proves a canonical decision was honored.\n\n``required`` answers whether a decision is in scope for QA at all; this answers the separate\nquestion of what counts as proof.  Collapsing the two forces every approved decision into\n\"the exact canonical string must appear\", which is correct for a name and wrong for a form the\ntarget language legitimately transforms.",
+      "enum": [
+        "exact",
+        "morphological",
+        "contextual",
+        "advisory"
+      ],
+      "title": "TerminologyEnforcement",
+      "type": "string"
+    },
+    "TerminologyFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
+        "source_term": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Term"
+        },
+        "enforcement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyEnforcement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "TerminologyFinding",
+      "type": "object"
+    },
+    "TerminologyValidationReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "checked_decisions": {
+          "minimum": 0,
+          "title": "Checked Decisions",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/TerminologyFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "valid",
+        "source_sha256",
+        "translation_sha256",
+        "checked_decisions"
+      ],
+      "title": "TerminologyValidationReport",
+      "type": "object"
+    },
+    "TranslationAlignmentReport": {
+      "additionalProperties": false,
+      "description": "The alignment verdict for one translated chunk.\n\n``contract_mode`` records how the paragraph identities being judged were established, because\nthe same measurements mean different things under the two.  Under ``marked`` a provider\nreturned the identities it was given and the measurements are a residual check; under\n``legacy_positional`` the identities are inferred from block order, which is exactly the\nassumption a boundary defect breaks, so the measurements are the only evidence there is.",
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "alignment_qa_version": {
+          "title": "Alignment Qa Version",
+          "type": "string"
+        },
+        "policy_id": {
+          "minLength": 1,
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "contract_mode": {
+          "enum": [
+            "marked",
+            "legacy_positional"
+          ],
+          "title": "Contract Mode",
+          "type": "string"
+        },
+        "marker_contract_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Marker Contract Version"
+        },
+        "evaluated": {
+          "title": "Evaluated",
+          "type": "boolean"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "aligned_pairs": {
+          "minimum": 0,
+          "title": "Aligned Pairs",
+          "type": "integer"
+        },
+        "measured_pairs": {
+          "minimum": 0,
+          "title": "Measured Pairs",
+          "type": "integer"
+        },
+        "flagged_pairs": {
+          "minimum": 0,
+          "title": "Flagged Pairs",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/ParagraphAlignmentFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "alignment_qa_version",
+        "policy_id",
+        "policy_version",
+        "contract_mode",
+        "evaluated",
+        "valid",
+        "source_sha256",
+        "translation_sha256",
+        "aligned_pairs",
+        "measured_pairs",
+        "flagged_pairs"
+      ],
+      "title": "TranslationAlignmentReport",
+      "type": "object"
+    },
+    "TranslationQAFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "TranslationQAFinding",
+      "type": "object"
+    },
+    "TranslationQAReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "source_paragraph_count": {
+          "minimum": 0,
+          "title": "Source Paragraph Count",
+          "type": "integer"
+        },
+        "translation_paragraph_count": {
+          "minimum": 0,
+          "title": "Translation Paragraph Count",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/TranslationQAFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "valid",
+        "source_sha256",
+        "translation_sha256",
+        "source_paragraph_count",
+        "translation_paragraph_count"
+      ],
+      "title": "TranslationQAReport",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Counts-and-hashes chapter record beside the private final literary text.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "literary_engine_version": {
+      "title": "Literary Engine Version",
+      "type": "string"
+    },
+    "editor_prompt_version": {
+      "title": "Editor Prompt Version",
+      "type": "string"
+    },
+    "editor_schema_version": {
+      "title": "Editor Schema Version",
+      "type": "string"
+    },
+    "style_contract_version": {
+      "title": "Style Contract Version",
+      "type": "string"
+    },
+    "edit_policy_version": {
+      "title": "Edit Policy Version",
+      "type": "string"
+    },
+    "correction_prompt_version": {
+      "title": "Correction Prompt Version",
+      "type": "string"
+    },
+    "correction_policy_version": {
+      "title": "Correction Policy Version",
+      "type": "string"
+    },
+    "continuity_prompt_version": {
+      "title": "Continuity Prompt Version",
+      "type": "string"
+    },
+    "continuity_schema_version": {
+      "title": "Continuity Schema Version",
+      "type": "string"
+    },
+    "chapter_id": {
+      "minLength": 1,
+      "title": "Chapter Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/LiteraryChapterStatus"
+    },
+    "paragraph_count": {
+      "minimum": 1,
+      "title": "Paragraph Count",
+      "type": "integer"
+    },
+    "changed_paragraph_count": {
+      "minimum": 0,
+      "title": "Changed Paragraph Count",
+      "type": "integer"
+    },
+    "changed_paragraph_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Changed Paragraph Ids",
+      "type": "array"
+    },
+    "attempted_changed_paragraph_count": {
+      "minimum": 0,
+      "title": "Attempted Changed Paragraph Count",
+      "type": "integer"
+    },
+    "character_delta": {
+      "title": "Character Delta",
+      "type": "integer"
+    },
+    "word_delta": {
+      "title": "Word Delta",
+      "type": "integer"
+    },
+    "changed_percentage": {
+      "maximum": 100.0,
+      "minimum": 0.0,
+      "title": "Changed Percentage",
+      "type": "number"
+    },
+    "broad_edit_count": {
+      "minimum": 0,
+      "title": "Broad Edit Count",
+      "type": "integer"
+    },
+    "suspicious_rewrite_count": {
+      "minimum": 0,
+      "title": "Suspicious Rewrite Count",
+      "type": "integer"
+    },
+    "marker_identity_preserved": {
+      "title": "Marker Identity Preserved",
+      "type": "boolean"
+    },
+    "unchanged_paragraph_hashes": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Unchanged Paragraph Hashes",
+      "type": "object"
+    },
+    "terminology_differences": {
+      "items": {
+        "$ref": "#/$defs/LiteraryTerminologyDifference"
+      },
+      "title": "Terminology Differences",
+      "type": "array"
+    },
+    "edit_category_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Edit Category Counts",
+      "type": "object"
+    },
+    "semantic_regressions_caught": {
+      "minimum": 0,
+      "title": "Semantic Regressions Caught",
+      "type": "integer"
+    },
+    "semantic_regressions_corrected": {
+      "minimum": 0,
+      "title": "Semantic Regressions Corrected",
+      "type": "integer"
+    },
+    "inconclusive_count": {
+      "minimum": 0,
+      "title": "Inconclusive Count",
+      "type": "integer"
+    },
+    "fallback_count": {
+      "minimum": 0,
+      "title": "Fallback Count",
+      "type": "integer"
+    },
+    "paragraphs": {
+      "items": {
+        "$ref": "#/$defs/LiteraryParagraphRecord"
+      },
+      "minItems": 1,
+      "title": "Paragraphs",
+      "type": "array"
+    },
+    "structural_report": {
+      "$ref": "#/$defs/TranslationQAReport"
+    },
+    "alignment_report": {
+      "$ref": "#/$defs/TranslationAlignmentReport"
+    },
+    "terminology_report": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TerminologyValidationReport"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "continuity_findings": {
+      "items": {
+        "$ref": "#/$defs/ContinuityFinding"
+      },
+      "title": "Continuity Findings",
+      "type": "array"
+    },
+    "provider_calls": {
+      "items": {
+        "$ref": "#/$defs/LiteraryProviderCall"
+      },
+      "title": "Provider Calls",
+      "type": "array"
+    },
+    "text_layers": {
+      "items": {
+        "$ref": "#/$defs/LiteraryTextLayerReference"
+      },
+      "minItems": 2,
+      "title": "Text Layers",
+      "type": "array"
+    },
+    "output_file": {
+      "format": "path",
+      "title": "Output File",
+      "type": "string"
+    },
+    "output_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Output Sha256",
+      "type": "string"
+    },
+    "reused_from_literary_run_id": {
+      "anyOf": [
+        {
+          "pattern": "^lr-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reused From Literary Run Id"
+    },
+    "reused_chapter_artifact_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reused Chapter Artifact Sha256"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "literary_engine_version",
+    "editor_prompt_version",
+    "editor_schema_version",
+    "style_contract_version",
+    "edit_policy_version",
+    "correction_prompt_version",
+    "correction_policy_version",
+    "continuity_prompt_version",
+    "continuity_schema_version",
+    "chapter_id",
+    "status",
+    "paragraph_count",
+    "changed_paragraph_count",
+    "attempted_changed_paragraph_count",
+    "character_delta",
+    "word_delta",
+    "changed_percentage",
+    "broad_edit_count",
+    "suspicious_rewrite_count",
+    "marker_identity_preserved",
+    "semantic_regressions_caught",
+    "semantic_regressions_corrected",
+    "inconclusive_count",
+    "fallback_count",
+    "paragraphs",
+    "structural_report",
+    "alignment_report",
+    "text_layers",
+    "output_file",
+    "output_sha256",
+    "created_at"
+  ],
+  "title": "LiteraryChapterArtifact",
+  "type": "object"
+}

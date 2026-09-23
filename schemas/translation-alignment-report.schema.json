@@ -1,0 +1,183 @@
+{
+  "$defs": {
+    "ParagraphAlignmentFinding": {
+      "additionalProperties": false,
+      "description": "One alignment or marker-contract defect, recorded without any translated content.",
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "error",
+            "warning"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "source_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Paragraph Index"
+        },
+        "related_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Related Paragraph Index"
+        },
+        "expected_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Marker"
+        },
+        "observed_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Marker"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "ParagraphAlignmentFinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The alignment verdict for one translated chunk.\n\n``contract_mode`` records how the paragraph identities being judged were established, because\nthe same measurements mean different things under the two.  Under ``marked`` a provider\nreturned the identities it was given and the measurements are a residual check; under\n``legacy_positional`` the identities are inferred from block order, which is exactly the\nassumption a boundary defect breaks, so the measurements are the only evidence there is.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "alignment_qa_version": {
+      "title": "Alignment Qa Version",
+      "type": "string"
+    },
+    "policy_id": {
+      "minLength": 1,
+      "title": "Policy Id",
+      "type": "string"
+    },
+    "policy_version": {
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "contract_mode": {
+      "enum": [
+        "marked",
+        "legacy_positional"
+      ],
+      "title": "Contract Mode",
+      "type": "string"
+    },
+    "marker_contract_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Marker Contract Version"
+    },
+    "evaluated": {
+      "title": "Evaluated",
+      "type": "boolean"
+    },
+    "valid": {
+      "title": "Valid",
+      "type": "boolean"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "translation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Translation Sha256",
+      "type": "string"
+    },
+    "aligned_pairs": {
+      "minimum": 0,
+      "title": "Aligned Pairs",
+      "type": "integer"
+    },
+    "measured_pairs": {
+      "minimum": 0,
+      "title": "Measured Pairs",
+      "type": "integer"
+    },
+    "flagged_pairs": {
+      "minimum": 0,
+      "title": "Flagged Pairs",
+      "type": "integer"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/ParagraphAlignmentFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "alignment_qa_version",
+    "policy_id",
+    "policy_version",
+    "contract_mode",
+    "evaluated",
+    "valid",
+    "source_sha256",
+    "translation_sha256",
+    "aligned_pairs",
+    "measured_pairs",
+    "flagged_pairs"
+  ],
+  "title": "TranslationAlignmentReport",
+  "type": "object"
+}

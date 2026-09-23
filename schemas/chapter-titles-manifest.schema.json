@@ -1,0 +1,249 @@
+{
+  "$defs": {
+    "ChapterTitleArtifactReference": {
+      "additionalProperties": false,
+      "description": "One published file of a chapter-title artifact.",
+      "properties": {
+        "file": {
+          "format": "path",
+          "title": "File",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "byte_count": {
+          "minimum": 0,
+          "title": "Byte Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "file",
+        "sha256",
+        "byte_count"
+      ],
+      "title": "ChapterTitleArtifactReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The content-addressed index of one chapter-title artifact directory.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "chapter_title_engine_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Chapter Title Engine Version",
+      "type": "string"
+    },
+    "chapter_title_prompt_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Chapter Title Prompt Version",
+      "type": "string"
+    },
+    "chapter_title_qa_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Chapter Title Qa Version",
+      "type": "string"
+    },
+    "artifact_id": {
+      "pattern": "^ct-[0-9a-f]{24}$",
+      "title": "Artifact Id",
+      "type": "string"
+    },
+    "book_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "source_language": {
+      "minLength": 2,
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "minLength": 2,
+      "title": "Target Language",
+      "type": "string"
+    },
+    "source_translation_run": {
+      "anyOf": [
+        {
+          "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Translation Run"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "snapshot_manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Snapshot Manifest Sha256",
+      "type": "string"
+    },
+    "terminology_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Sha256"
+    },
+    "terminology_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Version"
+    },
+    "chapter_count": {
+      "minimum": 1,
+      "title": "Chapter Count",
+      "type": "integer"
+    },
+    "translated_title_count": {
+      "minimum": 0,
+      "title": "Translated Title Count",
+      "type": "integer"
+    },
+    "deduplicated_title_count": {
+      "minimum": 0,
+      "title": "Deduplicated Title Count",
+      "type": "integer"
+    },
+    "recorded_title_count": {
+      "minimum": 0,
+      "title": "Recorded Title Count",
+      "type": "integer"
+    },
+    "inherited_title_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Inherited Title Count",
+      "type": "integer"
+    },
+    "override_title_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Override Title Count",
+      "type": "integer"
+    },
+    "parent_artifact_id": {
+      "anyOf": [
+        {
+          "pattern": "^ct-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parent Artifact Id"
+    },
+    "chapter_title_revision_version": {
+      "anyOf": [
+        {
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Chapter Title Revision Version"
+    },
+    "provider_calls": {
+      "minimum": 0,
+      "title": "Provider Calls",
+      "type": "integer"
+    },
+    "providers": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Providers",
+      "type": "object"
+    },
+    "models": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Models",
+      "type": "object"
+    },
+    "qa_valid": {
+      "const": true,
+      "default": true,
+      "title": "Qa Valid",
+      "type": "boolean"
+    },
+    "content_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Content Sha256",
+      "type": "string"
+    },
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/ChapterTitleArtifactReference"
+      },
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "chapter_title_engine_version",
+    "chapter_title_prompt_version",
+    "chapter_title_qa_version",
+    "artifact_id",
+    "book_id",
+    "source_language",
+    "target_language",
+    "snapshot_id",
+    "snapshot_manifest_sha256",
+    "chapter_count",
+    "translated_title_count",
+    "deduplicated_title_count",
+    "recorded_title_count",
+    "provider_calls",
+    "providers",
+    "models",
+    "content_sha256",
+    "artifacts",
+    "created_at"
+  ],
+  "title": "ChapterTitleManifest",
+  "type": "object"
+}

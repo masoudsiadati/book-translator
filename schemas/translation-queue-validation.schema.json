@@ -1,0 +1,61 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "valid": {
+      "title": "Valid",
+      "type": "boolean"
+    },
+    "snapshot_valid": {
+      "title": "Snapshot Valid",
+      "type": "boolean"
+    },
+    "counter_mismatch": {
+      "title": "Counter Mismatch",
+      "type": "boolean"
+    },
+    "status_mismatch": {
+      "title": "Status Mismatch",
+      "type": "boolean"
+    },
+    "expected_job_count": {
+      "minimum": 0,
+      "title": "Expected Job Count",
+      "type": "integer"
+    },
+    "actual_job_count": {
+      "minimum": 0,
+      "title": "Actual Job Count",
+      "type": "integer"
+    },
+    "errors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Errors",
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "valid",
+    "snapshot_valid",
+    "counter_mismatch",
+    "status_mismatch",
+    "expected_job_count",
+    "actual_job_count"
+  ],
+  "title": "TranslationQueueValidation",
+  "type": "object"
+}

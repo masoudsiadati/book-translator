@@ -1,0 +1,632 @@
+{
+  "$defs": {
+    "ObservedVariantSupport": {
+      "additionalProperties": false,
+      "description": "One independent piece of support for a target form, with its provenance.",
+      "properties": {
+        "corpus_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Corpus Id",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/ReferenceEvidenceSource"
+        },
+        "quality": {
+          "$ref": "#/$defs/ReferenceEvidenceQuality"
+        },
+        "observation_count": {
+          "minimum": 0,
+          "title": "Observation Count",
+          "type": "integer"
+        },
+        "reference_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Id"
+        },
+        "observed_surfaces": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Observed Surfaces",
+          "type": "object"
+        }
+      },
+      "required": [
+        "corpus_id",
+        "source",
+        "quality",
+        "observation_count"
+      ],
+      "title": "ObservedVariantSupport",
+      "type": "object"
+    },
+    "ReferenceCorpusIdentity": {
+      "additionalProperties": false,
+      "description": "The verified identity of one external corpus at retrieval time.",
+      "properties": {
+        "corpus_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Corpus Id",
+          "type": "string"
+        },
+        "book_number": {
+          "minimum": 1,
+          "title": "Book Number",
+          "type": "integer"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "corpus_version": {
+          "minLength": 1,
+          "title": "Corpus Version",
+          "type": "string"
+        },
+        "freeze_manifest_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Freeze Manifest Sha256"
+        }
+      },
+      "required": [
+        "corpus_id",
+        "book_number",
+        "label",
+        "path",
+        "sha256",
+        "corpus_version"
+      ],
+      "title": "ReferenceCorpusIdentity",
+      "type": "object"
+    },
+    "ReferenceEvidenceQuality": {
+      "enum": [
+        "clean",
+        "ocr_suspect",
+        "uncertain"
+      ],
+      "title": "ReferenceEvidenceQuality",
+      "type": "string"
+    },
+    "ReferenceEvidenceSource": {
+      "enum": [
+        "narrative",
+        "printed_glossary",
+        "project_glossary",
+        "user_decision",
+        "prior_volume_registry"
+      ],
+      "title": "ReferenceEvidenceSource",
+      "type": "string"
+    },
+    "ReferenceExclusions": {
+      "additionalProperties": false,
+      "description": "What retrieval saw and refused to carry into translation context.",
+      "properties": {
+        "reference_only_tm": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Reference Only Tm",
+          "type": "integer"
+        },
+        "anomalies": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Anomalies",
+          "type": "integer"
+        },
+        "uncertain_forms_withheld": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Uncertain Forms Withheld",
+          "type": "integer"
+        },
+        "ambiguous_matches": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Ambiguous Matches",
+          "type": "integer"
+        },
+        "ocr_suspect_forms_labelled": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Ocr Suspect Forms Labelled",
+          "type": "integer"
+        }
+      },
+      "title": "ReferenceExclusions",
+      "type": "object"
+    },
+    "ReferencePhrase": {
+      "additionalProperties": false,
+      "properties": {
+        "source_phrase": {
+          "minLength": 1,
+          "title": "Source Phrase",
+          "type": "string"
+        },
+        "categories": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Categories",
+          "type": "array"
+        },
+        "forms": {
+          "items": {
+            "$ref": "#/$defs/ReferenceTargetForm"
+          },
+          "minItems": 1,
+          "title": "Forms",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_phrase",
+        "forms"
+      ],
+      "title": "ReferencePhrase",
+      "type": "object"
+    },
+    "ReferenceProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "corpus_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Corpus Id",
+          "type": "string"
+        },
+        "book_label": {
+          "minLength": 1,
+          "title": "Book Label",
+          "type": "string"
+        },
+        "chapter": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Chapter"
+        },
+        "source": {
+          "$ref": "#/$defs/ReferenceEvidenceSource"
+        },
+        "quality": {
+          "$ref": "#/$defs/ReferenceEvidenceQuality"
+        },
+        "reference_id": {
+          "minLength": 1,
+          "title": "Reference Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "corpus_id",
+        "book_label",
+        "source",
+        "quality",
+        "reference_id"
+      ],
+      "title": "ReferenceProvenance",
+      "type": "object"
+    },
+    "ReferenceRetrievalIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "retriever_path": {
+          "minLength": 1,
+          "title": "Retriever Path",
+          "type": "string"
+        },
+        "retriever_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Retriever Sha256",
+          "type": "string"
+        },
+        "retriever_schema_version": {
+          "minLength": 1,
+          "title": "Retriever Schema Version",
+          "type": "string"
+        },
+        "corpora": {
+          "items": {
+            "$ref": "#/$defs/ReferenceCorpusIdentity"
+          },
+          "minItems": 1,
+          "title": "Corpora",
+          "type": "array"
+        },
+        "limits": {
+          "$ref": "#/$defs/ReferenceRetrievalLimits"
+        },
+        "include_uncertain": {
+          "const": false,
+          "default": false,
+          "title": "Include Uncertain",
+          "type": "boolean"
+        },
+        "include_reference_only": {
+          "const": false,
+          "default": false,
+          "title": "Include Reference Only",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "retriever_path",
+        "retriever_sha256",
+        "retriever_schema_version",
+        "corpora",
+        "limits"
+      ],
+      "title": "ReferenceRetrievalIdentity",
+      "type": "object"
+    },
+    "ReferenceRetrievalLimits": {
+      "additionalProperties": false,
+      "properties": {
+        "term_limit": {
+          "default": 15,
+          "minimum": 0,
+          "title": "Term Limit",
+          "type": "integer"
+        },
+        "entity_limit": {
+          "default": 15,
+          "minimum": 0,
+          "title": "Entity Limit",
+          "type": "integer"
+        },
+        "tm_limit": {
+          "default": 8,
+          "minimum": 0,
+          "title": "Tm Limit",
+          "type": "integer"
+        },
+        "phrase_limit": {
+          "default": 6,
+          "minimum": 0,
+          "title": "Phrase Limit",
+          "type": "integer"
+        },
+        "style_limit": {
+          "default": 3,
+          "minimum": 0,
+          "title": "Style Limit",
+          "type": "integer"
+        },
+        "voice_limit": {
+          "default": 4,
+          "minimum": 0,
+          "title": "Voice Limit",
+          "type": "integer"
+        }
+      },
+      "title": "ReferenceRetrievalLimits",
+      "type": "object"
+    },
+    "ReferenceSegment": {
+      "additionalProperties": false,
+      "description": "One clean bilingual translation-memory segment: analogy, never text to copy.",
+      "properties": {
+        "provenance": {
+          "$ref": "#/$defs/ReferenceProvenance"
+        },
+        "relevance_score": {
+          "minimum": 0.0,
+          "title": "Relevance Score",
+          "type": "number"
+        },
+        "minimum_alignment_confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Minimum Alignment Confidence",
+          "type": "number"
+        },
+        "source_text": {
+          "minLength": 1,
+          "title": "Source Text",
+          "type": "string"
+        },
+        "target_text": {
+          "minLength": 1,
+          "title": "Target Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provenance",
+        "relevance_score",
+        "minimum_alignment_confidence",
+        "source_text",
+        "target_text"
+      ],
+      "title": "ReferenceSegment",
+      "type": "object"
+    },
+    "ReferenceStyleSample": {
+      "additionalProperties": false,
+      "properties": {
+        "provenance": {
+          "$ref": "#/$defs/ReferenceProvenance"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "source_text": {
+          "minLength": 1,
+          "title": "Source Text",
+          "type": "string"
+        },
+        "target_text": {
+          "minLength": 1,
+          "title": "Target Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "provenance",
+        "source_text",
+        "target_text"
+      ],
+      "title": "ReferenceStyleSample",
+      "type": "object"
+    },
+    "ReferenceTargetForm": {
+      "additionalProperties": false,
+      "properties": {
+        "target_form": {
+          "minLength": 1,
+          "title": "Target Form",
+          "type": "string"
+        },
+        "support": {
+          "items": {
+            "$ref": "#/$defs/ObservedVariantSupport"
+          },
+          "minItems": 1,
+          "title": "Support",
+          "type": "array"
+        }
+      },
+      "required": [
+        "target_form",
+        "support"
+      ],
+      "title": "ReferenceTargetForm",
+      "type": "object"
+    },
+    "ReferenceTermEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "terminology",
+            "entity"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "categories": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Categories",
+          "type": "array"
+        },
+        "occurrences_in_passage": {
+          "minimum": 1,
+          "title": "Occurrences In Passage",
+          "type": "integer"
+        },
+        "cross_book_observation": {
+          "minLength": 1,
+          "title": "Cross Book Observation",
+          "type": "string"
+        },
+        "forms": {
+          "items": {
+            "$ref": "#/$defs/ReferenceTargetForm"
+          },
+          "minItems": 1,
+          "title": "Forms",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_term",
+        "kind",
+        "occurrences_in_passage",
+        "cross_book_observation",
+        "forms"
+      ],
+      "title": "ReferenceTermEvidence",
+      "type": "object"
+    },
+    "ReferenceVoiceSample": {
+      "additionalProperties": false,
+      "properties": {
+        "character": {
+          "minLength": 1,
+          "title": "Character",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ReferenceProvenance"
+        },
+        "attribution": {
+          "default": "",
+          "title": "Attribution",
+          "type": "string"
+        },
+        "source_dialogue": {
+          "minLength": 1,
+          "title": "Source Dialogue",
+          "type": "string"
+        },
+        "target_dialogue": {
+          "minLength": 1,
+          "title": "Target Dialogue",
+          "type": "string"
+        }
+      },
+      "required": [
+        "character",
+        "provenance",
+        "source_dialogue",
+        "target_dialogue"
+      ],
+      "title": "ReferenceVoiceSample",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "package_kind": {
+      "const": "reference_context",
+      "default": "reference_context",
+      "title": "Package Kind",
+      "type": "string"
+    },
+    "contract_version": {
+      "minLength": 1,
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "book_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "chapter_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Chapter Id",
+      "type": "string"
+    },
+    "chunk_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Chunk Id",
+      "type": "string"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "retrieval": {
+      "$ref": "#/$defs/ReferenceRetrievalIdentity"
+    },
+    "terminology": {
+      "items": {
+        "$ref": "#/$defs/ReferenceTermEvidence"
+      },
+      "title": "Terminology",
+      "type": "array"
+    },
+    "entities": {
+      "items": {
+        "$ref": "#/$defs/ReferenceTermEvidence"
+      },
+      "title": "Entities",
+      "type": "array"
+    },
+    "translation_memory": {
+      "items": {
+        "$ref": "#/$defs/ReferenceSegment"
+      },
+      "title": "Translation Memory",
+      "type": "array"
+    },
+    "phrases": {
+      "items": {
+        "$ref": "#/$defs/ReferencePhrase"
+      },
+      "title": "Phrases",
+      "type": "array"
+    },
+    "character_voice": {
+      "items": {
+        "$ref": "#/$defs/ReferenceVoiceSample"
+      },
+      "title": "Character Voice",
+      "type": "array"
+    },
+    "style": {
+      "items": {
+        "$ref": "#/$defs/ReferenceStyleSample"
+      },
+      "title": "Style",
+      "type": "array"
+    },
+    "exclusions": {
+      "$ref": "#/$defs/ReferenceExclusions"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "contract_version",
+    "book_id",
+    "chapter_id",
+    "chunk_id",
+    "source_sha256",
+    "retrieval"
+  ],
+  "title": "ReferenceContextPackage",
+  "type": "object"
+}

@@ -1,11 +1,32 @@
-book_id: "example-fantasy-novel-en-fa"
-title_en: "Example Fantasy Novel"
-title_fa: "رمان فانتزی نمونه"
-author: "Example Author"
+book_id: "the-fires-of-heaven-en-fa"
+title_en: "The Fires of Heaven"
+# Blank until a human decides the Persian title; the resolver never invents one.
+title_fa: ""
+author: "Robert Jordan"
 source_language: "en"
 target_language: "fa"
 pdf_path: "input/book.pdf"
 chunk_target_words: 1800
 chunk_max_words: 2400
 previous_context_words: 250
+translation_prompt: "config/translation-prompt.md"
+glossary: "config/glossary.yaml"
+style_guide: "config/style-guide.md"
+terminology: "config/terminology.yaml"
+terminology_acceptance_policy: "manual"
+terminology_confidence_threshold: 0.9
+terminology_review_required: true
+translation_provider_models:
+  fake:
+    - "fake-v1"
+  openai:
+    - "gpt-5"
+    - "gpt-5.6-terra"
+  codex-cli: []
+  claude-code: []
+openai_reasoning_models: []
+provider_timeout_seconds: 600
+provider_max_output_tokens: 12000
+provider_sdk_retry_count: 0
+provider_store_raw_response: true
 output_format: "epub3"

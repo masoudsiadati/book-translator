@@ -2,7 +2,6 @@
 
 import hashlib
 import os
-import re
 import shutil
 import tempfile
 from collections.abc import Callable
@@ -25,9 +24,14 @@ from book_translator.models import (
     ChapterStatus,
     ChunkMetadata,
     ChunkStatus,
-    TocKind,
 )
-from book_translator.paths import ProjectPaths, chunk_directory_name
+from book_translator.paths import (
+    ProjectPaths,
+    chapter_id_from_selector,
+    chunk_directory_name,
+    is_narrative_chapter_id,
+    parse_narrative_chapter_id,
+)
 from book_translator.status_transitions import can_transition_chapter
 
 
@@ -78,6 +82,7 @@ class ChapterChunkingPlan:
     config: ChunkingConfig
     chapters: tuple[PlannedChapterChunking, ...]
     force: bool
+    book: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -130,44 +135,35 @@ def _chapter_paths(directory: Path) -> ChapterChunkingPaths:
     )
 
 
-def _selector_directory(project_root: Path, selector: str) -> Path:
-    root = project_root / "workspace/chapters"
-    normalized = selector.strip().lower()
-    if normalized in {"prologue", "0"}:
-        directory = root / "000-prologue"
-    elif normalized.isdigit():
-        number = int(normalized)
-        if not 1 <= number <= 999:
-            raise ChapterChunkingError(f"invalid chapter selector {selector!r}")
-        directory = root / f"{number:03d}"
-    elif re.fullmatch(r"chapter-\d+", normalized):
-        number = int(normalized.removeprefix("chapter-"))
-        if not 1 <= number <= 999:
-            raise ChapterChunkingError(f"invalid chapter selector {selector!r}")
-        directory = root / f"{number:03d}"
-    else:
-        raise ChapterChunkingError(f"invalid chapter selector {selector!r}")
+def _chapters_root(project_root: Path, book: str | None) -> Path:
+    try:
+        return ProjectPaths(project_root, book).chapters
+    except ValueError as exc:
+        raise ChapterChunkingError(str(exc)) from exc
+
+
+def _selector_directory(project_root: Path, selector: str, book: str | None) -> Path:
+    try:
+        directory = _chapters_root(project_root, book) / chapter_id_from_selector(selector)
+    except ValueError as exc:
+        raise ChapterChunkingError(str(exc)) from exc
     if not directory.is_dir():
         raise ChapterChunkingError(f"selected chapter workspace not found: {directory}")
     return directory
 
 
 def _selected_chapters(
-    project_root: Path, selector: str | None
+    project_root: Path, selector: str | None, book: str | None = None
 ) -> list[tuple[Path, ChapterMetadata]]:
     if selector is not None:
-        directory = _selector_directory(project_root, selector)
+        directory = _selector_directory(project_root, selector, book)
         return [(directory, _load_chapter_metadata(directory / "metadata.yaml"))]
-    root = project_root / "workspace/chapters"
+    root = _chapters_root(project_root, book)
     if not root.is_dir():
         raise ChapterChunkingError(f"chapter workspace not found: {root}")
     selected: list[tuple[Path, ChapterMetadata]] = []
     for directory in sorted(root.iterdir(), key=lambda path: path.name):
-        if not directory.is_dir() or not (
-            directory.name == "000-prologue"
-            or re.fullmatch(r"\d{3}", directory.name)
-            and directory.name != "000"
-        ):
+        if not directory.is_dir() or not is_narrative_chapter_id(directory.name):
             continue
         metadata = _load_chapter_metadata(directory / "metadata.yaml")
         if metadata.status in {
@@ -177,7 +173,9 @@ def _selected_chapters(
         }:
             selected.append((directory, metadata))
     if not selected:
-        raise ChapterChunkingError("no normalized prologue or numbered chapters were found")
+        raise ChapterChunkingError(
+            "no normalized prologue, numbered chapters, or epilogue were found"
+        )
     return selected
 
 
@@ -185,8 +183,7 @@ def _validate_identity(
     paths: ChapterChunkingPaths, metadata: ChapterMetadata, project_root: Path
 ) -> None:
     expected_id = paths.chapter.name
-    expected_number = 0 if expected_id == "000-prologue" else int(expected_id)
-    expected_kind = TocKind.PROLOGUE if expected_id == "000-prologue" else TocKind.CHAPTER
+    expected_kind, expected_number = parse_narrative_chapter_id(expected_id)
     expected_cleaned = Path(paths.cleaned.relative_to(project_root).as_posix())
     if (
         metadata.chapter_id != expected_id
@@ -239,24 +236,22 @@ def _chunk_id(chapter_id: str, sequence: int) -> str:
     return f"{chapter_id}-{sequence:03d}"
 
 
-def _make_artifacts(
+def build_chunk_artifacts(
     *,
     project_root: Path,
     metadata: ChapterMetadata,
     plan: DocumentChunkPlan,
     cleaned_hash: str,
     created_at: datetime,
+    book: str | None = None,
 ) -> tuple[ChunkArtifact, ...]:
-    project_paths = ProjectPaths(project_root)
-    prologue = metadata.kind is TocKind.PROLOGUE
-    number = None if prologue else metadata.number
+    chunks_root = ProjectPaths(project_root, book).chapter_directory(metadata.chapter_id) / "chunks"
     artifacts: list[ChunkArtifact] = []
     for chunk in plan.chunks:
-        source_path = project_paths.chunk_source(number, chunk.sequence, prologue=prologue)
-        context_path = project_paths.chunk_context(number, chunk.sequence, prologue=prologue)
-        translation_path = project_paths.chunk_translation(
-            number, chunk.sequence, prologue=prologue
-        )
+        chunk_directory = chunks_root / chunk_directory_name(chunk.sequence)
+        source_path = chunk_directory / "source.md"
+        context_path = chunk_directory / "context.md"
+        translation_path = chunk_directory / "translation.md"
         source_hash = hashlib.sha256(chunk.source_text.encode("utf-8")).hexdigest()
         context_hash = hashlib.sha256(chunk.context.text.encode("utf-8")).hexdigest()
         chunk_metadata = ChunkMetadata(
@@ -424,11 +419,12 @@ def plan_chapter_chunking(
     selector: str | None = None,
     force: bool = False,
     now: Callable[[], datetime] | None = None,
+    book: str | None = None,
 ) -> ChapterChunkingPlan:
     timestamp = (now or (lambda: datetime.now(UTC)))()
     planned: list[PlannedChapterChunking] = []
     destinations: set[Path] = set()
-    for directory, metadata in _selected_chapters(project_root, selector):
+    for directory, metadata in _selected_chapters(project_root, selector, book):
         paths = _chapter_paths(directory)
         _validate_identity(paths, metadata, project_root)
         _validate_chunking_transition(metadata.status)
@@ -450,12 +446,13 @@ def plan_chapter_chunking(
             raise ChapterChunkingError(
                 f"conservation hash validation failed for {metadata.chapter_id}"
             )
-        artifacts = _make_artifacts(
+        artifacts = build_chunk_artifacts(
             project_root=project_root,
             metadata=metadata,
             plan=document_plan,
             cleaned_hash=cleaned_hash,
             created_at=timestamp,
+            book=book,
         )
         report_data = build_chunking_report(
             chapter_id=metadata.chapter_id,
@@ -495,7 +492,7 @@ def plan_chapter_chunking(
                 updated_metadata=updated,
             )
         )
-    return ChapterChunkingPlan(project_root, config, tuple(planned), force)
+    return ChapterChunkingPlan(project_root, config, tuple(planned), force, book)
 
 
 def _write_staging(item: PlannedChapterChunking) -> Path:

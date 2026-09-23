@@ -1,0 +1,70 @@
+{
+  "$defs": {
+    "BlindComparisonKeyEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "passage_id": {
+          "pattern": "^passage-[0-9a-f]{12}$",
+          "title": "Passage Id",
+          "type": "string"
+        },
+        "version_a": {
+          "enum": [
+            "v1_published",
+            "v2_literary_edited"
+          ],
+          "title": "Version A",
+          "type": "string"
+        },
+        "version_b": {
+          "enum": [
+            "v1_published",
+            "v2_literary_edited"
+          ],
+          "title": "Version B",
+          "type": "string"
+        }
+      },
+      "required": [
+        "passage_id",
+        "version_a",
+        "version_b"
+      ],
+      "title": "BlindComparisonKeyEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "contract_version": {
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "literary_run_id": {
+      "pattern": "^lr-[0-9a-f]{24}$",
+      "title": "Literary Run Id",
+      "type": "string"
+    },
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/BlindComparisonKeyEntry"
+      },
+      "minItems": 1,
+      "title": "Entries",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "contract_version",
+    "literary_run_id",
+    "entries"
+  ],
+  "title": "BlindComparisonAnswerKey",
+  "type": "object"
+}

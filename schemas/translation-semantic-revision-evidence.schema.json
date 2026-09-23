@@ -1,0 +1,1237 @@
+{
+  "$defs": {
+    "OperatorDefectStatement": {
+      "additionalProperties": false,
+      "description": "One defect a person identified in an already-accepted paragraph.\n\nThe judge's vocabulary is reused deliberately: the reviser is told what kind of defect to\ncorrect in exactly the terms it already understands. What differs is who claims it, which is\nwhy the claim is recorded as the operator's rather than dressed up as a judge verdict.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/SemanticFindingCode"
+        },
+        "severity": {
+          "$ref": "#/$defs/SemanticSeverity"
+        },
+        "source_evidence": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Source Evidence",
+          "type": "string"
+        },
+        "reason": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "decided_by": {
+          "const": "user",
+          "default": "user",
+          "title": "Decided By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "source_evidence",
+        "reason"
+      ],
+      "title": "OperatorDefectStatement",
+      "type": "object"
+    },
+    "ParagraphAlignmentFinding": {
+      "additionalProperties": false,
+      "description": "One alignment or marker-contract defect, recorded without any translated content.",
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "error",
+            "warning"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "source_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Paragraph Index"
+        },
+        "related_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Related Paragraph Index"
+        },
+        "expected_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Marker"
+        },
+        "observed_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Marker"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "ParagraphAlignmentFinding",
+      "type": "object"
+    },
+    "RevisedParagraphIdentity": {
+      "additionalProperties": false,
+      "description": "The one paragraph a targeted revision was allowed to touch, bound by hash.",
+      "properties": {
+        "paragraph_id": {
+          "pattern": "^P\\d{4}$",
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "paragraph_index": {
+          "minimum": 1,
+          "title": "Paragraph Index",
+          "type": "integer"
+        },
+        "source_paragraph_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Paragraph Sha256",
+          "type": "string"
+        },
+        "target_paragraph_sha256_before": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Target Paragraph Sha256 Before",
+          "type": "string"
+        },
+        "target_paragraph_sha256_after": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Paragraph Sha256 After"
+        }
+      },
+      "required": [
+        "paragraph_id",
+        "paragraph_index",
+        "source_paragraph_sha256",
+        "target_paragraph_sha256_before"
+      ],
+      "title": "RevisedParagraphIdentity",
+      "type": "object"
+    },
+    "SemanticFinding": {
+      "additionalProperties": false,
+      "description": "One fidelity defect the judge claims, with the evidence a repair stage would need.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/SemanticFindingCode"
+        },
+        "severity": {
+          "$ref": "#/$defs/SemanticSeverity"
+        },
+        "source_evidence": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Source Evidence",
+          "type": "string"
+        },
+        "explanation": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "source_evidence",
+        "explanation",
+        "confidence"
+      ],
+      "title": "SemanticFinding",
+      "type": "object"
+    },
+    "SemanticFindingCode": {
+      "description": "The closed vocabulary of fidelity defects the judge may report.\n\nIt is closed on purpose. An open vocabulary would let a provider invent a category nothing\ndownstream can classify, and the acceptance policy would then have to guess how serious an\nunknown code is. A code outside this set fails the response.",
+      "enum": [
+        "meaning_omitted",
+        "meaning_added",
+        "factual_change",
+        "action_changed",
+        "negation_changed",
+        "modality_changed",
+        "number_changed",
+        "entity_relation_changed",
+        "dialogue_content_changed",
+        "speaker_attribution_risk",
+        "temporal_relation_changed",
+        "causal_relation_changed"
+      ],
+      "title": "SemanticFindingCode",
+      "type": "string"
+    },
+    "SemanticJudgeRequestRecord": {
+      "additionalProperties": false,
+      "description": "Everything about one provider call except what was said.\n\nMessage digests stand in for the messages themselves, which is what lets a later reader prove\nthat a recorded verdict answers a specific request without the request being retained.",
+      "properties": {
+        "request_id": {
+          "pattern": "^sjq-[0-9a-f]{24}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "batch_size": {
+          "minimum": 1,
+          "title": "Batch Size",
+          "type": "integer"
+        },
+        "repetition": {
+          "minimum": 1,
+          "title": "Repetition",
+          "type": "integer"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "adapter_version": {
+          "minLength": 1,
+          "title": "Adapter Version",
+          "type": "string"
+        },
+        "model_requested": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Requested"
+        },
+        "model_returned": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Returned"
+        },
+        "system_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "System Message Sha256",
+          "type": "string"
+        },
+        "user_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "User Message Sha256",
+          "type": "string"
+        },
+        "input_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Tokens"
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Tokens"
+        },
+        "total_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Tokens"
+        },
+        "latency_milliseconds": {
+          "minimum": 0,
+          "title": "Latency Milliseconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "batch_size",
+        "repetition",
+        "provider",
+        "adapter_version",
+        "system_message_sha256",
+        "user_message_sha256",
+        "latency_milliseconds"
+      ],
+      "title": "SemanticJudgeRequestRecord",
+      "type": "object"
+    },
+    "SemanticParagraphOutcome": {
+      "additionalProperties": false,
+      "description": "One paragraph's judged verdict after the acceptance policy has read it.\n\nThe judge's verdict and the policy's outcome are recorded separately and never collapsed. A\njudge that reports a defect the policy considers immaterial is not wrong, and a record that\noverwrote its answer would make the policy impossible to recalibrate against real evidence.",
+      "properties": {
+        "paragraph_id": {
+          "pattern": "^P\\d{4}$",
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "paragraph_index": {
+          "minimum": 1,
+          "title": "Paragraph Index",
+          "type": "integer"
+        },
+        "judge_verdict": {
+          "$ref": "#/$defs/SemanticVerdict"
+        },
+        "policy_outcome": {
+          "$ref": "#/$defs/SemanticVerdict"
+        },
+        "judge_confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Judge Confidence",
+          "type": "number"
+        },
+        "source_word_count": {
+          "minimum": 0,
+          "title": "Source Word Count",
+          "type": "integer"
+        },
+        "target_word_count": {
+          "minimum": 0,
+          "title": "Target Word Count",
+          "type": "integer"
+        },
+        "material_findings": {
+          "items": {
+            "$ref": "#/$defs/SemanticFinding"
+          },
+          "title": "Material Findings",
+          "type": "array"
+        },
+        "advisory_findings": {
+          "items": {
+            "$ref": "#/$defs/SemanticFinding"
+          },
+          "title": "Advisory Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "paragraph_id",
+        "paragraph_index",
+        "judge_verdict",
+        "policy_outcome",
+        "judge_confidence",
+        "source_word_count",
+        "target_word_count"
+      ],
+      "title": "SemanticParagraphOutcome",
+      "type": "object"
+    },
+    "SemanticRevisionBounds": {
+      "additionalProperties": false,
+      "description": "Deterministic measurements of what a revision changed, recorded so it can be refused.\n\nEvery field is a count or a digest. ``changed_paragraph_indexes`` must be a subset of the\nwindow; anything else is a hard failure the orchestrator refuses before adoption, and the\nrecord of the refusal keeps these numbers so the failure is explainable afterwards.",
+      "properties": {
+        "paragraphs_in_window": {
+          "minimum": 1,
+          "title": "Paragraphs In Window",
+          "type": "integer"
+        },
+        "changed_paragraph_indexes": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Changed Paragraph Indexes",
+          "type": "array"
+        },
+        "unchanged_outside_window": {
+          "title": "Unchanged Outside Window",
+          "type": "boolean"
+        },
+        "marker_identity_preserved": {
+          "title": "Marker Identity Preserved",
+          "type": "boolean"
+        },
+        "character_delta": {
+          "title": "Character Delta",
+          "type": "integer"
+        },
+        "word_delta": {
+          "title": "Word Delta",
+          "type": "integer"
+        },
+        "outside_window_sha256_before": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Outside Window Sha256 Before",
+          "type": "string"
+        },
+        "outside_window_sha256_after": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Outside Window Sha256 After",
+          "type": "string"
+        },
+        "terminology_blocking_before": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Terminology Blocking Before",
+          "type": "array"
+        },
+        "terminology_blocking_after": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Terminology Blocking After",
+          "type": "array"
+        },
+        "lexical_content_preserved": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lexical Content Preserved"
+        }
+      },
+      "required": [
+        "paragraphs_in_window",
+        "unchanged_outside_window",
+        "marker_identity_preserved",
+        "character_delta",
+        "word_delta",
+        "outside_window_sha256_before",
+        "outside_window_sha256_after"
+      ],
+      "title": "SemanticRevisionBounds",
+      "type": "object"
+    },
+    "SemanticRevisionKind": {
+      "description": "How a revision candidate was produced.",
+      "enum": [
+        "deterministic_resegmentation",
+        "provider_revision"
+      ],
+      "title": "SemanticRevisionKind",
+      "type": "string"
+    },
+    "SemanticRevisionVerification": {
+      "additionalProperties": false,
+      "description": "The independent judgement of the revised paragraph that adoption rests on.",
+      "properties": {
+        "judge_engine_version": {
+          "title": "Judge Engine Version",
+          "type": "string"
+        },
+        "judge_prompt_version": {
+          "title": "Judge Prompt Version",
+          "type": "string"
+        },
+        "judge_schema_version": {
+          "title": "Judge Schema Version",
+          "type": "string"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/SemanticParagraphOutcome"
+        },
+        "request": {
+          "$ref": "#/$defs/SemanticJudgeRequestRecord"
+        }
+      },
+      "required": [
+        "judge_engine_version",
+        "judge_prompt_version",
+        "judge_schema_version",
+        "policy_version",
+        "outcome",
+        "request"
+      ],
+      "title": "SemanticRevisionVerification",
+      "type": "object"
+    },
+    "SemanticRevisionWindow": {
+      "additionalProperties": false,
+      "description": "The explicit, bounded paragraph range a revision was allowed to change.",
+      "properties": {
+        "first_index": {
+          "minimum": 1,
+          "title": "First Index",
+          "type": "integer"
+        },
+        "last_index": {
+          "minimum": 1,
+          "title": "Last Index",
+          "type": "integer"
+        },
+        "reason": {
+          "enum": [
+            "single_paragraph",
+            "boundary_displacement"
+          ],
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "first_index",
+        "last_index",
+        "reason"
+      ],
+      "title": "SemanticRevisionWindow",
+      "type": "object"
+    },
+    "SemanticSeverity": {
+      "description": "How much a defect costs a reader.",
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "title": "SemanticSeverity",
+      "type": "string"
+    },
+    "SemanticVerdict": {
+      "description": "What the judge concluded about one paragraph.",
+      "enum": [
+        "PASS",
+        "REVISE",
+        "INCONCLUSIVE"
+      ],
+      "title": "SemanticVerdict",
+      "type": "string"
+    },
+    "TerminologyEnforcement": {
+      "description": "What kind of target evidence proves a canonical decision was honored.\n\n``required`` answers whether a decision is in scope for QA at all; this answers the separate\nquestion of what counts as proof.  Collapsing the two forces every approved decision into\n\"the exact canonical string must appear\", which is correct for a name and wrong for a form the\ntarget language legitimately transforms.",
+      "enum": [
+        "exact",
+        "morphological",
+        "contextual",
+        "advisory"
+      ],
+      "title": "TerminologyEnforcement",
+      "type": "string"
+    },
+    "TerminologyFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
+        "source_term": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Term"
+        },
+        "enforcement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyEnforcement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "TerminologyFinding",
+      "type": "object"
+    },
+    "TerminologyValidationReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "checked_decisions": {
+          "minimum": 0,
+          "title": "Checked Decisions",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/TerminologyFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "valid",
+        "source_sha256",
+        "translation_sha256",
+        "checked_decisions"
+      ],
+      "title": "TerminologyValidationReport",
+      "type": "object"
+    },
+    "TranslationAlignmentReport": {
+      "additionalProperties": false,
+      "description": "The alignment verdict for one translated chunk.\n\n``contract_mode`` records how the paragraph identities being judged were established, because\nthe same measurements mean different things under the two.  Under ``marked`` a provider\nreturned the identities it was given and the measurements are a residual check; under\n``legacy_positional`` the identities are inferred from block order, which is exactly the\nassumption a boundary defect breaks, so the measurements are the only evidence there is.",
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "alignment_qa_version": {
+          "title": "Alignment Qa Version",
+          "type": "string"
+        },
+        "policy_id": {
+          "minLength": 1,
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "contract_mode": {
+          "enum": [
+            "marked",
+            "legacy_positional"
+          ],
+          "title": "Contract Mode",
+          "type": "string"
+        },
+        "marker_contract_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Marker Contract Version"
+        },
+        "evaluated": {
+          "title": "Evaluated",
+          "type": "boolean"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "aligned_pairs": {
+          "minimum": 0,
+          "title": "Aligned Pairs",
+          "type": "integer"
+        },
+        "measured_pairs": {
+          "minimum": 0,
+          "title": "Measured Pairs",
+          "type": "integer"
+        },
+        "flagged_pairs": {
+          "minimum": 0,
+          "title": "Flagged Pairs",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/ParagraphAlignmentFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "alignment_qa_version",
+        "policy_id",
+        "policy_version",
+        "contract_mode",
+        "evaluated",
+        "valid",
+        "source_sha256",
+        "translation_sha256",
+        "aligned_pairs",
+        "measured_pairs",
+        "flagged_pairs"
+      ],
+      "title": "TranslationAlignmentReport",
+      "type": "object"
+    },
+    "TranslationQAFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "TranslationQAFinding",
+      "type": "object"
+    },
+    "TranslationQAReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "source_paragraph_count": {
+          "minimum": 0,
+          "title": "Source Paragraph Count",
+          "type": "integer"
+        },
+        "translation_paragraph_count": {
+          "minimum": 0,
+          "title": "Translation Paragraph Count",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/TranslationQAFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "valid",
+        "source_sha256",
+        "translation_sha256",
+        "source_paragraph_count",
+        "translation_paragraph_count"
+      ],
+      "title": "TranslationQAReport",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable record of one bounded semantic revision attempt, adopted or refused.\n\nAn adopted revision supersedes the job's effective translation the way a structural repair\ndoes, and it names what it superseded so the supersession is checkable. A refused revision\nis recorded too: it spent budget, and a budget spent on nothing must still be accountable.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "revision_engine_version": {
+      "title": "Revision Engine Version",
+      "type": "string"
+    },
+    "revision_prompt_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Revision Prompt Version"
+    },
+    "revision_policy_version": {
+      "title": "Revision Policy Version",
+      "type": "string"
+    },
+    "displacement_classifier_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Displacement Classifier Version"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "job_id": {
+      "minLength": 1,
+      "title": "Job Id",
+      "type": "string"
+    },
+    "chunk_id": {
+      "minLength": 1,
+      "title": "Chunk Id",
+      "type": "string"
+    },
+    "revision_number": {
+      "minimum": 1,
+      "title": "Revision Number",
+      "type": "integer"
+    },
+    "kind": {
+      "$ref": "#/$defs/SemanticRevisionKind"
+    },
+    "provider_contacted": {
+      "title": "Provider Contacted",
+      "type": "boolean"
+    },
+    "window": {
+      "$ref": "#/$defs/SemanticRevisionWindow"
+    },
+    "triggering_findings": {
+      "items": {
+        "$ref": "#/$defs/SemanticFinding"
+      },
+      "title": "Triggering Findings",
+      "type": "array"
+    },
+    "superseded_translation_file": {
+      "format": "path",
+      "title": "Superseded Translation File",
+      "type": "string"
+    },
+    "superseded_translation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Superseded Translation Sha256",
+      "type": "string"
+    },
+    "superseded_semantic_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Superseded Semantic File"
+    },
+    "superseded_semantic_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Superseded Semantic Sha256"
+    },
+    "source_file": {
+      "format": "path",
+      "title": "Source File",
+      "type": "string"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "translation_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Translation File"
+    },
+    "translation_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Translation Sha256"
+    },
+    "terminology_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology File"
+    },
+    "terminology_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Sha256"
+    },
+    "request": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SemanticJudgeRequestRecord"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "bounds": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SemanticRevisionBounds"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "marker_findings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Marker Findings",
+      "type": "array"
+    },
+    "terminology_report": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TerminologyValidationReport"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "structural_report": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TranslationQAReport"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "alignment_report": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TranslationAlignmentReport"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "adopted": {
+      "title": "Adopted",
+      "type": "boolean"
+    },
+    "refusals": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Refusals",
+      "type": "array"
+    },
+    "defect_origin": {
+      "default": "judge",
+      "enum": [
+        "judge",
+        "operator"
+      ],
+      "title": "Defect Origin",
+      "type": "string"
+    },
+    "operator_defect": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OperatorDefectStatement"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "revised_paragraph": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RevisedParagraphIdentity"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "snapshot_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Snapshot Id"
+    },
+    "manifest_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Manifest Sha256"
+    },
+    "occurrence_exemption_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Occurrence Exemption Ids",
+      "type": "array"
+    },
+    "verification": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SemanticRevisionVerification"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "revision_engine_version",
+    "revision_policy_version",
+    "run_id",
+    "job_id",
+    "chunk_id",
+    "revision_number",
+    "kind",
+    "provider_contacted",
+    "window",
+    "superseded_translation_file",
+    "superseded_translation_sha256",
+    "source_file",
+    "source_sha256",
+    "adopted",
+    "created_at"
+  ],
+  "title": "TranslationSemanticRevisionEvidence",
+  "type": "object"
+}

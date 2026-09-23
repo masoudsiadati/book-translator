@@ -1,7 +1,6 @@
 """Chapter normalization preflight and recoverable transactional execution."""
 
 import hashlib
-import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -13,10 +12,17 @@ from pydantic import ValidationError
 
 from book_translator.atomic_write import atomic_write_text
 from book_translator.hashing import sha256_file
-from book_translator.models import ChapterMetadata, ChapterStatus, TocKind
+from book_translator.models import ChapterMetadata, ChapterStatus
 from book_translator.normalization.engine import NORMALIZATION_VERSION, normalize_text
 from book_translator.normalization.models import NormalizationResult
 from book_translator.normalization.reporting import build_report, serialize_yaml
+from book_translator.paths import (
+    NARRATIVE_KINDS,
+    ProjectPaths,
+    chapter_id_from_selector,
+    is_narrative_chapter_id,
+    parse_narrative_chapter_id,
+)
 from book_translator.status_transitions import can_transition_chapter
 
 
@@ -51,6 +57,7 @@ class NormalizationPlan:
     chapters: tuple[PlannedChapter, ...]
     normalization_version: str
     force: bool
+    book: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,43 +84,29 @@ def _paths(directory: Path) -> NormalizationPaths:
     )
 
 
-def _chapter_number(directory: Path) -> int | None:
-    return None if directory.name == "000-prologue" else int(directory.name)
-
-
-def _selected_directories(project_root: Path, selector: str | None) -> list[Path]:
-    root = project_root / "workspace/chapters"
+def _selected_directories(
+    project_root: Path, selector: str | None, book: str | None = None
+) -> list[Path]:
+    try:
+        root = ProjectPaths(project_root, book).chapters
+    except ValueError as exc:
+        raise ChapterNormalizationError(str(exc)) from exc
     if selector is None:
         if not root.is_dir():
             raise ChapterNormalizationError(f"chapter workspace not found: {root}")
+        # Canonical names sort in narrative order: 000-prologue, 001..999, 999-epilogue.
         return sorted(
             (
                 path
                 for path in root.iterdir()
-                if path.is_dir()
-                and (
-                    path.name == "000-prologue"
-                    or re.fullmatch(r"\d{3}", path.name)
-                    and path.name != "000"
-                )
+                if path.is_dir() and is_narrative_chapter_id(path.name)
             ),
-            key=lambda path: (path.name != "000-prologue", path.name),
+            key=lambda path: path.name,
         )
-    normalized = selector.strip().lower()
-    if normalized in {"prologue", "0"}:
-        destination = root / "000-prologue"
-    elif normalized.isdigit():
-        number = int(normalized)
-        if not 1 <= number <= 999:
-            raise ChapterNormalizationError(f"invalid chapter selector {selector!r}")
-        destination = root / f"{number:03d}"
-    elif re.fullmatch(r"chapter-\d+", normalized):
-        number = int(normalized.removeprefix("chapter-"))
-        if not 1 <= number <= 999:
-            raise ChapterNormalizationError(f"invalid chapter selector {selector!r}")
-        destination = root / f"{number:03d}"
-    else:
-        raise ChapterNormalizationError(f"invalid chapter selector {selector!r}")
+    try:
+        destination = root / chapter_id_from_selector(selector)
+    except ValueError as exc:
+        raise ChapterNormalizationError(str(exc)) from exc
     if not destination.is_dir():
         raise ChapterNormalizationError(f"selected chapter workspace not found: {destination}")
     return [destination]
@@ -154,7 +147,17 @@ def _validate_complete_existing(
             f"invalid normalization report {paths.report}: {exc}"
         ) from exc
     cleaned_hash = sha256_file(paths.cleaned)
-    if metadata.status is not ChapterStatus.NORMALIZED:
+    normalized_or_later = {
+        ChapterStatus.NORMALIZED,
+        ChapterStatus.VALIDATED,
+        ChapterStatus.CHUNKED,
+        ChapterStatus.TRANSLATING,
+        ChapterStatus.TRANSLATED,
+        ChapterStatus.REVIEW_REQUIRED,
+        ChapterStatus.REVIEWED,
+        ChapterStatus.APPROVED,
+    }
+    if metadata.status not in normalized_or_later:
         raise ChapterNormalizationError(f"inconsistent normalized status for {metadata.chapter_id}")
     if metadata.cleaned_sha256 != cleaned_hash:
         raise ChapterNormalizationError(f"cleaned hash integrity error for {metadata.chapter_id}")
@@ -197,6 +200,7 @@ def _validate_complete_existing(
             "source_physical_line_count": expected_result.document.source_physical_line_count,
             "cleaned_paragraph_count": expected_paragraphs,
             "page_markers_removed": expected_result.page_markers_removed,
+            "page_continuation_joins": expected_result.page_continuation_joins,
             "page_transitions": list(expected_result.document.page_transitions),
             "wrapped_line_joins": expected_result.wrapped_line_joins,
             "hyphen_repairs": expected_result.hyphen_repairs,
@@ -243,20 +247,25 @@ def plan_normalization(
     force: bool = False,
     normalization_version: str = NORMALIZATION_VERSION,
     now: Callable[[], datetime] | None = None,
+    book: str | None = None,
 ) -> NormalizationPlan:
     if not normalization_version.strip():
         raise ChapterNormalizationError("normalization version must not be empty")
     timestamp = (now or (lambda: datetime.now(UTC)))()
     planned: list[PlannedChapter] = []
-    for directory in _selected_directories(project_root, selector):
+    for directory in _selected_directories(project_root, selector, book):
         paths = _paths(directory)
         if not paths.source.is_file() or not paths.metadata.is_file():
             raise ChapterNormalizationError(f"incomplete extracted chapter workspace: {directory}")
         metadata = _load_metadata(paths.metadata)
-        if metadata.kind not in {TocKind.PROLOGUE, TocKind.CHAPTER}:
+        if metadata.kind not in NARRATIVE_KINDS:
             raise ChapterNormalizationError(f"unsupported chapter kind for {metadata.chapter_id}")
-        expected_number = _chapter_number(directory)
-        if metadata.number != (0 if expected_number is None else expected_number):
+        expected_kind, expected_number = parse_narrative_chapter_id(directory.name)
+        if (
+            metadata.chapter_id != directory.name
+            or metadata.kind is not expected_kind
+            or metadata.number != expected_number
+        ):
             raise ChapterNormalizationError(
                 f"chapter metadata path mismatch for {metadata.chapter_id}"
             )
@@ -284,7 +293,7 @@ def plan_normalization(
             result,
             force=force,
         )
-        if not can_transition_chapter(
+        if action != "skip" and not can_transition_chapter(
             metadata.status, ChapterStatus.NORMALIZED, explicit_retry=force
         ):
             action = "conflict"
@@ -309,8 +318,10 @@ def plan_normalization(
             )
         )
     if not planned:
-        raise ChapterNormalizationError("no extracted prologue or numbered chapters found")
-    return NormalizationPlan(project_root, tuple(planned), normalization_version, force)
+        raise ChapterNormalizationError(
+            "no extracted prologue, numbered chapters, or epilogue found"
+        )
+    return NormalizationPlan(project_root, tuple(planned), normalization_version, force, book)
 
 
 def _serialize_metadata(metadata: ChapterMetadata) -> str:

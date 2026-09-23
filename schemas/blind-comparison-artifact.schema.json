@@ -1,0 +1,139 @@
+{
+  "$defs": {
+    "BlindComparisonPassage": {
+      "additionalProperties": false,
+      "properties": {
+        "passage_id": {
+          "pattern": "^passage-[0-9a-f]{12}$",
+          "title": "Passage Id",
+          "type": "string"
+        },
+        "chapter_id": {
+          "minLength": 1,
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "paragraph_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Paragraph Ids",
+          "type": "array"
+        },
+        "version_a_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Version A Sha256",
+          "type": "string"
+        },
+        "version_b_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Version B Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "passage_id",
+        "chapter_id",
+        "paragraph_ids",
+        "version_a_sha256",
+        "version_b_sha256"
+      ],
+      "title": "BlindComparisonPassage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Prose-free manifest for the human-facing A/B document.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "contract_version": {
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "literary_run_id": {
+      "pattern": "^lr-[0-9a-f]{24}$",
+      "title": "Literary Run Id",
+      "type": "string"
+    },
+    "labels": {
+      "const": "Version A / Version B",
+      "default": "Version A / Version B",
+      "title": "Labels",
+      "type": "string"
+    },
+    "identity_revealed": {
+      "const": false,
+      "default": false,
+      "title": "Identity Revealed",
+      "type": "boolean"
+    },
+    "rubric": {
+      "items": {
+        "enum": [
+          "روانی",
+          "طبیعی بودن فارسی",
+          "لحن رمان",
+          "دیالوگ",
+          "انسجام",
+          "وفاداری ادراک‌شده",
+          "ترجیح کلی"
+        ],
+        "type": "string"
+      },
+      "title": "Rubric",
+      "type": "array"
+    },
+    "passages": {
+      "items": {
+        "$ref": "#/$defs/BlindComparisonPassage"
+      },
+      "minItems": 1,
+      "title": "Passages",
+      "type": "array"
+    },
+    "document_file": {
+      "format": "path",
+      "title": "Document File",
+      "type": "string"
+    },
+    "document_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Document Sha256",
+      "type": "string"
+    },
+    "answer_key_file": {
+      "format": "path",
+      "title": "Answer Key File",
+      "type": "string"
+    },
+    "answer_key_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Answer Key Sha256",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "contract_version",
+    "literary_run_id",
+    "rubric",
+    "passages",
+    "document_file",
+    "document_sha256",
+    "answer_key_file",
+    "answer_key_sha256",
+    "created_at"
+  ],
+  "title": "BlindComparisonArtifact",
+  "type": "object"
+}

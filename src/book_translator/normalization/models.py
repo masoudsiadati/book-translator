@@ -74,5 +74,11 @@ class NormalizationResult:
         return sum(change.change_type == "page_marker_removed" for change in self.changes)
 
     @property
+    def page_continuation_joins(self) -> int:
+        return sum(
+            change.change_type == "page_boundary_continuation_join" for change in self.changes
+        )
+
+    @property
     def ambiguous_blocks(self) -> int:
         return sum(change.change_type == "ambiguous_block" for change in self.changes)

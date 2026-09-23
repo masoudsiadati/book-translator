@@ -1,0 +1,167 @@
+{
+  "$defs": {
+    "TerminologyReview": {
+      "additionalProperties": false,
+      "properties": {
+        "review_id": {
+          "pattern": "^tr-[0-9a-f]{24}$",
+          "title": "Review Id",
+          "type": "string"
+        },
+        "proposal_id": {
+          "pattern": "^tp-[0-9a-f]{24}$",
+          "title": "Proposal Id",
+          "type": "string"
+        },
+        "disposition": {
+          "$ref": "#/$defs/TerminologyReviewDisposition"
+        },
+        "reviewed_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reviewed Target"
+        },
+        "provider_reviewed_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Reviewed Target"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "meaning_fidelity": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Meaning Fidelity",
+          "type": "number"
+        },
+        "target_naturalness": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Target Naturalness",
+          "type": "number"
+        },
+        "transliteration_stability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Transliteration Stability",
+          "type": "number"
+        },
+        "terminology_consistency": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Terminology Consistency",
+          "type": "number"
+        },
+        "register_appropriateness": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Register Appropriateness",
+          "type": "number"
+        },
+        "morphology_suitability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Morphology Suitability",
+          "type": "number"
+        },
+        "ambiguity_safety": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Ambiguity Safety",
+          "type": "number"
+        },
+        "reason_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        },
+        "blocked": {
+          "default": false,
+          "title": "Blocked",
+          "type": "boolean"
+        },
+        "conflict_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Conflict Codes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "review_id",
+        "proposal_id",
+        "disposition",
+        "reviewed_target",
+        "confidence",
+        "meaning_fidelity",
+        "target_naturalness",
+        "transliteration_stability",
+        "terminology_consistency",
+        "register_appropriateness",
+        "morphology_suitability",
+        "ambiguity_safety",
+        "reason_codes",
+        "notes"
+      ],
+      "title": "TerminologyReview",
+      "type": "object"
+    },
+    "TerminologyReviewDisposition": {
+      "enum": [
+        "accept",
+        "revise",
+        "reject",
+        "defer"
+      ],
+      "title": "TerminologyReviewDisposition",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "reviews": {
+      "items": {
+        "$ref": "#/$defs/TerminologyReview"
+      },
+      "title": "Reviews",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version"
+  ],
+  "title": "TerminologyReviewResponse",
+  "type": "object"
+}

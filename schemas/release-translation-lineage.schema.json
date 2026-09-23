@@ -1,0 +1,316 @@
+{
+  "$defs": {
+    "ReleaseChunkLineage": {
+      "additionalProperties": false,
+      "description": "Everything a third party needs to re-verify one released chunk.\n\nIt deliberately holds no prose and no provider prompt or response: the translated bytes are\nnamed and hashed, never quoted.",
+      "properties": {
+        "chapter_id": {
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "chapter_sequence": {
+          "minimum": 1,
+          "title": "Chapter Sequence",
+          "type": "integer"
+        },
+        "chunk_id": {
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "chunk_sequence": {
+          "minimum": 1,
+          "title": "Chunk Sequence",
+          "type": "integer"
+        },
+        "paragraph_offset": {
+          "minimum": 1,
+          "title": "Paragraph Offset",
+          "type": "integer"
+        },
+        "job_id": {
+          "minLength": 1,
+          "title": "Job Id",
+          "type": "string"
+        },
+        "source_file": {
+          "format": "path",
+          "title": "Source File",
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "source_paragraph_count": {
+          "minimum": 1,
+          "title": "Source Paragraph Count",
+          "type": "integer"
+        },
+        "context_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Context Sha256",
+          "type": "string"
+        },
+        "translation_file": {
+          "format": "path",
+          "title": "Translation File",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "translation_paragraph_count": {
+          "minimum": 1,
+          "title": "Translation Paragraph Count",
+          "type": "integer"
+        },
+        "acceptance_status": {
+          "$ref": "#/$defs/TranslationAcceptanceStatus"
+        },
+        "acceptance_origin": {
+          "$ref": "#/$defs/TranslationAcceptanceOrigin"
+        },
+        "acceptance_evidence_file": {
+          "format": "path",
+          "title": "Acceptance Evidence File",
+          "type": "string"
+        },
+        "acceptance_evidence_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Acceptance Evidence Sha256",
+          "type": "string"
+        },
+        "attempt_id": {
+          "minLength": 1,
+          "title": "Attempt Id",
+          "type": "string"
+        },
+        "attempt_number": {
+          "minimum": 1,
+          "title": "Attempt Number",
+          "type": "integer"
+        },
+        "attempt_file": {
+          "format": "path",
+          "title": "Attempt File",
+          "type": "string"
+        },
+        "attempt_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Attempt Sha256",
+          "type": "string"
+        },
+        "provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "provider_resolution": {
+          "$ref": "#/$defs/ReleaseProviderResolution"
+        },
+        "provider_attempts": {
+          "minimum": 0,
+          "title": "Provider Attempts",
+          "type": "integer"
+        },
+        "terminology_qa_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Terminology Qa Version"
+        },
+        "structural_qa_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Structural Qa Version"
+        },
+        "lineage_source_run_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lineage Source Run Id"
+        },
+        "lineage_source_job_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lineage Source Job Id"
+        }
+      },
+      "required": [
+        "chapter_id",
+        "chapter_sequence",
+        "chunk_id",
+        "chunk_sequence",
+        "paragraph_offset",
+        "job_id",
+        "source_file",
+        "source_sha256",
+        "source_paragraph_count",
+        "context_sha256",
+        "translation_file",
+        "translation_sha256",
+        "translation_paragraph_count",
+        "acceptance_status",
+        "acceptance_origin",
+        "acceptance_evidence_file",
+        "acceptance_evidence_sha256",
+        "attempt_id",
+        "attempt_number",
+        "attempt_file",
+        "attempt_sha256",
+        "provider_resolution",
+        "provider_attempts"
+      ],
+      "title": "ReleaseChunkLineage",
+      "type": "object"
+    },
+    "ReleaseProviderResolution": {
+      "description": "How a chunk's originating provider was established, or why it could not be.",
+      "enum": [
+        "attempt",
+        "carry_forward_source",
+        "reuse_source",
+        "unresolved"
+      ],
+      "title": "ReleaseProviderResolution",
+      "type": "string"
+    },
+    "TranslationAcceptanceOrigin": {
+      "enum": [
+        "initial_qa",
+        "qa_reevaluation",
+        "reuse_qa",
+        "historical_reevaluation",
+        "structural_repair"
+      ],
+      "title": "TranslationAcceptanceOrigin",
+      "type": "string"
+    },
+    "TranslationAcceptanceStatus": {
+      "enum": [
+        "accepted",
+        "qa_rejected"
+      ],
+      "title": "TranslationAcceptanceStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The complete chunk-level provenance of one release.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "release_assembly_engine_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Release Assembly Engine Version",
+      "type": "string"
+    },
+    "release_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Release Id",
+      "type": "string"
+    },
+    "book_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "source_translation_run": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Source Translation Run",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "snapshot_manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Snapshot Manifest Sha256",
+      "type": "string"
+    },
+    "chunk_count": {
+      "minimum": 1,
+      "title": "Chunk Count",
+      "type": "integer"
+    },
+    "chunks": {
+      "items": {
+        "$ref": "#/$defs/ReleaseChunkLineage"
+      },
+      "title": "Chunks",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "release_assembly_engine_version",
+    "release_id",
+    "book_id",
+    "source_translation_run",
+    "snapshot_id",
+    "snapshot_manifest_sha256",
+    "chunk_count",
+    "chunks"
+  ],
+  "title": "ReleaseLineageDocument",
+  "type": "object"
+}

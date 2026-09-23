@@ -1,0 +1,208 @@
+{
+  "$defs": {
+    "ExecutionReservationResolutionKind": {
+      "description": "The external provider-contact fact an operator asserts about a reservation.",
+      "enum": [
+        "provider_not_contacted",
+        "provider_contact_unknown",
+        "provider_contacted_no_result"
+      ],
+      "title": "ExecutionReservationResolutionKind",
+      "type": "string"
+    },
+    "ExecutionResolutionProvenance": {
+      "description": "Who asserted the external fact recorded by a resolution.",
+      "enum": [
+        "operator"
+      ],
+      "title": "ExecutionResolutionProvenance",
+      "type": "string"
+    },
+    "ProviderName": {
+      "enum": [
+        "fake",
+        "openai",
+        "codex-cli",
+        "claude-code"
+      ],
+      "title": "ProviderName",
+      "type": "string"
+    },
+    "TranslationAttemptStatus": {
+      "enum": [
+        "prepared",
+        "requesting",
+        "succeeded",
+        "failed",
+        "ambiguous",
+        "invalid"
+      ],
+      "title": "TranslationAttemptStatus",
+      "type": "string"
+    },
+    "TranslationJobStatus": {
+      "enum": [
+        "pending",
+        "claimed",
+        "running",
+        "succeeded",
+        "failed",
+        "retry_pending",
+        "cancelled",
+        "blocked"
+      ],
+      "title": "TranslationJobStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Durable evidence that an operator resolved one incomplete execution reservation.\n\nA reservation records only that a local worker was about to contact a provider.  When the\nworker dies after the send marker is published, delivery is unknowable from the workspace\nalone and automatic recovery refuses.  This record preserves the operator's explicit external\nassertion, the reservation it applies to, and the exact queue accounting it produced, so the\nreservation itself never has to be edited or deleted.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "resolution_id": {
+      "pattern": "^xrr-[0-9a-f]{24}$",
+      "title": "Resolution Id",
+      "type": "string"
+    },
+    "resolver_engine_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Resolver Engine Version",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/ExecutionResolutionProvenance"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "job_id": {
+      "minLength": 1,
+      "title": "Job Id",
+      "type": "string"
+    },
+    "chunk_id": {
+      "minLength": 1,
+      "title": "Chunk Id",
+      "type": "string"
+    },
+    "attempt_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]*__attempt-\\d{3,}$",
+      "title": "Attempt Id",
+      "type": "string"
+    },
+    "attempt_number": {
+      "minimum": 1,
+      "title": "Attempt Number",
+      "type": "integer"
+    },
+    "reservation_file": {
+      "format": "path",
+      "title": "Reservation File",
+      "type": "string"
+    },
+    "reservation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Reservation Sha256",
+      "type": "string"
+    },
+    "reservation_status": {
+      "$ref": "#/$defs/TranslationAttemptStatus"
+    },
+    "provider": {
+      "$ref": "#/$defs/ProviderName"
+    },
+    "prompt_package_id": {
+      "minLength": 1,
+      "title": "Prompt Package Id",
+      "type": "string"
+    },
+    "request_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Request Sha256",
+      "type": "string"
+    },
+    "resolution": {
+      "$ref": "#/$defs/ExecutionReservationResolutionKind"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "previous_job_status": {
+      "$ref": "#/$defs/TranslationJobStatus"
+    },
+    "previous_attempt_count": {
+      "minimum": 1,
+      "title": "Previous Attempt Count",
+      "type": "integer"
+    },
+    "previous_abandoned_attempt_count": {
+      "minimum": 0,
+      "title": "Previous Abandoned Attempt Count",
+      "type": "integer"
+    },
+    "resulting_job_status": {
+      "$ref": "#/$defs/TranslationJobStatus"
+    },
+    "resulting_attempt_count": {
+      "minimum": 1,
+      "title": "Resulting Attempt Count",
+      "type": "integer"
+    },
+    "resulting_abandoned_attempt_count": {
+      "minimum": 0,
+      "title": "Resulting Abandoned Attempt Count",
+      "type": "integer"
+    },
+    "provider_attempt_consumed": {
+      "title": "Provider Attempt Consumed",
+      "type": "boolean"
+    },
+    "replay_permitted": {
+      "title": "Replay Permitted",
+      "type": "boolean"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "resolution_id",
+    "resolver_engine_version",
+    "provenance",
+    "run_id",
+    "job_id",
+    "chunk_id",
+    "attempt_id",
+    "attempt_number",
+    "reservation_file",
+    "reservation_sha256",
+    "reservation_status",
+    "provider",
+    "prompt_package_id",
+    "request_sha256",
+    "resolution",
+    "reason",
+    "previous_job_status",
+    "previous_attempt_count",
+    "previous_abandoned_attempt_count",
+    "resulting_job_status",
+    "resulting_attempt_count",
+    "resulting_abandoned_attempt_count",
+    "provider_attempt_consumed",
+    "replay_permitted",
+    "created_at"
+  ],
+  "title": "ExecutionReservationResolution",
+  "type": "object"
+}

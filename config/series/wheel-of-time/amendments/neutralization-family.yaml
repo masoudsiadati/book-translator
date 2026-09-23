@@ -1,0 +1,33 @@
+schema_version: "1.0"
+request_kind: series_policy_amendment_request
+series_id: wheel-of-time
+resulting_policy_version: 1.1.0
+rationale: >-
+  Govern the gentle/still neutralization family as one concept: participles and gerunds share
+  explicitly authorized Persian realizations, and aliases that attached ordinary words or the
+  participle to the gerund decision are removed.
+terms:
+  - source_term: Gentled
+    status: LOCKED
+    target_term: "خنثی‌شده"
+    allowed_target_forms: ["خنثی شده", "خنثی شدن"]
+    aliases: ["gentled"]
+    rationale: participle decision; the spaced participle and the verbal noun are authorized grammatical realizations
+  - source_term: gentling
+    status: LOCKED
+    target_term: "خنثی شدن"
+    allowed_target_forms: ["خنثی‌شده", "خنثی شده"]
+    aliases: ["Gentling"]
+    rationale: gerund decision; ordinary "gentle" and the participle "gentled" are no longer aliases
+  - source_term: Stilled
+    status: LOCKED
+    target_term: "خنثی‌شده"
+    allowed_target_forms: ["خنثی شده", "خنثی شدن"]
+    aliases: ["stilled"]
+    rationale: participle decision; lowercase "stilled" stays with the participle
+  - source_term: stilling
+    status: LOCKED
+    target_term: "خنثی شدن"
+    allowed_target_forms: ["خنثی‌شده", "خنثی شده"]
+    aliases: ["Stilling"]
+    rationale: gerund decision; lowercase "stilled" belongs to the participle decision

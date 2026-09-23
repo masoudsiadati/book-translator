@@ -1,9 +1,61 @@
 {
+  "$defs": {
+    "BookMetadataFieldProvenance": {
+      "additionalProperties": false,
+      "description": "Per-field provenance; `evidence` is a locator and never carries book prose.",
+      "properties": {
+        "field": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Field",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/BookMetadataProvenance"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence"
+        }
+      },
+      "required": [
+        "field",
+        "provenance"
+      ],
+      "title": "BookMetadataFieldProvenance",
+      "type": "object"
+    },
+    "BookMetadataProvenance": {
+      "description": "Where a resolved book metadata value actually came from.",
+      "enum": [
+        "pdf_metadata",
+        "front_matter",
+        "configuration",
+        "external_research",
+        "unresolved"
+      ],
+      "title": "BookMetadataProvenance",
+      "type": "string"
+    }
+  },
   "additionalProperties": false,
   "properties": {
     "schema_version": {
       "pattern": "^\\d+\\.\\d+$",
       "title": "Schema Version",
+      "type": "string"
+    },
+    "metadata_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Metadata Version",
       "type": "string"
     },
     "book_id": {
@@ -17,10 +69,28 @@
       "title": "Source Pdf",
       "type": "string"
     },
+    "source_pdf_name": {
+      "minLength": 1,
+      "title": "Source Pdf Name",
+      "type": "string"
+    },
     "source_pdf_sha256": {
       "pattern": "^[0-9a-f]{64}$",
       "title": "Source Pdf Sha256",
       "type": "string"
+    },
+    "source_pdf_page_count": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Pdf Page Count"
     },
     "title_en": {
       "minLength": 1,
@@ -28,7 +98,7 @@
       "type": "string"
     },
     "title_fa": {
-      "minLength": 1,
+      "default": "",
       "title": "Title Fa",
       "type": "string"
     },
@@ -47,10 +117,96 @@
       "title": "Target Language",
       "type": "string"
     },
+    "series_name": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Series Name"
+    },
+    "series_index": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Series Index"
+    },
+    "edition": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Edition"
+    },
+    "publisher": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Publisher"
+    },
+    "publication_year": {
+      "anyOf": [
+        {
+          "maximum": 9999,
+          "minimum": 1000,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Publication Year"
+    },
+    "isbn": {
+      "anyOf": [
+        {
+          "pattern": "^(?:\\d{9}[\\dX]|\\d{13})$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Isbn"
+    },
     "expected_output_format": {
       "const": "epub3",
       "title": "Expected Output Format",
       "type": "string"
+    },
+    "provenance": {
+      "items": {
+        "$ref": "#/$defs/BookMetadataFieldProvenance"
+      },
+      "title": "Provenance",
+      "type": "array"
     },
     "created_at": {
       "format": "date-time",
@@ -65,15 +221,17 @@
   },
   "required": [
     "schema_version",
+    "metadata_version",
     "book_id",
     "source_pdf",
+    "source_pdf_name",
     "source_pdf_sha256",
     "title_en",
-    "title_fa",
     "author",
     "source_language",
     "target_language",
     "expected_output_format",
+    "provenance",
     "created_at",
     "updated_at"
   ],

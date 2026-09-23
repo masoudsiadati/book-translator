@@ -1,0 +1,224 @@
+{
+  "$defs": {
+    "ChapterTitleOrigin": {
+      "description": "Where one released Persian chapter title actually came from.",
+      "enum": [
+        "provider_translation",
+        "recorded_title",
+        "deduplicated",
+        "inherited_title",
+        "operator_override"
+      ],
+      "title": "ChapterTitleOrigin",
+      "type": "string"
+    },
+    "ChapterTitleRecord": {
+      "additionalProperties": false,
+      "description": "One chapter's title pair, addressed by the bytes of both sides.",
+      "properties": {
+        "chapter_id": {
+          "minLength": 1,
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "chapter_sequence": {
+          "minimum": 1,
+          "title": "Chapter Sequence",
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/TocKind"
+        },
+        "number": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Number"
+        },
+        "title_en": {
+          "minLength": 1,
+          "title": "Title En",
+          "type": "string"
+        },
+        "title_fa": {
+          "minLength": 1,
+          "title": "Title Fa",
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "origin": {
+          "$ref": "#/$defs/ChapterTitleOrigin"
+        }
+      },
+      "required": [
+        "chapter_id",
+        "chapter_sequence",
+        "kind",
+        "title_en",
+        "title_fa",
+        "source_sha256",
+        "translation_sha256",
+        "origin"
+      ],
+      "title": "ChapterTitleRecord",
+      "type": "object"
+    },
+    "TocKind": {
+      "enum": [
+        "front_matter",
+        "prologue",
+        "chapter",
+        "epilogue",
+        "appendix",
+        "unknown"
+      ],
+      "title": "TocKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The answer: every chapter of one snapshot with its target-language title.\n\nIt carries no timestamp. Given the same titles it serializes to the same bytes, which is what\nlets a release name a title artifact by hash and stay reproducible.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "chapter_title_engine_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Chapter Title Engine Version",
+      "type": "string"
+    },
+    "artifact_id": {
+      "pattern": "^ct-[0-9a-f]{24}$",
+      "title": "Artifact Id",
+      "type": "string"
+    },
+    "book_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "source_language": {
+      "minLength": 2,
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "minLength": 2,
+      "title": "Target Language",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "snapshot_manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Snapshot Manifest Sha256",
+      "type": "string"
+    },
+    "terminology_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology File"
+    },
+    "terminology_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Sha256"
+    },
+    "terminology_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Version"
+    },
+    "chapter_count": {
+      "minimum": 1,
+      "title": "Chapter Count",
+      "type": "integer"
+    },
+    "chapters": {
+      "items": {
+        "$ref": "#/$defs/ChapterTitleRecord"
+      },
+      "title": "Chapters",
+      "type": "array"
+    },
+    "content_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Content Sha256",
+      "type": "string"
+    },
+    "parent_artifact_id": {
+      "anyOf": [
+        {
+          "pattern": "^ct-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parent Artifact Id"
+    }
+  },
+  "required": [
+    "schema_version",
+    "chapter_title_engine_version",
+    "artifact_id",
+    "book_id",
+    "source_language",
+    "target_language",
+    "snapshot_id",
+    "snapshot_manifest_sha256",
+    "chapter_count",
+    "chapters",
+    "content_sha256"
+  ],
+  "title": "ChapterTitleDocument",
+  "type": "object"
+}

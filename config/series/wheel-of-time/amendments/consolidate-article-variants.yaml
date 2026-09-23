@@ -1,0 +1,35 @@
+schema_version: '1.0'
+request_kind: series_policy_amendment_request
+series_id: wheel-of-time
+resulting_policy_version: 1.2.0
+rationale: 'Consolidate two fictional concepts that the policy stated twice. An explicit
+  project decision keyed on the article-bearing spelling and a corpus promotion keyed
+  on the bare spelling named one thing in the story and carried two targets, so every
+  prompt rendered both instructions and enforcement honoured only the longer span.
+  The article-bearing project decision governs; the bare spelling becomes its alias
+  so every occurrence stays matched and enforced; the promoted concepts are retired
+  to evidence with their corpus support intact. The retired renderings are competing
+  historical variants, not grammatical realizations, and are deliberately not authorized
+  target forms.'
+terms:
+- source_term: the Dark One
+  status: LOCKED
+  target_term: ارباب تاریکی
+  aliases:
+  - Dark One
+  rationale: the bare spelling is an article variant of the same fictional concept
+    and is governed by this decision
+- source_term: The One Power
+  status: LOCKED
+  target_term: قدرت یگانه
+  aliases:
+  - One Power
+  rationale: the bare spelling is an article variant of the same fictional concept
+    and is governed by this decision
+retired_terms:
+- source_term: Dark One
+  rationale: displaced by the locked project decision on 'the Dark One'; its corpus
+    evidence for اهریمن is preserved as observed variants
+- source_term: One Power
+  rationale: displaced by the locked project decision on 'The One Power'; its corpus
+    evidence for نیروی یگانه is preserved as observed variants

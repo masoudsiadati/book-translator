@@ -1,0 +1,232 @@
+{
+  "$defs": {
+    "TranslationSnapshotStatus": {
+      "enum": [
+        "draft",
+        "validated",
+        "frozen",
+        "invalid"
+      ],
+      "title": "TranslationSnapshotStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "pattern": "^translation-[a-z0-9._-]+-[0-9a-f]{24}$",
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "snapshot_kind": {
+      "const": "translation",
+      "default": "translation",
+      "title": "Snapshot Kind",
+      "type": "string"
+    },
+    "label": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Label"
+    },
+    "manifest_file": {
+      "format": "path",
+      "title": "Manifest File",
+      "type": "string"
+    },
+    "manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Manifest Sha256",
+      "type": "string"
+    },
+    "book_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "selection_mode": {
+      "enum": [
+        "full",
+        "subset"
+      ],
+      "title": "Selection Mode",
+      "type": "string"
+    },
+    "selected_chapter_count": {
+      "minimum": 1,
+      "title": "Selected Chapter Count",
+      "type": "integer"
+    },
+    "selected_chunk_count": {
+      "minimum": 1,
+      "title": "Selected Chunk Count",
+      "type": "integer"
+    },
+    "source_language": {
+      "minLength": 2,
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "minLength": 2,
+      "title": "Target Language",
+      "type": "string"
+    },
+    "prompt_version": {
+      "title": "Prompt Version",
+      "type": "string"
+    },
+    "glossary_version": {
+      "title": "Glossary Version",
+      "type": "string"
+    },
+    "style_guide_version": {
+      "title": "Style Guide Version",
+      "type": "string"
+    },
+    "terminology_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Version"
+    },
+    "source_anomalies_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Anomalies Version"
+    },
+    "open_questions_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Open Questions Version"
+    },
+    "series_terminology_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Series Terminology Version"
+    },
+    "reference_corpus_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reference Corpus Version"
+    },
+    "reference_context_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reference Context Version"
+    },
+    "terminology_exemptions_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Exemptions Version"
+    },
+    "status": {
+      "$ref": "#/$defs/TranslationSnapshotStatus"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "frozen_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Frozen At"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "snapshot_id",
+    "manifest_file",
+    "manifest_sha256",
+    "book_id",
+    "selection_mode",
+    "selected_chapter_count",
+    "selected_chunk_count",
+    "source_language",
+    "target_language",
+    "prompt_version",
+    "glossary_version",
+    "style_guide_version",
+    "status",
+    "created_at"
+  ],
+  "title": "TranslationSnapshot",
+  "type": "object"
+}

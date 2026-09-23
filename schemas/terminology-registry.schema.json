@@ -1,0 +1,311 @@
+{
+  "$defs": {
+    "CandidateStatus": {
+      "enum": [
+        "candidate",
+        "approved",
+        "rejected"
+      ],
+      "title": "CandidateStatus",
+      "type": "string"
+    },
+    "DecisionSource": {
+      "description": "Who owns a canonical decision.\n\n``imported`` is the legacy provenance carried by pre-registry glossary entries.  Ownership is\ndeliberately independent of :class:`DecisionState` and of ``locked``: an AI may hold a\nconfirmed decision, and a user-owned decision may still be provisional.",
+      "enum": [
+        "ai",
+        "user",
+        "imported",
+        "inferred"
+      ],
+      "title": "DecisionSource",
+      "type": "string"
+    },
+    "DecisionState": {
+      "description": "Whether a canonical decision is settled or a working choice pending evidence.\n\n``provisional`` means the target is a translation choice made to keep the pipeline moving, not\na factual claim about the source.  It is enforced exactly like a confirmed decision so that a\nbook stays internally consistent, but it remains revisable and must carry an open question.",
+      "enum": [
+        "confirmed",
+        "provisional"
+      ],
+      "title": "DecisionState",
+      "type": "string"
+    },
+    "TerminologyCandidate": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "classification": {
+          "$ref": "#/$defs/TerminologyType"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "status": {
+          "$ref": "#/$defs/CandidateStatus",
+          "default": "candidate"
+        },
+        "provenance": {
+          "$ref": "#/$defs/DecisionSource"
+        },
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "occurrences": {
+          "items": {
+            "$ref": "#/$defs/TerminologyOccurrence"
+          },
+          "title": "Occurrences",
+          "type": "array"
+        },
+        "context_sensitive": {
+          "default": false,
+          "title": "Context Sensitive",
+          "type": "boolean"
+        },
+        "classification_conflicts": {
+          "items": {
+            "$ref": "#/$defs/TerminologyType"
+          },
+          "title": "Classification Conflicts",
+          "type": "array"
+        },
+        "evidence_notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Notes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "source_term",
+        "classification",
+        "confidence",
+        "provenance"
+      ],
+      "title": "TerminologyCandidate",
+      "type": "object"
+    },
+    "TerminologyDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_id": {
+          "pattern": "^td-[0-9a-f]{24}$",
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "target_term": {
+          "minLength": 1,
+          "title": "Target Term",
+          "type": "string"
+        },
+        "decision_source": {
+          "$ref": "#/$defs/DecisionSource"
+        },
+        "decision_state": {
+          "$ref": "#/$defs/DecisionState",
+          "default": "confirmed"
+        },
+        "locked": {
+          "default": false,
+          "title": "Locked",
+          "type": "boolean"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "enforcement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyEnforcement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "competing_variants": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Competing Variants",
+          "type": "array"
+        },
+        "contextual_notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Contextual Notes",
+          "type": "array"
+        },
+        "allowed_target_forms": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Target Forms",
+          "type": "array"
+        }
+      },
+      "required": [
+        "decision_id",
+        "candidate_id",
+        "target_term",
+        "decision_source"
+      ],
+      "title": "TerminologyDecision",
+      "type": "object"
+    },
+    "TerminologyEnforcement": {
+      "description": "What kind of target evidence proves a canonical decision was honored.\n\n``required`` answers whether a decision is in scope for QA at all; this answers the separate\nquestion of what counts as proof.  Collapsing the two forces every approved decision into\n\"the exact canonical string must appear\", which is correct for a name and wrong for a form the\ntarget language legitimately transforms.",
+      "enum": [
+        "exact",
+        "morphological",
+        "contextual",
+        "advisory"
+      ],
+      "title": "TerminologyEnforcement",
+      "type": "string"
+    },
+    "TerminologyOccurrence": {
+      "additionalProperties": false,
+      "properties": {
+        "chapter_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "chunk_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9._-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Chunk Id"
+        },
+        "location": {
+          "default": "source",
+          "enum": [
+            "source",
+            "context"
+          ],
+          "title": "Location",
+          "type": "string"
+        },
+        "count": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "chapter_id"
+      ],
+      "title": "TerminologyOccurrence",
+      "type": "object"
+    },
+    "TerminologyType": {
+      "enum": [
+        "person",
+        "place",
+        "organization",
+        "title",
+        "people",
+        "invented",
+        "artifact",
+        "historical_event",
+        "story_term",
+        "recurring_phrase",
+        "context_sensitive"
+      ],
+      "title": "TerminologyType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "registry_kind": {
+      "const": "terminology",
+      "default": "terminology",
+      "title": "Registry Kind",
+      "type": "string"
+    },
+    "version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Version",
+      "type": "string"
+    },
+    "book_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "source_language": {
+      "minLength": 2,
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "minLength": 2,
+      "title": "Target Language",
+      "type": "string"
+    },
+    "candidates": {
+      "items": {
+        "$ref": "#/$defs/TerminologyCandidate"
+      },
+      "title": "Candidates",
+      "type": "array"
+    },
+    "decisions": {
+      "items": {
+        "$ref": "#/$defs/TerminologyDecision"
+      },
+      "title": "Decisions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "version",
+    "book_id",
+    "source_language",
+    "target_language"
+  ],
+  "title": "TerminologyRegistry",
+  "type": "object"
+}

@@ -19,7 +19,12 @@ from book_translator.models import (
     TocEntry,
     TocKind,
 )
-from book_translator.paths import ProjectPaths
+from book_translator.paths import (
+    NARRATIVE_KINDS,
+    ProjectPaths,
+    chapter_id_from_selector,
+    narrative_chapter_id,
+)
 from book_translator.pdf_inspector import PdfError, open_pdf
 
 EXTRACTION_VERSION = "1.0"
@@ -53,6 +58,7 @@ class ExtractionPlan:
     page_count: int
     entries: list[PlannedEntry]
     force: bool
+    book: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,12 +85,14 @@ def load_toc(path: Path) -> TocDocument:
 
 
 def _entry_paths(entry: TocEntry, project_paths: ProjectPaths) -> EntryPaths:
-    if entry.kind is TocKind.PROLOGUE:
-        directory = project_paths.chapter(prologue=True)
-        chapter_id = "000-prologue"
-    elif entry.kind is TocKind.CHAPTER and entry.number is not None:
-        directory = project_paths.chapter(entry.number)
-        chapter_id = f"{entry.number:03d}"
+    if entry.kind in NARRATIVE_KINDS:
+        try:
+            chapter_id = narrative_chapter_id(entry.kind, entry.number)
+        except ValueError as exc:
+            raise ChapterExtractionError(
+                f"entry {entry.entry_id} is not extractable: {exc}"
+            ) from exc
+        directory = project_paths.chapter_directory(chapter_id)
     elif entry.kind is TocKind.FRONT_MATTER:
         directory = project_paths.front_matter(entry.entry_id)
         chapter_id = entry.entry_id
@@ -105,27 +113,24 @@ def _resolve_selector(
     allowed = [
         entry
         for entry in entries
-        if entry.kind in {TocKind.PROLOGUE, TocKind.CHAPTER}
+        if entry.kind in NARRATIVE_KINDS
         or (include_front_matter and entry.kind is TocKind.FRONT_MATTER)
     ]
     if selector is None:
         return allowed
     normalized = selector.strip().lower()
     matches: list[TocEntry]
-    if normalized in {"prologue", "0"}:
-        matches = [entry for entry in allowed if entry.kind is TocKind.PROLOGUE]
-    elif normalized.isdigit():
-        number = int(normalized)
-        matches = [
-            entry for entry in allowed if entry.kind is TocKind.CHAPTER and entry.number == number
-        ]
-    elif re.fullmatch(r"chapter-\d+", normalized):
-        number = int(normalized.removeprefix("chapter-"))
-        matches = [
-            entry for entry in allowed if entry.kind is TocKind.CHAPTER and entry.number == number
-        ]
-    else:
+    try:
+        chapter_id = chapter_id_from_selector(normalized)
+    except ValueError:
         matches = [entry for entry in allowed if entry.entry_id.lower() == normalized]
+    else:
+        matches = [
+            entry
+            for entry in allowed
+            if entry.kind in NARRATIVE_KINDS
+            and narrative_chapter_id(entry.kind, entry.number) == chapter_id
+        ]
     if not matches:
         raise ChapterExtractionError(
             f"chapter selector {selector!r} did not resolve to an extractable TOC entry"
@@ -210,7 +215,9 @@ def plan_extraction(
     selector: str | None = None,
     include_front_matter: bool = False,
     force: bool = False,
+    book: str | None = None,
 ) -> ExtractionPlan:
+    """Plan extraction into the selected book workspace; `book=None` is the legacy root."""
     toc = load_toc(toc_path)
     try:
         resolved_pdf, document = open_pdf(pdf_path)
@@ -226,7 +233,10 @@ def plan_extraction(
             raise ChapterExtractionError("TOC contains no entries selected for extraction")
         if len({entry.entry_id for entry in selected}) != len(selected):
             raise ChapterExtractionError("selected TOC entry IDs are not unique")
-        project_paths = ProjectPaths(project_root)
+        try:
+            project_paths = ProjectPaths(project_root, book)
+        except ValueError as exc:
+            raise ChapterExtractionError(str(exc)) from exc
         planned: list[PlannedEntry] = []
         destinations: set[Path] = set()
         for entry in selected:
@@ -254,6 +264,7 @@ def plan_extraction(
             document.page_count,
             planned,
             force,
+            book,
         )
     finally:
         document.close()  # type: ignore[no-untyped-call]

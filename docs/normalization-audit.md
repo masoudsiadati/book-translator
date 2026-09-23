@@ -1,5 +1,98 @@
 # Deterministic normalization audit
 
+## 2026-09-08 lowercase-edge possessive-name amendment
+
+Normalization Engine 1.6.0 updates `page-boundary-continuations` to 1.5.0. A second-book audit
+reported two canonical page boundaries whose left edge ended on a bare lowercase word and whose right
+edge began with a capitalized possessive name word. The audit already classified both as
+`nonterminal=true, possessive_continuation=true`, but the 1.4.0 pass only accepted a possessive name
+word after a *capitalized* name word (the split-proper-name shape) and otherwise required a lowercase
+right edge, so the two boundaries stayed unresolved and blocked translation readiness.
+
+The new predicate requires the last whitespace-delimited token of the left edge to be entirely
+alphabetic and lowercase (no trailing punctuation, quotation mark, dash, or ellipsis) and the first
+word of the right edge to be a title-case alphabetic stem carrying a possessive suffix. A prose
+paragraph never ends on a bare unpunctuated lowercase word, so the left edge proves the clause is
+incomplete; the possessive noun phrase completes it. All existing guards stay in front of it:
+different canonical pages, multi-line non-verse blocks on both sides, no structural or list block, no
+quote-led right block, no unmatched quote-led left block without a prior completed sentence, and no
+boundary hyphen. A plain capitalized right edge is still a paragraph boundary.
+
+Across both workspaces the rule changes cleaned bytes for exactly two chapters of the second book,
+each losing one logical paragraph while keeping its chunk count; all 57 first-book chapters produce
+byte-identical output and were not regenerated, so their 1.5.0 metadata is version-stale only.
+
+## 2026-08-13 interruption and grammatical-continuation amendment
+
+Normalization Engine 1.5.0 updates `page-boundary-continuations` to 1.4.0. The new rules attach a
+page-leading em-dash/closing-quote tail only to unmatched dialogue, join an em-dash plus lowercase
+clause only to non-dialogue narration, and allow a capitalized complement only after an article that
+cannot grammatically terminate the left clause. Quote-led new-speaker blocks remain hard boundaries.
+A dangling dash alone is never sufficient. Real-workspace regression checks cover all nine manually
+reviewed boundaries without embedding book prose in tests.
+
+## 2026-08-13 capitalized-name and one-line-tail amendment
+
+Normalization Engine 1.4.0 updates `page-boundary-continuations` to 1.3.0. Canonical boundary
+inspection found two extraction shapes excluded by the 1.2.0 pass: a multi-line nonterminal block on
+page 347 continued on page 348 with the capitalized possessive second word of a proper name, and a
+multi-line quote-led block on page 626 continued on page 627 by a one-line lowercase closing tail.
+
+The first extension requires capitalized lexical words on both edges and a possessive suffix on the
+following edge. The second requires an unmatched quote-led left block with an earlier complete
+sentence, a lowercase one-line right block ending in a dialogue closer, and all existing nonterminal
+edge checks. Both require different canonical source pages. Headings, titles, verse, scene separators,
+lists and structural one-line blocks, terminal prose, boundary hyphens, quote-led following blocks,
+and ordinary separate dialogue remain protected.
+
+A read-only six-chapter plan changes cleaned bytes only for chapters 020 and 042, reducing each by one
+logical paragraph while retaining its chunk count. Chapter 020 chunk 002 remains byte-identical with
+33 source paragraphs, and chapter 042 chunk 003 remains byte-identical with 18 source paragraphs;
+their provider-created translation splits therefore remain visible to structural QA. The Prologue,
+001, 033, and 056 cleaned and chunk bytes remain identical, though their normalization metadata is
+version-stale. No mutable artifacts or immutable downstream lineage were rewritten.
+
+## 2026-08-10 mixed-dialogue page-boundary amendment
+
+Normalization Engine 1.2.0 updates `page-boundary-continuations` to 1.1.0. A structural audit of a
+reported numbered-chapter boundary showed that extraction correctly preserved two PDF text blocks on
+successive canonical pages, but the normalization pass rejected the otherwise clear continuation
+solely because the left block began with dialogue. The block contained a closed quotation followed by
+narration and another quotation; quote-led was therefore not a reliable paragraph-level exclusion.
+
+The deterministic suspicious-boundary rule still requires different marked pages, multi-line
+non-verse blocks, a nonterminal and nonhyphenated left edge, and a lowercase right edge. It still
+rejects structural blocks, a quote-led right block, and a quote-led left block with no closing dialogue
+delimiter. Balanced dialogue before narration no longer blocks a join. Synthetic regressions cover
+ordinary page splits, lowercase continuations, lowercase starts after terminal paragraphs, straight
+and curly unclosed dialogue, new quote-led dialogue, and the reported mixed-dialogue shape.
+
+A read-only chapter 056 plan changes cleaned SHA-256 from
+`98b7f37fb6344cf2092a959e481cb64b695843f5ceabb02496c3d101b612f438` to
+`e9a99cc6ee6143577a9309470ef86238cbb12261e1a5cfca2cf7d2544a92e8bf`, reduces logical paragraphs
+from 44 to 42, and keeps two chunks while changing both chunk source hashes. Immutable snapshots,
+runs, prompt packages, attempts, source bytes, and translations were not modified.
+
+## 2026-08-08 page-boundary regression amendment
+
+Normalization Engine 1.1.0 adds `page-boundary-continuations` 1.0.0 after wrapped-line joining and
+before paragraph rendering. Extraction already retained canonical page markers and ordered PDF text
+blocks, but version 1.0 rendered every block adjacent to a marker as a paragraph. The new pass joins
+only adjacent blocks on different marked pages when both are multi-line non-verse prose, the left edge
+has no terminal punctuation or boundary hyphen, and the right edge begins lowercase. One-line
+structural blocks, Markdown headings, explicit scene separators, and quote-led dialogue are excluded.
+
+A controlled read-only Prologue dry run found eight qualifying boundaries among 23 page transitions,
+including both reported regressions. Paragraph count changed from 144 to 136; non-whitespace character
+order was conserved; the two known artificial breaks disappeared; and the generic chunk engine
+reconstructed the resulting five-chunk document byte-for-byte. No canonical source, cleaned artifact,
+snapshot, run, attempt, or prompt package was written or replaced during the check.
+
+Version 1.0 artifacts are historical rather than silently upgraded. The normalization version and
+cleaned hash make them stale; chunk hashes and immutable snapshot manifests carry that staleness
+through chunk, snapshot, run, and prompt-package lineage. Regeneration therefore creates new derived
+artifacts in that order after downstream safety blockers are explicitly resolved.
+
 Audit date: 2026-08-06. The review covered the frozen architecture, project rules, canonical models
 and paths, hashing and atomic writes, lifecycle policy, CLI integration, every normalization module,
 tests, and pipeline/recovery documentation. No numbered real chapter was normalized.
@@ -92,9 +185,9 @@ files, and strict mypy clean across 39 source/test files. Editable installation 
 prose, dialogue, headings, short lines, verse-like lines, boundary and internal hyphens, em/en dashes,
 and canonical markers. Three runs over a 73,240-byte input produced identical output bytes, SHA-256
 `7cf6a326108521ec7094f614485930a0b385842bb21581331f79f170f999c0ba`, and counters: 1,200 physical
-lines, 500 blocks/paragraphs, 25 markers, 500 wrapped joins, and 100 hyphen repairs. Observed elapsed
-times were 0.019207, 0.016650, and 0.017395 seconds (0.017395-second median); peak traced Python memory
-was 1,746,150 bytes. Timings are observational and have no test threshold.
+lines, 500 blocks/paragraphs, 25 markers, 500 wrapped joins, and 100 hyphen repairs. On 2026-08-13,
+observed elapsed times were 0.022963, 0.018868, and 0.019267 seconds (0.019267-second median); peak traced Python memory
+was 1,750,014 bytes. Timings are observational and have no test threshold.
 
 For normal extracted blocks, time and retained memory scale linearly with source characters, lines,
 blocks, and recorded changes. A chapter is represented by the source string, parsed line/block

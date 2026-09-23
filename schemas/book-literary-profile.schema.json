@@ -1,0 +1,76 @@
+{
+  "$defs": {
+    "ChapterLiteraryGuidance": {
+      "additionalProperties": false,
+      "properties": {
+        "chapter_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "focus": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Focus",
+          "type": "array"
+        },
+        "negative_controls": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 4,
+          "title": "Negative Controls",
+          "type": "array"
+        }
+      },
+      "required": [
+        "chapter_id"
+      ],
+      "title": "ChapterLiteraryGuidance",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Optional book-scoped style and pilot guidance, frozen independently of generic style.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "profile_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Profile Version",
+      "type": "string"
+    },
+    "book_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Book Id",
+      "type": "string"
+    },
+    "prose_profile": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 12,
+      "title": "Prose Profile",
+      "type": "array"
+    },
+    "chapter_guidance": {
+      "items": {
+        "$ref": "#/$defs/ChapterLiteraryGuidance"
+      },
+      "title": "Chapter Guidance",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "profile_version",
+    "book_id"
+  ],
+  "title": "BookLiteraryProfile",
+  "type": "object"
+}

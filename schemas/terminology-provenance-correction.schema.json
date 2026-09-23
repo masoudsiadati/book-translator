@@ -1,0 +1,189 @@
+{
+  "$defs": {
+    "DisclosedMaterial": {
+      "description": "Categories of source-derived material, ordered from least to most revealing.",
+      "enum": [
+        "terminology_names",
+        "target_translations",
+        "aggregate_corpus_statistics",
+        "entity_cooccurrence",
+        "sentence_excerpts",
+        "paragraph_excerpts",
+        "chunk_excerpts"
+      ],
+      "title": "DisclosedMaterial",
+      "type": "string"
+    },
+    "InferenceLocality": {
+      "description": "Where the reasoning that produced a resolution actually ran.",
+      "enum": [
+        "local_process",
+        "remote_hosted",
+        "deterministic_none"
+      ],
+      "title": "InferenceLocality",
+      "type": "string"
+    },
+    "ReviewerProvenance": {
+      "additionalProperties": false,
+      "description": "Separates local orchestration from the service that performed model inference.",
+      "properties": {
+        "reviewer": {
+          "minLength": 1,
+          "title": "Reviewer",
+          "type": "string"
+        },
+        "reviewer_kind": {
+          "minLength": 1,
+          "title": "Reviewer Kind",
+          "type": "string"
+        },
+        "inference_locality": {
+          "$ref": "#/$defs/InferenceLocality"
+        },
+        "inference_provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Inference Provider"
+        },
+        "account_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Account Type"
+        },
+        "local_orchestration": {
+          "title": "Local Orchestration",
+          "type": "boolean"
+        },
+        "external_service_contacted": {
+          "title": "External Service Contacted",
+          "type": "boolean"
+        },
+        "disclosed_material": {
+          "items": {
+            "$ref": "#/$defs/DisclosedMaterial"
+          },
+          "title": "Disclosed Material",
+          "type": "array"
+        },
+        "withheld_material": {
+          "items": {
+            "$ref": "#/$defs/DisclosedMaterial"
+          },
+          "title": "Withheld Material",
+          "type": "array"
+        },
+        "prior_model_knowledge_used": {
+          "default": false,
+          "title": "Prior Model Knowledge Used",
+          "type": "boolean"
+        },
+        "disclosure_note": {
+          "minLength": 1,
+          "title": "Disclosure Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reviewer",
+        "reviewer_kind",
+        "inference_locality",
+        "local_orchestration",
+        "external_service_contacted",
+        "disclosure_note"
+      ],
+      "title": "ReviewerProvenance",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An explicit superseding provenance record for an immutable reconciliation run.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "correction_id": {
+      "pattern": "^tsrc-[0-9a-f]{24}$",
+      "title": "Correction Id",
+      "type": "string"
+    },
+    "supersedes_run_id": {
+      "pattern": "^tsr-run-[0-9a-f]{24}$",
+      "title": "Supersedes Run Id",
+      "type": "string"
+    },
+    "original_reviewer": {
+      "minLength": 1,
+      "title": "Original Reviewer",
+      "type": "string"
+    },
+    "original_reviewer_kind": {
+      "minLength": 1,
+      "title": "Original Reviewer Kind",
+      "type": "string"
+    },
+    "original_external_service_contacted": {
+      "title": "Original External Service Contacted",
+      "type": "boolean"
+    },
+    "corrected_provenance": {
+      "$ref": "#/$defs/ReviewerProvenance"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "resolution_count": {
+      "minimum": 0,
+      "title": "Resolution Count",
+      "type": "integer"
+    },
+    "resolution_set_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Resolution Set Sha256",
+      "type": "string"
+    },
+    "resolutions_unchanged": {
+      "title": "Resolutions Unchanged",
+      "type": "boolean"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "correction_id",
+    "supersedes_run_id",
+    "original_reviewer",
+    "original_reviewer_kind",
+    "original_external_service_contacted",
+    "corrected_provenance",
+    "reason",
+    "resolution_count",
+    "resolution_set_sha256",
+    "resolutions_unchanged",
+    "created_at"
+  ],
+  "title": "ReconciliationProvenanceCorrection",
+  "type": "object"
+}

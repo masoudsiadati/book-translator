@@ -1,0 +1,89 @@
+{
+  "$defs": {
+    "LiteraryEditReason": {
+      "description": "Closed, non-explanatory vocabulary for the kind of prose edit made.",
+      "enum": [
+        "literal_syntax",
+        "awkward_wording",
+        "dialogue_naturalness",
+        "flow",
+        "repetition",
+        "pronoun_clarity",
+        "register",
+        "rhythm",
+        "punctuation",
+        "no_change"
+      ],
+      "title": "LiteraryEditReason",
+      "type": "string"
+    },
+    "LiteraryEditedParagraph": {
+      "additionalProperties": false,
+      "description": "One editor output paragraph, still subject to independent fidelity verification.",
+      "properties": {
+        "paragraph_id": {
+          "pattern": "^P\\d{4}$",
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "edited_text": {
+          "minLength": 1,
+          "title": "Edited Text",
+          "type": "string"
+        },
+        "changed": {
+          "title": "Changed",
+          "type": "boolean"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/LiteraryEditReason"
+          },
+          "maxItems": 9,
+          "title": "Reasons",
+          "type": "array"
+        },
+        "changed_flag_normalized": {
+          "default": false,
+          "title": "Changed Flag Normalized",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "paragraph_id",
+        "edited_text",
+        "changed"
+      ],
+      "title": "LiteraryEditedParagraph",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A bounded retry that may answer only the paragraphs rejected by semantic QA.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "correction_schema_version": {
+      "title": "Correction Schema Version",
+      "type": "string"
+    },
+    "paragraphs": {
+      "items": {
+        "$ref": "#/$defs/LiteraryEditedParagraph"
+      },
+      "minItems": 1,
+      "title": "Paragraphs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "correction_schema_version",
+    "paragraphs"
+  ],
+  "title": "LiteraryCorrectionResponse",
+  "type": "object"
+}

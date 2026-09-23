@@ -1,0 +1,387 @@
+{
+  "$defs": {
+    "ReleaseCheck": {
+      "description": "The seven things a release has to prove before it may be published.",
+      "enum": [
+        "manifest",
+        "book_integrity",
+        "chapters",
+        "translations",
+        "titles",
+        "terminology",
+        "provenance"
+      ],
+      "title": "ReleaseCheck",
+      "type": "string"
+    },
+    "ReleaseCheckStatus": {
+      "description": "The outcome of one check.\n\n``SKIPPED`` is not a quiet pass. It means the evidence a check needs was not reachable — the\ncanonical workspace is absent, which is the ordinary case when verifying a release that has\nbeen copied somewhere else. A skipped check is reported as skipped everywhere it appears, and\na release with skipped checks is verified only as far as the bytes in front of the verifier\nallow.",
+      "enum": [
+        "pass",
+        "fail",
+        "skipped"
+      ],
+      "title": "ReleaseCheckStatus",
+      "type": "string"
+    },
+    "ReleaseVerificationCheck": {
+      "additionalProperties": false,
+      "description": "The outcome of one check with the evidence it actually examined.",
+      "properties": {
+        "check": {
+          "$ref": "#/$defs/ReleaseCheck"
+        },
+        "status": {
+          "$ref": "#/$defs/ReleaseCheckStatus"
+        },
+        "examined": {
+          "minimum": 0,
+          "title": "Examined",
+          "type": "integer"
+        },
+        "expected": {
+          "minimum": 0,
+          "title": "Expected",
+          "type": "integer"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "finding_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Finding Codes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "check",
+        "status",
+        "examined",
+        "expected",
+        "detail"
+      ],
+      "title": "ReleaseVerificationCheck",
+      "type": "object"
+    },
+    "ReleaseVerificationFinding": {
+      "additionalProperties": false,
+      "description": "One discrepancy. It names a check, a subject, and a code — never book prose.",
+      "properties": {
+        "check": {
+          "$ref": "#/$defs/ReleaseCheck"
+        },
+        "code": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "subject": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subject"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "check",
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "ReleaseVerificationFinding",
+      "type": "object"
+    },
+    "ReleaseVerificationStatus": {
+      "description": "Whether the release may be published.",
+      "enum": [
+        "READY_FOR_PUBLICATION",
+        "NOT_READY_FOR_PUBLICATION"
+      ],
+      "title": "ReleaseVerificationStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The complete, re-derivable verdict on one release directory.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "release_verification_engine_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Release Verification Engine Version",
+      "type": "string"
+    },
+    "release_id": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Release Id",
+      "type": "string"
+    },
+    "release_path": {
+      "format": "path",
+      "title": "Release Path",
+      "type": "string"
+    },
+    "release_assembly_engine_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Release Assembly Engine Version"
+    },
+    "source_translation_run": {
+      "anyOf": [
+        {
+          "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Translation Run"
+    },
+    "snapshot_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Snapshot Id"
+    },
+    "snapshot_manifest_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Snapshot Manifest Sha256"
+    },
+    "manifest_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Manifest Sha256"
+    },
+    "release_content_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Release Content Sha256"
+    },
+    "book_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Book Sha256"
+    },
+    "terminology_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Sha256"
+    },
+    "chapter_title_artifact_id": {
+      "anyOf": [
+        {
+          "pattern": "^ct-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Chapter Title Artifact Id"
+    },
+    "chapter_title_artifact_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Chapter Title Artifact Sha256"
+    },
+    "files_verified": {
+      "minimum": 0,
+      "title": "Files Verified",
+      "type": "integer"
+    },
+    "files_expected": {
+      "minimum": 0,
+      "title": "Files Expected",
+      "type": "integer"
+    },
+    "chapters_verified": {
+      "minimum": 0,
+      "title": "Chapters Verified",
+      "type": "integer"
+    },
+    "chapters_expected": {
+      "minimum": 0,
+      "title": "Chapters Expected",
+      "type": "integer"
+    },
+    "chunks_verified": {
+      "minimum": 0,
+      "title": "Chunks Verified",
+      "type": "integer"
+    },
+    "chunks_expected": {
+      "minimum": 0,
+      "title": "Chunks Expected",
+      "type": "integer"
+    },
+    "titles_verified": {
+      "minimum": 0,
+      "title": "Titles Verified",
+      "type": "integer"
+    },
+    "titles_expected": {
+      "minimum": 0,
+      "title": "Titles Expected",
+      "type": "integer"
+    },
+    "workspace_reachable": {
+      "title": "Workspace Reachable",
+      "type": "boolean"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/ReleaseVerificationCheck"
+      },
+      "title": "Checks",
+      "type": "array"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/ReleaseVerificationFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "failed_checks": {
+      "items": {
+        "$ref": "#/$defs/ReleaseCheck"
+      },
+      "title": "Failed Checks",
+      "type": "array"
+    },
+    "skipped_checks": {
+      "items": {
+        "$ref": "#/$defs/ReleaseCheck"
+      },
+      "title": "Skipped Checks",
+      "type": "array"
+    },
+    "status": {
+      "$ref": "#/$defs/ReleaseVerificationStatus"
+    },
+    "content_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Content Sha256",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "release_verification_engine_version",
+    "release_id",
+    "release_path",
+    "files_verified",
+    "files_expected",
+    "chapters_verified",
+    "chapters_expected",
+    "chunks_verified",
+    "chunks_expected",
+    "titles_verified",
+    "titles_expected",
+    "workspace_reachable",
+    "checks",
+    "status",
+    "content_sha256",
+    "created_at"
+  ],
+  "title": "ReleaseVerificationReport",
+  "type": "object"
+}

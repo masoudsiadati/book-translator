@@ -1,0 +1,41 @@
+# Frozen external reference corpora for the Wheel of Time series: the professional Persian
+# translations of Book 1 and Book 2 (V2.1 freezes) and the read-only cross-book retriever.
+# Every path is pinned by SHA-256; retrieval refuses to open anything that drifted.
+# Books 3 and 4 are deliberately not part of this configuration.
+schema_version: '1.0'
+config_kind: reference_corpus
+series_id: wheel-of-time
+retriever:
+  path: /mnt/c/fidibo-poc/cross_book_retriever.py
+  sha256: d18e56ab3f4b9fd58a1b0a9c986a1969080126293f307595a62462896d05d6e8
+  schema_version: cross-book-retriever/1
+corpora:
+- corpus_id: book1
+  book_number: 1
+  label: Book 1
+  path: /mnt/c/fidibo-poc/reference-db/book1/book1-reference-v2.sqlite3
+  sha256: 1042f0103b82375239c7e7ee0f1c5d049c2166e2d262ae4a4296f3fbd2b50490
+  corpus_version: V2.1
+  freeze_manifest_file: /mnt/c/fidibo-poc/reference-db/book1/book1-v2.1-freeze-manifest.json
+  freeze_manifest_sha256: a672a749bf43211d84cc990e06e0e07ca1fb24af119a7e2a1457eb8ceb72d982
+- corpus_id: book2
+  book_number: 2
+  label: Book 2
+  path: /mnt/c/fidibo-poc/reference-db/book2/book2-reference-v2.sqlite3
+  sha256: c23f6d1e70eb8f5c72be77d7ecd601f486fc941b289c81791d27d9f5da176a60
+  corpus_version: V2.1
+  freeze_manifest_file: /mnt/c/fidibo-poc/reference-db/book2/book2-v2.1-freeze-manifest.json
+  freeze_manifest_sha256: 784315016b2ee075bdbe475884d5c816f367e1fa85cff4e6456b2a460a3792d6
+# Legacy databases that exist beside the corpora and are never opened.
+excluded_paths:
+- /mnt/c/fidibo-poc/reference-db/book-reference.sqlite3
+- /mnt/c/fidibo-poc/reference-db/book1/book1-reference.sqlite3
+limits:
+  term_limit: 15
+  entity_limit: 15
+  tm_limit: 8
+  phrase_limit: 6
+  style_limit: 3
+  voice_limit: 4
+include_uncertain: false
+include_reference_only: false

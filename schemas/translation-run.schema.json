@@ -1,0 +1,232 @@
+{
+  "$defs": {
+    "TranslationRunStatus": {
+      "enum": [
+        "created",
+        "ready",
+        "active",
+        "completed",
+        "completed_with_failures",
+        "cancelled",
+        "invalid"
+      ],
+      "title": "TranslationRunStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "label": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Label"
+    },
+    "snapshot_id": {
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "snapshot_path": {
+      "format": "path",
+      "title": "Snapshot Path",
+      "type": "string"
+    },
+    "snapshot_manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Snapshot Manifest Sha256",
+      "type": "string"
+    },
+    "queue_engine_version": {
+      "title": "Queue Engine Version",
+      "type": "string"
+    },
+    "output_contract_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Output Contract Version"
+    },
+    "semantic_gate_policy_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Semantic Gate Policy Version"
+    },
+    "source_language": {
+      "minLength": 2,
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "minLength": 2,
+      "title": "Target Language",
+      "type": "string"
+    },
+    "chapter_count": {
+      "minimum": 1,
+      "title": "Chapter Count",
+      "type": "integer"
+    },
+    "job_count": {
+      "minimum": 1,
+      "title": "Job Count",
+      "type": "integer"
+    },
+    "pending_count": {
+      "minimum": 0,
+      "title": "Pending Count",
+      "type": "integer"
+    },
+    "claimed_count": {
+      "minimum": 0,
+      "title": "Claimed Count",
+      "type": "integer"
+    },
+    "running_count": {
+      "minimum": 0,
+      "title": "Running Count",
+      "type": "integer"
+    },
+    "succeeded_count": {
+      "minimum": 0,
+      "title": "Succeeded Count",
+      "type": "integer"
+    },
+    "failed_count": {
+      "minimum": 0,
+      "title": "Failed Count",
+      "type": "integer"
+    },
+    "retry_pending_count": {
+      "minimum": 0,
+      "title": "Retry Pending Count",
+      "type": "integer"
+    },
+    "cancelled_count": {
+      "minimum": 0,
+      "title": "Cancelled Count",
+      "type": "integer"
+    },
+    "blocked_count": {
+      "minimum": 0,
+      "title": "Blocked Count",
+      "type": "integer"
+    },
+    "accepted_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Accepted Count",
+      "type": "integer"
+    },
+    "qa_rejected_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Qa Rejected Count",
+      "type": "integer"
+    },
+    "provider_succeeded_unassessed_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Provider Succeeded Unassessed Count",
+      "type": "integer"
+    },
+    "max_attempts": {
+      "minimum": 1,
+      "title": "Max Attempts",
+      "type": "integer"
+    },
+    "retry_backoff_seconds": {
+      "minimum": 0,
+      "title": "Retry Backoff Seconds",
+      "type": "integer"
+    },
+    "status": {
+      "$ref": "#/$defs/TranslationRunStatus"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "completed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Completed At"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "snapshot_id",
+    "snapshot_path",
+    "snapshot_manifest_sha256",
+    "queue_engine_version",
+    "source_language",
+    "target_language",
+    "chapter_count",
+    "job_count",
+    "pending_count",
+    "claimed_count",
+    "running_count",
+    "succeeded_count",
+    "failed_count",
+    "retry_pending_count",
+    "cancelled_count",
+    "blocked_count",
+    "max_attempts",
+    "retry_backoff_seconds",
+    "status",
+    "created_at",
+    "updated_at"
+  ],
+  "title": "TranslationRun",
+  "type": "object"
+}

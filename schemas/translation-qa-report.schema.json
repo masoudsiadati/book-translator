@@ -1,0 +1,81 @@
+{
+  "$defs": {
+    "TranslationQAFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "TranslationQAFinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "valid": {
+      "title": "Valid",
+      "type": "boolean"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "translation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Translation Sha256",
+      "type": "string"
+    },
+    "source_paragraph_count": {
+      "minimum": 0,
+      "title": "Source Paragraph Count",
+      "type": "integer"
+    },
+    "translation_paragraph_count": {
+      "minimum": 0,
+      "title": "Translation Paragraph Count",
+      "type": "integer"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/TranslationQAFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "valid",
+    "source_sha256",
+    "translation_sha256",
+    "source_paragraph_count",
+    "translation_paragraph_count"
+  ],
+  "title": "TranslationQAReport",
+  "type": "object"
+}

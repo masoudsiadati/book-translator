@@ -1,0 +1,547 @@
+{
+  "$defs": {
+    "ConflictRelation": {
+      "description": "Why two terminology records belong to the same conflict component.",
+      "enum": [
+        "exact_canonical_conflict",
+        "alias_relationship",
+        "canonical_subterm",
+        "competing_variant",
+        "normalization_identity",
+        "shared_target"
+      ],
+      "title": "ConflictRelation",
+      "type": "string"
+    },
+    "DisclosedMaterial": {
+      "description": "Categories of source-derived material, ordered from least to most revealing.",
+      "enum": [
+        "terminology_names",
+        "target_translations",
+        "aggregate_corpus_statistics",
+        "entity_cooccurrence",
+        "sentence_excerpts",
+        "paragraph_excerpts",
+        "chunk_excerpts"
+      ],
+      "title": "DisclosedMaterial",
+      "type": "string"
+    },
+    "InferenceLocality": {
+      "description": "Where the reasoning that produced a resolution actually ran.",
+      "enum": [
+        "local_process",
+        "remote_hosted",
+        "deterministic_none"
+      ],
+      "title": "InferenceLocality",
+      "type": "string"
+    },
+    "ReconciliationClassification": {
+      "description": "The semantic relationship the reviewer established for a component.",
+      "enum": [
+        "same_concept_alias",
+        "distinct_concepts",
+        "canonical_and_compound",
+        "wrong_target",
+        "invalid_relationship_only",
+        "insufficient_evidence"
+      ],
+      "title": "ReconciliationClassification",
+      "type": "string"
+    },
+    "RegistryEdit": {
+      "additionalProperties": false,
+      "description": "One typed, auditable registry change derived from a semantic resolution.",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/RegistryEditKind"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "decision_id": {
+          "anyOf": [
+            {
+              "pattern": "^td-[0-9a-f]{24}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Id"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        },
+        "previous_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Previous Value"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "candidate_id",
+        "source_term",
+        "value",
+        "reason"
+      ],
+      "title": "RegistryEdit",
+      "type": "object"
+    },
+    "RegistryEditKind": {
+      "enum": [
+        "set_target",
+        "add_alias",
+        "remove_alias",
+        "create_decision",
+        "remove_competing_variant"
+      ],
+      "title": "RegistryEditKind",
+      "type": "string"
+    },
+    "ResidualComponent": {
+      "additionalProperties": false,
+      "description": "One residual terminology family that survived a combined remediation simulation.",
+      "properties": {
+        "component_id": {
+          "pattern": "^trc-[0-9a-f]{24}$",
+          "title": "Component Id",
+          "type": "string"
+        },
+        "source_terms": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Terms",
+          "type": "array"
+        },
+        "candidate_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Candidate Ids",
+          "type": "array"
+        },
+        "decision_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Decision Ids",
+          "type": "array"
+        },
+        "finding_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Finding Ids",
+          "type": "array"
+        },
+        "relations": {
+          "items": {
+            "$ref": "#/$defs/ConflictRelation"
+          },
+          "title": "Relations",
+          "type": "array"
+        },
+        "relation_details": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Relation Details",
+          "type": "array"
+        },
+        "alias_cycle": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Alias Cycle",
+          "type": "array"
+        },
+        "size": {
+          "minimum": 1,
+          "title": "Size",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "component_id",
+        "source_terms",
+        "size"
+      ],
+      "title": "ResidualComponent",
+      "type": "object"
+    },
+    "ResidualResolution": {
+      "additionalProperties": false,
+      "description": "The machine-readable disposition for exactly one residual component.",
+      "properties": {
+        "component_id": {
+          "pattern": "^trc-[0-9a-f]{24}$",
+          "title": "Component Id",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/ResidualResolutionOutcome"
+        },
+        "classification": {
+          "$ref": "#/$defs/ReconciliationClassification"
+        },
+        "finding_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Finding Ids",
+          "type": "array"
+        },
+        "edits": {
+          "items": {
+            "$ref": "#/$defs/RegistryEdit"
+          },
+          "title": "Edits",
+          "type": "array"
+        },
+        "validator_rule_change": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Validator Rule Change"
+        },
+        "resolves_alias_cycle": {
+          "default": false,
+          "title": "Resolves Alias Cycle",
+          "type": "boolean"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "evidence_references": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence References",
+          "type": "array"
+        },
+        "prior_model_knowledge_used": {
+          "default": false,
+          "title": "Prior Model Knowledge Used",
+          "type": "boolean"
+        },
+        "prior_model_knowledge_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Prior Model Knowledge Note"
+        },
+        "reasoning_summary": {
+          "minLength": 1,
+          "title": "Reasoning Summary",
+          "type": "string"
+        },
+        "escalated": {
+          "default": false,
+          "title": "Escalated",
+          "type": "boolean"
+        },
+        "escalation_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Escalation Reason"
+        }
+      },
+      "required": [
+        "component_id",
+        "outcome",
+        "classification",
+        "confidence",
+        "evidence_references",
+        "reasoning_summary"
+      ],
+      "title": "ResidualResolution",
+      "type": "object"
+    },
+    "ResidualResolutionOutcome": {
+      "description": "The disposition a residual reconciliation may reach for one component.",
+      "enum": [
+        "valid_distinct_terms",
+        "canonical_plus_compound",
+        "canonical_plus_source_alias",
+        "singular_plural_normalization",
+        "remove_false_alias",
+        "remove_false_variant",
+        "reject_not_terminology",
+        "change_target",
+        "validator_false_positive",
+        "escalate"
+      ],
+      "title": "ResidualResolutionOutcome",
+      "type": "string"
+    },
+    "ReviewerProvenance": {
+      "additionalProperties": false,
+      "description": "Separates local orchestration from the service that performed model inference.",
+      "properties": {
+        "reviewer": {
+          "minLength": 1,
+          "title": "Reviewer",
+          "type": "string"
+        },
+        "reviewer_kind": {
+          "minLength": 1,
+          "title": "Reviewer Kind",
+          "type": "string"
+        },
+        "inference_locality": {
+          "$ref": "#/$defs/InferenceLocality"
+        },
+        "inference_provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Inference Provider"
+        },
+        "account_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Account Type"
+        },
+        "local_orchestration": {
+          "title": "Local Orchestration",
+          "type": "boolean"
+        },
+        "external_service_contacted": {
+          "title": "External Service Contacted",
+          "type": "boolean"
+        },
+        "disclosed_material": {
+          "items": {
+            "$ref": "#/$defs/DisclosedMaterial"
+          },
+          "title": "Disclosed Material",
+          "type": "array"
+        },
+        "withheld_material": {
+          "items": {
+            "$ref": "#/$defs/DisclosedMaterial"
+          },
+          "title": "Withheld Material",
+          "type": "array"
+        },
+        "prior_model_knowledge_used": {
+          "default": false,
+          "title": "Prior Model Knowledge Used",
+          "type": "boolean"
+        },
+        "disclosure_note": {
+          "minLength": 1,
+          "title": "Disclosure Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reviewer",
+        "reviewer_kind",
+        "inference_locality",
+        "local_orchestration",
+        "external_service_contacted",
+        "disclosure_note"
+      ],
+      "title": "ReviewerProvenance",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An immutable second-round reconciliation over the residual blockers only.\n\nThe lineage fields are the point of the record: this run reasons against the *prospective*\nregistry produced by a previous plan in simulation, so it must name the run it follows, the\nresolution set that run produced, the plan that was simulated, and the prospective hash the\nanalysis actually saw.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tsr-residual-[0-9a-f]{24}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "engine_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "previous_run_id": {
+      "pattern": "^tsr-run-[0-9a-f]{24}$",
+      "title": "Previous Run Id",
+      "type": "string"
+    },
+    "previous_resolution_set_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Previous Resolution Set Sha256",
+      "type": "string"
+    },
+    "previous_plan_id": {
+      "pattern": "^trp-[0-9a-f]{24}$",
+      "title": "Previous Plan Id",
+      "type": "string"
+    },
+    "provenance_correction_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsrc-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Provenance Correction Id"
+    },
+    "source_registry_semantic_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Registry Semantic Sha256",
+      "type": "string"
+    },
+    "source_registry_raw_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Registry Raw Sha256",
+      "type": "string"
+    },
+    "prospective_semantic_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Prospective Semantic Sha256",
+      "type": "string"
+    },
+    "residual_finding_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Residual Finding Ids",
+      "type": "array"
+    },
+    "residual_alias_cycles": {
+      "items": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "title": "Residual Alias Cycles",
+      "type": "array"
+    },
+    "components": {
+      "items": {
+        "$ref": "#/$defs/ResidualComponent"
+      },
+      "minItems": 1,
+      "title": "Components",
+      "type": "array"
+    },
+    "resolutions": {
+      "items": {
+        "$ref": "#/$defs/ResidualResolution"
+      },
+      "minItems": 1,
+      "title": "Resolutions",
+      "type": "array"
+    },
+    "outcome_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Outcome Counts",
+      "type": "object"
+    },
+    "escalation_count": {
+      "minimum": 0,
+      "title": "Escalation Count",
+      "type": "integer"
+    },
+    "provenance": {
+      "$ref": "#/$defs/ReviewerProvenance"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "engine_version",
+    "previous_run_id",
+    "previous_resolution_set_sha256",
+    "previous_plan_id",
+    "source_registry_semantic_sha256",
+    "source_registry_raw_sha256",
+    "prospective_semantic_sha256",
+    "components",
+    "resolutions",
+    "escalation_count",
+    "provenance",
+    "created_at"
+  ],
+  "title": "ResidualReconciliationRun",
+  "type": "object"
+}

@@ -1,0 +1,4 @@
+schema_version: '1.0'
+resource_kind: source_anomalies
+resource_file: config/source-anomalies.yaml
+version: 1.0.0

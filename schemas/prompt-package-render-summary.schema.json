@@ -1,0 +1,56 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "selected_jobs": {
+      "minimum": 0,
+      "title": "Selected Jobs",
+      "type": "integer"
+    },
+    "rendered": {
+      "minimum": 0,
+      "title": "Rendered",
+      "type": "integer"
+    },
+    "skipped": {
+      "minimum": 0,
+      "title": "Skipped",
+      "type": "integer"
+    },
+    "stale": {
+      "minimum": 0,
+      "title": "Stale",
+      "type": "integer"
+    },
+    "conflicting": {
+      "minimum": 0,
+      "title": "Conflicting",
+      "type": "integer"
+    },
+    "valid": {
+      "minimum": 0,
+      "title": "Valid",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "selected_jobs",
+    "rendered",
+    "skipped",
+    "stale",
+    "conflicting",
+    "valid"
+  ],
+  "title": "PromptPackageRenderSummary",
+  "type": "object"
+}

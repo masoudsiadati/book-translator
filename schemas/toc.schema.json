@@ -84,6 +84,7 @@
         "front_matter",
         "prologue",
         "chapter",
+        "epilogue",
         "appendix",
         "unknown"
       ],

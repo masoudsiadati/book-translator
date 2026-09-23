@@ -1,0 +1,123 @@
+{
+  "additionalProperties": false,
+  "description": "Durable evidence that a canonical decision record was corrected in place.\n\nThe registry only ever holds the active decision, so a correction that changes provenance —\nfor example an AI choice mistakenly recorded as a locked user preference — would otherwise\nleave no trace.  This record preserves the superseded fields verbatim.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "correction_id": {
+      "pattern": "^tdc-[0-9a-f]{24}$",
+      "title": "Correction Id",
+      "type": "string"
+    },
+    "candidate_id": {
+      "pattern": "^tc-[0-9a-f]{24}$",
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "decision_id": {
+      "pattern": "^td-[0-9a-f]{24}$",
+      "title": "Decision Id",
+      "type": "string"
+    },
+    "source_term": {
+      "minLength": 1,
+      "title": "Source Term",
+      "type": "string"
+    },
+    "previous_target_term": {
+      "minLength": 1,
+      "title": "Previous Target Term",
+      "type": "string"
+    },
+    "previous_decision_source": {
+      "minLength": 1,
+      "title": "Previous Decision Source",
+      "type": "string"
+    },
+    "previous_decision_state": {
+      "minLength": 1,
+      "title": "Previous Decision State",
+      "type": "string"
+    },
+    "previous_locked": {
+      "title": "Previous Locked",
+      "type": "boolean"
+    },
+    "corrected_target_term": {
+      "minLength": 1,
+      "title": "Corrected Target Term",
+      "type": "string"
+    },
+    "corrected_decision_source": {
+      "minLength": 1,
+      "title": "Corrected Decision Source",
+      "type": "string"
+    },
+    "corrected_decision_state": {
+      "minLength": 1,
+      "title": "Corrected Decision State",
+      "type": "string"
+    },
+    "corrected_locked": {
+      "title": "Corrected Locked",
+      "type": "boolean"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "question_id": {
+      "anyOf": [
+        {
+          "pattern": "^tq-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Question Id"
+    },
+    "registry_sha256_before": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Registry Sha256 Before",
+      "type": "string"
+    },
+    "registry_sha256_after": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Registry Sha256 After",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "correction_id",
+    "candidate_id",
+    "decision_id",
+    "source_term",
+    "previous_target_term",
+    "previous_decision_source",
+    "previous_decision_state",
+    "previous_locked",
+    "corrected_target_term",
+    "corrected_decision_source",
+    "corrected_decision_state",
+    "corrected_locked",
+    "reason",
+    "registry_sha256_before",
+    "registry_sha256_after",
+    "created_at"
+  ],
+  "title": "TerminologyDecisionCorrection",
+  "type": "object"
+}

@@ -1,0 +1,4 @@
+schema_version: "1.0"
+resource_kind: style_guide
+resource_file: config/style-guide.md
+version: 1.1.0

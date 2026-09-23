@@ -1,0 +1,365 @@
+{
+  "$defs": {
+    "PromptPackageMessageReference": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "enum": [
+            "system",
+            "user"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "file": {
+          "format": "path",
+          "title": "File",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "character_count": {
+          "minimum": 0,
+          "title": "Character Count",
+          "type": "integer"
+        },
+        "estimated_tokens": {
+          "minimum": 0,
+          "title": "Estimated Tokens",
+          "type": "integer"
+        },
+        "exact_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exact Tokens"
+        }
+      },
+      "required": [
+        "role",
+        "file",
+        "sha256",
+        "character_count",
+        "estimated_tokens"
+      ],
+      "title": "PromptPackageMessageReference",
+      "type": "object"
+    },
+    "PromptPackageResourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "resource_kind": {
+          "$ref": "#/$defs/SnapshotResourceKind"
+        },
+        "file": {
+          "format": "path",
+          "title": "File",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "resource_kind",
+        "file",
+        "sha256",
+        "version"
+      ],
+      "title": "PromptPackageResourceReference",
+      "type": "object"
+    },
+    "PromptPackageStatus": {
+      "enum": [
+        "rendered",
+        "validated",
+        "invalid"
+      ],
+      "title": "PromptPackageStatus",
+      "type": "string"
+    },
+    "SnapshotResourceKind": {
+      "enum": [
+        "prompt",
+        "glossary",
+        "style_guide",
+        "terminology",
+        "source_anomalies",
+        "open_questions",
+        "series_terminology",
+        "reference_corpus",
+        "reference_context",
+        "terminology_exemptions"
+      ],
+      "title": "SnapshotResourceKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "package_id": {
+      "pattern": "^pp-[0-9a-f]{24}$",
+      "title": "Package Id",
+      "type": "string"
+    },
+    "package_manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Package Manifest Sha256",
+      "type": "string"
+    },
+    "renderer_version": {
+      "title": "Renderer Version",
+      "type": "string"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "job_id": {
+      "title": "Job Id",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Manifest Sha256",
+      "type": "string"
+    },
+    "chapter_id": {
+      "title": "Chapter Id",
+      "type": "string"
+    },
+    "chunk_id": {
+      "title": "Chunk Id",
+      "type": "string"
+    },
+    "chunk_sequence": {
+      "minimum": 1,
+      "title": "Chunk Sequence",
+      "type": "integer"
+    },
+    "total_chapter_chunks": {
+      "minimum": 1,
+      "title": "Total Chapter Chunks",
+      "type": "integer"
+    },
+    "system_message": {
+      "$ref": "#/$defs/PromptPackageMessageReference"
+    },
+    "user_message": {
+      "$ref": "#/$defs/PromptPackageMessageReference"
+    },
+    "chunk_source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Chunk Source Sha256",
+      "type": "string"
+    },
+    "context_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Context Sha256",
+      "type": "string"
+    },
+    "prompt": {
+      "$ref": "#/$defs/PromptPackageResourceReference"
+    },
+    "glossary": {
+      "$ref": "#/$defs/PromptPackageResourceReference"
+    },
+    "style_guide": {
+      "$ref": "#/$defs/PromptPackageResourceReference"
+    },
+    "terminology": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PromptPackageResourceReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "source_anomalies": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PromptPackageResourceReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "series_terminology": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PromptPackageResourceReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "reference_context": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PromptPackageResourceReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "terminology_context_contract_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Context Contract Version"
+    },
+    "terminology_exemptions": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PromptPackageResourceReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "source_language": {
+      "minLength": 2,
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "minLength": 2,
+      "title": "Target Language",
+      "type": "string"
+    },
+    "source_word_count": {
+      "minimum": 0,
+      "title": "Source Word Count",
+      "type": "integer"
+    },
+    "context_word_count": {
+      "minimum": 0,
+      "title": "Context Word Count",
+      "type": "integer"
+    },
+    "estimated_input_tokens": {
+      "minimum": 0,
+      "title": "Estimated Input Tokens",
+      "type": "integer"
+    },
+    "exact_input_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Exact Input Tokens"
+    },
+    "output_contract_version": {
+      "title": "Output Contract Version",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/PromptPackageStatus"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "validated_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Validated At"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "package_id",
+    "package_manifest_sha256",
+    "renderer_version",
+    "run_id",
+    "job_id",
+    "snapshot_id",
+    "manifest_sha256",
+    "chapter_id",
+    "chunk_id",
+    "chunk_sequence",
+    "total_chapter_chunks",
+    "system_message",
+    "user_message",
+    "chunk_source_sha256",
+    "context_sha256",
+    "prompt",
+    "glossary",
+    "style_guide",
+    "source_language",
+    "target_language",
+    "source_word_count",
+    "context_word_count",
+    "estimated_input_tokens",
+    "output_contract_version",
+    "status",
+    "created_at"
+  ],
+  "title": "PromptPackage",
+  "type": "object"
+}

@@ -1,0 +1,1022 @@
+{
+  "$defs": {
+    "GovernedRegistryTransitionRecord": {
+      "additionalProperties": false,
+      "description": "One published governed registry edit on the path between two frozen registries.",
+      "properties": {
+        "event_id": {
+          "minLength": 1,
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_kind": {
+          "minLength": 1,
+          "title": "Event Kind",
+          "type": "string"
+        },
+        "semantic_sha256_before": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Semantic Sha256 Before",
+          "type": "string"
+        },
+        "semantic_sha256_after": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Semantic Sha256 After",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "event_kind",
+        "semantic_sha256_before",
+        "semantic_sha256_after"
+      ],
+      "title": "GovernedRegistryTransitionRecord",
+      "type": "object"
+    },
+    "GovernedTerminologyDrift": {
+      "additionalProperties": false,
+      "description": "Whether the terminology move behind a changed request is governed end to end.\n\n``registry`` lineage connects two registry semantic identities through decision corrections and\napplied remediation plans. ``series_policy`` lineage connects two frozen series-policy *files*\n(their SHA-256, stored in the same fields) through published policy amendments; there the\nregistry is only a projection of the policy, so the policy is what has to be explained.",
+      "properties": {
+        "from_semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "From Semantic Sha256",
+          "type": "string"
+        },
+        "to_semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "To Semantic Sha256",
+          "type": "string"
+        },
+        "explained": {
+          "title": "Explained",
+          "type": "boolean"
+        },
+        "transitions": {
+          "items": {
+            "$ref": "#/$defs/GovernedRegistryTransitionRecord"
+          },
+          "title": "Transitions",
+          "type": "array"
+        },
+        "locked_decision_drift": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Locked Decision Drift",
+          "type": "array"
+        },
+        "lineage_kind": {
+          "default": "registry",
+          "enum": [
+            "registry",
+            "series_policy"
+          ],
+          "title": "Lineage Kind",
+          "type": "string"
+        },
+        "waived_term_changes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Waived Term Changes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "from_semantic_sha256",
+        "to_semantic_sha256",
+        "explained"
+      ],
+      "title": "GovernedTerminologyDrift",
+      "type": "object"
+    },
+    "HistoricalCompatibilityTier": {
+      "description": "How a historical provider request relates to the request the new run would send.",
+      "enum": [
+        "exact_rendered_request",
+        "governed_resource_drift",
+        "occurrence_exemption_drift",
+        "contract_changed",
+        "unsafe_drift"
+      ],
+      "title": "HistoricalCompatibilityTier",
+      "type": "string"
+    },
+    "HistoricalRequestCompatibility": {
+      "additionalProperties": false,
+      "description": "The compatibility proof recorded beside one carried-forward historical output.",
+      "properties": {
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "tier": {
+          "$ref": "#/$defs/HistoricalCompatibilityTier"
+        },
+        "provider_contacted": {
+          "const": false,
+          "default": false,
+          "title": "Provider Contacted",
+          "type": "boolean"
+        },
+        "source_snapshot_id": {
+          "title": "Source Snapshot Id",
+          "type": "string"
+        },
+        "target_snapshot_id": {
+          "title": "Target Snapshot Id",
+          "type": "string"
+        },
+        "source_prompt_package_id": {
+          "pattern": "^pp-[0-9a-f]{24}$",
+          "title": "Source Prompt Package Id",
+          "type": "string"
+        },
+        "target_prompt_package_id": {
+          "pattern": "^pp-[0-9a-f]{24}$",
+          "title": "Target Prompt Package Id",
+          "type": "string"
+        },
+        "source_system_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source System Message Sha256",
+          "type": "string"
+        },
+        "target_system_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Target System Message Sha256",
+          "type": "string"
+        },
+        "source_user_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source User Message Sha256",
+          "type": "string"
+        },
+        "target_user_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Target User Message Sha256",
+          "type": "string"
+        },
+        "source_output_contract": {
+          "title": "Source Output Contract",
+          "type": "string"
+        },
+        "target_output_contract": {
+          "title": "Target Output Contract",
+          "type": "string"
+        },
+        "source_terminology_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Terminology Sha256"
+        },
+        "target_terminology_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Terminology Sha256"
+        },
+        "source_manifest_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Manifest Sha256"
+        },
+        "target_manifest_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Manifest Sha256"
+        },
+        "source_series_policy_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Series Policy Sha256"
+        },
+        "target_series_policy_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Series Policy Sha256"
+        },
+        "verified_identity_checks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Verified Identity Checks",
+          "type": "array"
+        },
+        "changed_framed_sections": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Changed Framed Sections",
+          "type": "array"
+        },
+        "observed_resource_drift": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Observed Resource Drift",
+          "type": "array"
+        },
+        "terminology_drift": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/GovernedTerminologyDrift"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "occurrence_exemption_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Occurrence Exemption Ids",
+          "type": "array"
+        },
+        "counterfactual_user_message_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Counterfactual User Message Sha256"
+        }
+      },
+      "required": [
+        "policy_version",
+        "tier",
+        "source_snapshot_id",
+        "target_snapshot_id",
+        "source_prompt_package_id",
+        "target_prompt_package_id",
+        "source_system_message_sha256",
+        "target_system_message_sha256",
+        "source_user_message_sha256",
+        "target_user_message_sha256",
+        "source_output_contract",
+        "target_output_contract",
+        "verified_identity_checks",
+        "rationale"
+      ],
+      "title": "HistoricalRequestCompatibility",
+      "type": "object"
+    },
+    "ParagraphAlignmentFinding": {
+      "additionalProperties": false,
+      "description": "One alignment or marker-contract defect, recorded without any translated content.",
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "error",
+            "warning"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "source_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Paragraph Index"
+        },
+        "related_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Related Paragraph Index"
+        },
+        "expected_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Marker"
+        },
+        "observed_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Marker"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "ParagraphAlignmentFinding",
+      "type": "object"
+    },
+    "TerminologyEnforcement": {
+      "description": "What kind of target evidence proves a canonical decision was honored.\n\n``required`` answers whether a decision is in scope for QA at all; this answers the separate\nquestion of what counts as proof.  Collapsing the two forces every approved decision into\n\"the exact canonical string must appear\", which is correct for a name and wrong for a form the\ntarget language legitimately transforms.",
+      "enum": [
+        "exact",
+        "morphological",
+        "contextual",
+        "advisory"
+      ],
+      "title": "TerminologyEnforcement",
+      "type": "string"
+    },
+    "TerminologyFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
+        "source_term": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Term"
+        },
+        "enforcement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TerminologyEnforcement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "TerminologyFinding",
+      "type": "object"
+    },
+    "TerminologyValidationReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "checked_decisions": {
+          "minimum": 0,
+          "title": "Checked Decisions",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/TerminologyFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "valid",
+        "source_sha256",
+        "translation_sha256",
+        "checked_decisions"
+      ],
+      "title": "TerminologyValidationReport",
+      "type": "object"
+    },
+    "TranslationAcceptanceStatus": {
+      "enum": [
+        "accepted",
+        "qa_rejected"
+      ],
+      "title": "TranslationAcceptanceStatus",
+      "type": "string"
+    },
+    "TranslationAlignmentReport": {
+      "additionalProperties": false,
+      "description": "The alignment verdict for one translated chunk.\n\n``contract_mode`` records how the paragraph identities being judged were established, because\nthe same measurements mean different things under the two.  Under ``marked`` a provider\nreturned the identities it was given and the measurements are a residual check; under\n``legacy_positional`` the identities are inferred from block order, which is exactly the\nassumption a boundary defect breaks, so the measurements are the only evidence there is.",
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "alignment_qa_version": {
+          "title": "Alignment Qa Version",
+          "type": "string"
+        },
+        "policy_id": {
+          "minLength": 1,
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "contract_mode": {
+          "enum": [
+            "marked",
+            "legacy_positional"
+          ],
+          "title": "Contract Mode",
+          "type": "string"
+        },
+        "marker_contract_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Marker Contract Version"
+        },
+        "evaluated": {
+          "title": "Evaluated",
+          "type": "boolean"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "aligned_pairs": {
+          "minimum": 0,
+          "title": "Aligned Pairs",
+          "type": "integer"
+        },
+        "measured_pairs": {
+          "minimum": 0,
+          "title": "Measured Pairs",
+          "type": "integer"
+        },
+        "flagged_pairs": {
+          "minimum": 0,
+          "title": "Flagged Pairs",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/ParagraphAlignmentFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "alignment_qa_version",
+        "policy_id",
+        "policy_version",
+        "contract_mode",
+        "evaluated",
+        "valid",
+        "source_sha256",
+        "translation_sha256",
+        "aligned_pairs",
+        "measured_pairs",
+        "flagged_pairs"
+      ],
+      "title": "TranslationAlignmentReport",
+      "type": "object"
+    },
+    "TranslationQAFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "TranslationQAFinding",
+      "type": "object"
+    },
+    "TranslationQAReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "valid": {
+          "title": "Valid",
+          "type": "boolean"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Sha256",
+          "type": "string"
+        },
+        "translation_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Translation Sha256",
+          "type": "string"
+        },
+        "source_paragraph_count": {
+          "minimum": 0,
+          "title": "Source Paragraph Count",
+          "type": "integer"
+        },
+        "translation_paragraph_count": {
+          "minimum": 0,
+          "title": "Translation Paragraph Count",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/TranslationQAFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "valid",
+        "source_sha256",
+        "translation_sha256",
+        "source_paragraph_count",
+        "translation_paragraph_count"
+      ],
+      "title": "TranslationQAReport",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable new-run provenance for one re-evaluated historical rejected output.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "carry_forward_engine_version": {
+      "title": "Carry Forward Engine Version",
+      "type": "string"
+    },
+    "execution_kind": {
+      "const": "historical_reevaluation",
+      "default": "historical_reevaluation",
+      "title": "Execution Kind",
+      "type": "string"
+    },
+    "provider_contacted": {
+      "const": false,
+      "default": false,
+      "title": "Provider Contacted",
+      "type": "boolean"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "job_id": {
+      "title": "Job Id",
+      "type": "string"
+    },
+    "carry_forward_number": {
+      "minimum": 1,
+      "title": "Carry Forward Number",
+      "type": "integer"
+    },
+    "source_run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Source Run Id",
+      "type": "string"
+    },
+    "source_job_id": {
+      "title": "Source Job Id",
+      "type": "string"
+    },
+    "source_attempt_id": {
+      "title": "Source Attempt Id",
+      "type": "string"
+    },
+    "source_attempt_number": {
+      "minimum": 1,
+      "title": "Source Attempt Number",
+      "type": "integer"
+    },
+    "source_attempt_file": {
+      "format": "path",
+      "title": "Source Attempt File",
+      "type": "string"
+    },
+    "source_attempt_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Attempt Sha256",
+      "type": "string"
+    },
+    "source_provider": {
+      "title": "Source Provider",
+      "type": "string"
+    },
+    "source_provider_adapter_version": {
+      "title": "Source Provider Adapter Version",
+      "type": "string"
+    },
+    "source_provider_response_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Provider Response Id"
+    },
+    "source_model_returned": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Model Returned"
+    },
+    "source_translation_file": {
+      "format": "path",
+      "title": "Source Translation File",
+      "type": "string"
+    },
+    "source_translation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Translation Sha256",
+      "type": "string"
+    },
+    "historical_acceptance_file": {
+      "format": "path",
+      "title": "Historical Acceptance File",
+      "type": "string"
+    },
+    "historical_acceptance_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Historical Acceptance Sha256",
+      "type": "string"
+    },
+    "historical_reevaluation_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Historical Reevaluation File"
+    },
+    "historical_reevaluation_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Historical Reevaluation Sha256"
+    },
+    "historical_status": {
+      "$ref": "#/$defs/TranslationAcceptanceStatus"
+    },
+    "historical_terminology_report": {
+      "$ref": "#/$defs/TerminologyValidationReport"
+    },
+    "historical_structural_report": {
+      "$ref": "#/$defs/TranslationQAReport"
+    },
+    "compatibility": {
+      "$ref": "#/$defs/HistoricalRequestCompatibility"
+    },
+    "source_file": {
+      "format": "path",
+      "title": "Source File",
+      "type": "string"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "context_file": {
+      "format": "path",
+      "title": "Context File",
+      "type": "string"
+    },
+    "context_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Context Sha256",
+      "type": "string"
+    },
+    "terminology_file": {
+      "format": "path",
+      "title": "Terminology File",
+      "type": "string"
+    },
+    "terminology_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Terminology Sha256",
+      "type": "string"
+    },
+    "prompt_file": {
+      "format": "path",
+      "title": "Prompt File",
+      "type": "string"
+    },
+    "prompt_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Prompt Sha256",
+      "type": "string"
+    },
+    "style_file": {
+      "format": "path",
+      "title": "Style File",
+      "type": "string"
+    },
+    "style_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Style Sha256",
+      "type": "string"
+    },
+    "terminology_qa_version": {
+      "title": "Terminology Qa Version",
+      "type": "string"
+    },
+    "structural_qa_version": {
+      "title": "Structural Qa Version",
+      "type": "string"
+    },
+    "terminology_report": {
+      "$ref": "#/$defs/TerminologyValidationReport"
+    },
+    "structural_report": {
+      "$ref": "#/$defs/TranslationQAReport"
+    },
+    "alignment_qa_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Alignment Qa Version"
+    },
+    "alignment_report": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TranslationAlignmentReport"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "resulting_status": {
+      "$ref": "#/$defs/TranslationAcceptanceStatus"
+    },
+    "accepted": {
+      "title": "Accepted",
+      "type": "boolean"
+    },
+    "translation_file": {
+      "format": "path",
+      "title": "Translation File",
+      "type": "string"
+    },
+    "translation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Translation Sha256",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "carry_forward_engine_version",
+    "run_id",
+    "job_id",
+    "carry_forward_number",
+    "source_run_id",
+    "source_job_id",
+    "source_attempt_id",
+    "source_attempt_number",
+    "source_attempt_file",
+    "source_attempt_sha256",
+    "source_provider",
+    "source_provider_adapter_version",
+    "source_translation_file",
+    "source_translation_sha256",
+    "historical_acceptance_file",
+    "historical_acceptance_sha256",
+    "historical_status",
+    "historical_terminology_report",
+    "historical_structural_report",
+    "compatibility",
+    "source_file",
+    "source_sha256",
+    "context_file",
+    "context_sha256",
+    "terminology_file",
+    "terminology_sha256",
+    "prompt_file",
+    "prompt_sha256",
+    "style_file",
+    "style_sha256",
+    "terminology_qa_version",
+    "structural_qa_version",
+    "terminology_report",
+    "structural_report",
+    "resulting_status",
+    "accepted",
+    "translation_file",
+    "translation_sha256",
+    "created_at"
+  ],
+  "title": "TranslationHistoricalReevaluationEvidence",
+  "type": "object"
+}

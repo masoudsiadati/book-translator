@@ -1,0 +1,343 @@
+{
+  "$defs": {
+    "SeriesPolicyAmendmentRequest": {
+      "additionalProperties": false,
+      "description": "An operator's batch of explicit series decisions, applied atomically or not at all.",
+      "properties": {
+        "schema_version": {
+          "pattern": "^\\d+\\.\\d+$",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "request_kind": {
+          "const": "series_policy_amendment_request",
+          "default": "series_policy_amendment_request",
+          "title": "Request Kind",
+          "type": "string"
+        },
+        "series_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Series Id",
+          "type": "string"
+        },
+        "resulting_policy_version": {
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+          "title": "Resulting Policy Version",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "terms": {
+          "items": {
+            "$ref": "#/$defs/SeriesTermAmendment"
+          },
+          "minItems": 1,
+          "title": "Terms",
+          "type": "array"
+        },
+        "retired_terms": {
+          "items": {
+            "$ref": "#/$defs/SeriesTermRetirement"
+          },
+          "title": "Retired Terms",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "series_id",
+        "resulting_policy_version",
+        "rationale",
+        "terms"
+      ],
+      "title": "SeriesPolicyAmendmentRequest",
+      "type": "object"
+    },
+    "SeriesProvenanceKind": {
+      "description": "Why a term holds its status.",
+      "enum": [
+        "explicit_user",
+        "explicit_project",
+        "promoted_reference",
+        "prior_volume",
+        "unresolved"
+      ],
+      "title": "SeriesProvenanceKind",
+      "type": "string"
+    },
+    "SeriesTermAmendment": {
+      "additionalProperties": false,
+      "description": "One explicit decision a person states about an existing series term.\n\nEvery field is the decision's *complete* intended state rather than a patch: aliases and\nauthorized forms listed here replace the term's lists, so what the policy says afterwards is\nexactly what the request says and nothing is left to merge rules.",
+      "properties": {
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "status": {
+          "default": "LOCKED",
+          "enum": [
+            "LOCKED",
+            "STRONG_REFERENCE"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "target_term": {
+          "minLength": 1,
+          "title": "Target Term",
+          "type": "string"
+        },
+        "allowed_target_forms": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Target Forms",
+          "type": "array"
+        },
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_term",
+        "target_term",
+        "rationale"
+      ],
+      "title": "SeriesTermAmendment",
+      "type": "object"
+    },
+    "SeriesTermChange": {
+      "additionalProperties": false,
+      "description": "What one amendment did to one term, stated as sets so a reader never diffs text.",
+      "properties": {
+        "concept_id": {
+          "pattern": "^sc-[0-9a-f]{24}$",
+          "title": "Concept Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "status_before": {
+          "$ref": "#/$defs/SeriesTermStatus"
+        },
+        "status_after": {
+          "$ref": "#/$defs/SeriesTermStatus"
+        },
+        "target_before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Before"
+        },
+        "target_after": {
+          "title": "Target After",
+          "type": "string"
+        },
+        "provenance_before": {
+          "$ref": "#/$defs/SeriesProvenanceKind"
+        },
+        "provenance_after": {
+          "$ref": "#/$defs/SeriesProvenanceKind"
+        },
+        "aliases_added": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases Added",
+          "type": "array"
+        },
+        "aliases_removed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases Removed",
+          "type": "array"
+        },
+        "forms_added": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Forms Added",
+          "type": "array"
+        },
+        "forms_removed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Forms Removed",
+          "type": "array"
+        }
+      },
+      "required": [
+        "concept_id",
+        "source_term",
+        "status_before",
+        "status_after",
+        "target_after",
+        "provenance_before",
+        "provenance_after"
+      ],
+      "title": "SeriesTermChange",
+      "type": "object"
+    },
+    "SeriesTermRetirement": {
+      "additionalProperties": false,
+      "description": "One decided term a person withdraws to evidence.\n\nRetirement is not deletion. The term keeps its concept, its spelling, and every observed\nvariant the corpora attested; it simply stops stating a canonical decision, which is the only\nway one concept can end up with two rival renderings. It is the governed answer to a promotion\nthat turned out to name something an explicit decision already governs.",
+      "properties": {
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_term",
+        "rationale"
+      ],
+      "title": "SeriesTermRetirement",
+      "type": "object"
+    },
+    "SeriesTermStatus": {
+      "description": "The force a series decision carries for the current book.",
+      "enum": [
+        "LOCKED",
+        "STRONG_REFERENCE",
+        "OBSERVED_VARIANTS"
+      ],
+      "title": "SeriesTermStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable evidence that a series policy moved from one exact file identity to another.\n\nA frozen snapshot pins the policy bytes that were true when it was taken; a later governed\nedit legitimately moves the live policy away from them. This record is what makes that move\n*explained*: a chain of records whose hashes connect two frozen policies is the proof a\ncross-snapshot migration needs before it may waive a changed terminology projection.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "record_kind": {
+      "const": "series_policy_amendment",
+      "default": "series_policy_amendment",
+      "title": "Record Kind",
+      "type": "string"
+    },
+    "amendment_engine_version": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Amendment Engine Version",
+      "type": "string"
+    },
+    "amendment_id": {
+      "pattern": "^spa-[0-9a-f]{24}$",
+      "title": "Amendment Id",
+      "type": "string"
+    },
+    "series_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]*$",
+      "title": "Series Id",
+      "type": "string"
+    },
+    "policy_file": {
+      "format": "path",
+      "title": "Policy File",
+      "type": "string"
+    },
+    "policy_sha256_before": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Policy Sha256 Before",
+      "type": "string"
+    },
+    "policy_sha256_after": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Policy Sha256 After",
+      "type": "string"
+    },
+    "policy_identity_before": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Policy Identity Before",
+      "type": "string"
+    },
+    "policy_identity_after": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Policy Identity After",
+      "type": "string"
+    },
+    "policy_version_before": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Policy Version Before",
+      "type": "string"
+    },
+    "policy_version_after": {
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "title": "Policy Version After",
+      "type": "string"
+    },
+    "request": {
+      "$ref": "#/$defs/SeriesPolicyAmendmentRequest"
+    },
+    "request_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Request Sha256",
+      "type": "string"
+    },
+    "changes": {
+      "items": {
+        "$ref": "#/$defs/SeriesTermChange"
+      },
+      "minItems": 1,
+      "title": "Changes",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "amendment_engine_version",
+    "amendment_id",
+    "series_id",
+    "policy_file",
+    "policy_sha256_before",
+    "policy_sha256_after",
+    "policy_identity_before",
+    "policy_identity_after",
+    "policy_version_before",
+    "policy_version_after",
+    "request",
+    "request_sha256",
+    "changes",
+    "created_at"
+  ],
+  "title": "SeriesPolicyAmendmentRecord",
+  "type": "object"
+}

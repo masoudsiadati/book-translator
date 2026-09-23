@@ -1,0 +1,490 @@
+{
+  "$defs": {
+    "SemanticFinding": {
+      "additionalProperties": false,
+      "description": "One fidelity defect the judge claims, with the evidence a repair stage would need.",
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/SemanticFindingCode"
+        },
+        "severity": {
+          "$ref": "#/$defs/SemanticSeverity"
+        },
+        "source_evidence": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Source Evidence",
+          "type": "string"
+        },
+        "explanation": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "source_evidence",
+        "explanation",
+        "confidence"
+      ],
+      "title": "SemanticFinding",
+      "type": "object"
+    },
+    "SemanticFindingCode": {
+      "description": "The closed vocabulary of fidelity defects the judge may report.\n\nIt is closed on purpose. An open vocabulary would let a provider invent a category nothing\ndownstream can classify, and the acceptance policy would then have to guess how serious an\nunknown code is. A code outside this set fails the response.",
+      "enum": [
+        "meaning_omitted",
+        "meaning_added",
+        "factual_change",
+        "action_changed",
+        "negation_changed",
+        "modality_changed",
+        "number_changed",
+        "entity_relation_changed",
+        "dialogue_content_changed",
+        "speaker_attribution_risk",
+        "temporal_relation_changed",
+        "causal_relation_changed"
+      ],
+      "title": "SemanticFindingCode",
+      "type": "string"
+    },
+    "SemanticJudgeRequestRecord": {
+      "additionalProperties": false,
+      "description": "Everything about one provider call except what was said.\n\nMessage digests stand in for the messages themselves, which is what lets a later reader prove\nthat a recorded verdict answers a specific request without the request being retained.",
+      "properties": {
+        "request_id": {
+          "pattern": "^sjq-[0-9a-f]{24}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "batch_size": {
+          "minimum": 1,
+          "title": "Batch Size",
+          "type": "integer"
+        },
+        "repetition": {
+          "minimum": 1,
+          "title": "Repetition",
+          "type": "integer"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "adapter_version": {
+          "minLength": 1,
+          "title": "Adapter Version",
+          "type": "string"
+        },
+        "model_requested": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Requested"
+        },
+        "model_returned": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Returned"
+        },
+        "system_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "System Message Sha256",
+          "type": "string"
+        },
+        "user_message_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "User Message Sha256",
+          "type": "string"
+        },
+        "input_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Tokens"
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Tokens"
+        },
+        "total_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Tokens"
+        },
+        "latency_milliseconds": {
+          "minimum": 0,
+          "title": "Latency Milliseconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "request_id",
+        "batch_size",
+        "repetition",
+        "provider",
+        "adapter_version",
+        "system_message_sha256",
+        "user_message_sha256",
+        "latency_milliseconds"
+      ],
+      "title": "SemanticJudgeRequestRecord",
+      "type": "object"
+    },
+    "SemanticParagraphOutcome": {
+      "additionalProperties": false,
+      "description": "One paragraph's judged verdict after the acceptance policy has read it.\n\nThe judge's verdict and the policy's outcome are recorded separately and never collapsed. A\njudge that reports a defect the policy considers immaterial is not wrong, and a record that\noverwrote its answer would make the policy impossible to recalibrate against real evidence.",
+      "properties": {
+        "paragraph_id": {
+          "pattern": "^P\\d{4}$",
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "paragraph_index": {
+          "minimum": 1,
+          "title": "Paragraph Index",
+          "type": "integer"
+        },
+        "judge_verdict": {
+          "$ref": "#/$defs/SemanticVerdict"
+        },
+        "policy_outcome": {
+          "$ref": "#/$defs/SemanticVerdict"
+        },
+        "judge_confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Judge Confidence",
+          "type": "number"
+        },
+        "source_word_count": {
+          "minimum": 0,
+          "title": "Source Word Count",
+          "type": "integer"
+        },
+        "target_word_count": {
+          "minimum": 0,
+          "title": "Target Word Count",
+          "type": "integer"
+        },
+        "material_findings": {
+          "items": {
+            "$ref": "#/$defs/SemanticFinding"
+          },
+          "title": "Material Findings",
+          "type": "array"
+        },
+        "advisory_findings": {
+          "items": {
+            "$ref": "#/$defs/SemanticFinding"
+          },
+          "title": "Advisory Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "paragraph_id",
+        "paragraph_index",
+        "judge_verdict",
+        "policy_outcome",
+        "judge_confidence",
+        "source_word_count",
+        "target_word_count"
+      ],
+      "title": "SemanticParagraphOutcome",
+      "type": "object"
+    },
+    "SemanticSeverity": {
+      "description": "How much a defect costs a reader.",
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "title": "SemanticSeverity",
+      "type": "string"
+    },
+    "SemanticVerdict": {
+      "description": "What the judge concluded about one paragraph.",
+      "enum": [
+        "PASS",
+        "REVISE",
+        "INCONCLUSIVE"
+      ],
+      "title": "SemanticVerdict",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable semantic coverage evidence for one chunk under one evaluation.\n\nIt never claims anything about acceptance. A translation the judge asks to revise stays\nexactly as accepted as it was; this record is evidence a later governed stage may act on, and\non its own it changes nothing.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "judge_engine_version": {
+      "title": "Judge Engine Version",
+      "type": "string"
+    },
+    "judge_prompt_version": {
+      "title": "Judge Prompt Version",
+      "type": "string"
+    },
+    "judge_schema_version": {
+      "title": "Judge Schema Version",
+      "type": "string"
+    },
+    "policy_version": {
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "provider_contacted": {
+      "const": true,
+      "default": true,
+      "title": "Provider Contacted",
+      "type": "boolean"
+    },
+    "mutated_acceptance": {
+      "const": false,
+      "default": false,
+      "title": "Mutated Acceptance",
+      "type": "boolean"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "job_id": {
+      "minLength": 1,
+      "title": "Job Id",
+      "type": "string"
+    },
+    "chapter_id": {
+      "minLength": 1,
+      "title": "Chapter Id",
+      "type": "string"
+    },
+    "chunk_id": {
+      "minLength": 1,
+      "title": "Chunk Id",
+      "type": "string"
+    },
+    "evaluation_number": {
+      "minimum": 1,
+      "title": "Evaluation Number",
+      "type": "integer"
+    },
+    "repetition": {
+      "minimum": 1,
+      "title": "Repetition",
+      "type": "integer"
+    },
+    "look": {
+      "default": "first",
+      "enum": [
+        "first",
+        "second"
+      ],
+      "title": "Look",
+      "type": "string"
+    },
+    "context_radius": {
+      "default": 1,
+      "minimum": 0,
+      "title": "Context Radius",
+      "type": "integer"
+    },
+    "context_policy_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Context Policy Version"
+    },
+    "identity_mode": {
+      "enum": [
+        "marked",
+        "legacy_positional"
+      ],
+      "title": "Identity Mode",
+      "type": "string"
+    },
+    "source_file": {
+      "format": "path",
+      "title": "Source File",
+      "type": "string"
+    },
+    "source_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "translation_file": {
+      "format": "path",
+      "title": "Translation File",
+      "type": "string"
+    },
+    "translation_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Translation Sha256",
+      "type": "string"
+    },
+    "terminology_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology File"
+    },
+    "terminology_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminology Sha256"
+    },
+    "context_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Context Sha256",
+      "type": "string"
+    },
+    "paragraph_count": {
+      "minimum": 1,
+      "title": "Paragraph Count",
+      "type": "integer"
+    },
+    "judged_paragraphs": {
+      "minimum": 0,
+      "title": "Judged Paragraphs",
+      "type": "integer"
+    },
+    "pass_count": {
+      "minimum": 0,
+      "title": "Pass Count",
+      "type": "integer"
+    },
+    "revise_count": {
+      "minimum": 0,
+      "title": "Revise Count",
+      "type": "integer"
+    },
+    "inconclusive_count": {
+      "minimum": 0,
+      "title": "Inconclusive Count",
+      "type": "integer"
+    },
+    "requests": {
+      "items": {
+        "$ref": "#/$defs/SemanticJudgeRequestRecord"
+      },
+      "title": "Requests",
+      "type": "array"
+    },
+    "outcomes": {
+      "items": {
+        "$ref": "#/$defs/SemanticParagraphOutcome"
+      },
+      "title": "Outcomes",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "judge_engine_version",
+    "judge_prompt_version",
+    "judge_schema_version",
+    "policy_version",
+    "run_id",
+    "job_id",
+    "chapter_id",
+    "chunk_id",
+    "evaluation_number",
+    "repetition",
+    "identity_mode",
+    "source_file",
+    "source_sha256",
+    "translation_file",
+    "translation_sha256",
+    "context_sha256",
+    "paragraph_count",
+    "judged_paragraphs",
+    "pass_count",
+    "revise_count",
+    "inconclusive_count",
+    "created_at"
+  ],
+  "title": "SemanticQAEvidence",
+  "type": "object"
+}

@@ -1,0 +1,158 @@
+{
+  "$defs": {
+    "TerminologyProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "proposal_id": {
+          "pattern": "^tp-[0-9a-f]{24}$",
+          "title": "Proposal Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "pattern": "^tc-[0-9a-f]{24}$",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "source_term": {
+          "minLength": 1,
+          "title": "Source Term",
+          "type": "string"
+        },
+        "proposed_target": {
+          "minLength": 1,
+          "title": "Proposed Target",
+          "type": "string"
+        },
+        "provider_proposed_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider Proposed Target"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "classification": {
+          "$ref": "#/$defs/TerminologyType"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        },
+        "known_variants": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Known Variants",
+          "type": "array"
+        },
+        "action": {
+          "default": "ai_proposal",
+          "enum": [
+            "ai_proposal",
+            "reuse_existing"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "canonical_source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Canonical Source"
+        },
+        "canonicalization_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Canonicalization Confidence"
+        },
+        "blocked": {
+          "default": false,
+          "title": "Blocked",
+          "type": "boolean"
+        },
+        "conflict_codes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Conflict Codes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "proposal_id",
+        "candidate_id",
+        "source_term",
+        "proposed_target",
+        "confidence",
+        "classification"
+      ],
+      "title": "TerminologyProposal",
+      "type": "object"
+    },
+    "TerminologyType": {
+      "enum": [
+        "person",
+        "place",
+        "organization",
+        "title",
+        "people",
+        "invented",
+        "artifact",
+        "historical_event",
+        "story_term",
+        "recurring_phrase",
+        "context_sensitive"
+      ],
+      "title": "TerminologyType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "proposals": {
+      "items": {
+        "$ref": "#/$defs/TerminologyProposal"
+      },
+      "title": "Proposals",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version"
+  ],
+  "title": "TerminologyProposalResponse",
+  "type": "object"
+}

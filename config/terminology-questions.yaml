@@ -1,0 +1,36 @@
+schema_version: '1.0'
+registry_kind: terminology_questions
+version: 1.0.0
+book_id: the-fires-of-heaven-en-fa
+questions:
+- question_id: tq-2d489fe980db527a5b846394
+  candidate_id: tc-11e2772a60167f0365a3311a
+  decision_id: td-b91c3987a20590699138e56a
+  source_term: Aunt Resara
+  provisional_target: خاله رسارا
+  category: kinship_side
+  question: Is Resara a maternal aunt (خاله) or a paternal aunt (عمه)? English 'Aunt'
+    does not encode the distinction that Persian requires.
+  status: open
+  blocking: false
+  evidence_status: inconclusive
+  chapters:
+  - '001'
+  chunks:
+  - 001-002
+  - 001-004
+  research:
+    current_book: checked_inconclusive
+    web: not_checked
+    other_volumes: not_checked
+    notes:
+    - 2 corpus occurrences (001-002, 001-004); both reported speech with no kinship-side
+      marker
+    - Nearest evidence groups the speaker's mother with her aunts collectively; not
+      probative of side
+    - Zero possessive kinship constructions (mother's/father's sister) corpus-wide
+  provenance: current_book
+  evidence_sha256: null
+  resolution: null
+  created_at: '2026-08-16T10:47:20.021682Z'
+  superseded_by: null

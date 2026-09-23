@@ -1,0 +1,104 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "manifest_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Manifest Sha256",
+      "type": "string"
+    },
+    "queue_engine_version": {
+      "title": "Queue Engine Version",
+      "type": "string"
+    },
+    "chapter_count": {
+      "minimum": 1,
+      "title": "Chapter Count",
+      "type": "integer"
+    },
+    "job_count": {
+      "minimum": 1,
+      "title": "Job Count",
+      "type": "integer"
+    },
+    "first_job_id": {
+      "title": "First Job Id",
+      "type": "string"
+    },
+    "last_job_id": {
+      "title": "Last Job Id",
+      "type": "string"
+    },
+    "pending_count": {
+      "minimum": 0,
+      "title": "Pending Count",
+      "type": "integer"
+    },
+    "max_attempts": {
+      "minimum": 1,
+      "title": "Max Attempts",
+      "type": "integer"
+    },
+    "retry_backoff_seconds": {
+      "minimum": 0,
+      "title": "Retry Backoff Seconds",
+      "type": "integer"
+    },
+    "one_to_one_coverage": {
+      "title": "One To One Coverage",
+      "type": "boolean"
+    },
+    "ordering_valid": {
+      "title": "Ordering Valid",
+      "type": "boolean"
+    },
+    "snapshot_valid": {
+      "title": "Snapshot Valid",
+      "type": "boolean"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "snapshot_id",
+    "manifest_sha256",
+    "queue_engine_version",
+    "chapter_count",
+    "job_count",
+    "first_job_id",
+    "last_job_id",
+    "pending_count",
+    "max_attempts",
+    "retry_backoff_seconds",
+    "one_to_one_coverage",
+    "ordering_valid",
+    "snapshot_valid",
+    "created_at"
+  ],
+  "title": "TranslationQueueReport",
+  "type": "object"
+}

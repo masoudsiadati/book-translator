@@ -1,0 +1,232 @@
+{
+  "$defs": {
+    "ImpactedChunk": {
+      "additionalProperties": false,
+      "description": "One chunk whose frozen source actually contains the affected source form.",
+      "properties": {
+        "chunk_id": {
+          "minLength": 1,
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "chapter_id": {
+          "minLength": 1,
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "occurrence_count": {
+          "minimum": 1,
+          "title": "Occurrence Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "chunk_id",
+        "chapter_id",
+        "occurrence_count"
+      ],
+      "title": "ImpactedChunk",
+      "type": "object"
+    },
+    "ImpactedSnapshot": {
+      "additionalProperties": false,
+      "description": "One snapshot that froze the terminology registry carrying the affected decision.",
+      "properties": {
+        "snapshot_id": {
+          "minLength": 1,
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "terminology_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Terminology Sha256"
+        },
+        "open_questions_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Open Questions Sha256"
+        },
+        "froze_affected_decision": {
+          "title": "Froze Affected Decision",
+          "type": "boolean"
+        },
+        "chunk_count": {
+          "minimum": 0,
+          "title": "Chunk Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "froze_affected_decision",
+        "chunk_count"
+      ],
+      "title": "ImpactedSnapshot",
+      "type": "object"
+    },
+    "ImpactedTranslation": {
+      "additionalProperties": false,
+      "description": "One recorded translation whose acceptance may depend on the affected decision.",
+      "properties": {
+        "run_id": {
+          "minLength": 1,
+          "title": "Run Id",
+          "type": "string"
+        },
+        "job_id": {
+          "minLength": 1,
+          "title": "Job Id",
+          "type": "string"
+        },
+        "chunk_id": {
+          "minLength": 1,
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "status": {
+          "minLength": 1,
+          "title": "Status",
+          "type": "string"
+        },
+        "requires_reevaluation": {
+          "title": "Requires Reevaluation",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "run_id",
+        "job_id",
+        "chunk_id",
+        "status",
+        "requires_reevaluation"
+      ],
+      "title": "ImpactedTranslation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Read-only blast radius of changing one terminology decision.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "candidate_id": {
+      "pattern": "^tc-[0-9a-f]{24}$",
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "source_term": {
+      "minLength": 1,
+      "title": "Source Term",
+      "type": "string"
+    },
+    "current_target_term": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Current Target Term"
+    },
+    "current_decision_state": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Current Decision State"
+    },
+    "proposed_target_term": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Proposed Target Term"
+    },
+    "question_id": {
+      "anyOf": [
+        {
+          "pattern": "^tq-[0-9a-f]{24}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Question Id"
+    },
+    "impacted_chunks": {
+      "items": {
+        "$ref": "#/$defs/ImpactedChunk"
+      },
+      "title": "Impacted Chunks",
+      "type": "array"
+    },
+    "impacted_snapshots": {
+      "items": {
+        "$ref": "#/$defs/ImpactedSnapshot"
+      },
+      "title": "Impacted Snapshots",
+      "type": "array"
+    },
+    "impacted_translations": {
+      "items": {
+        "$ref": "#/$defs/ImpactedTranslation"
+      },
+      "title": "Impacted Translations",
+      "type": "array"
+    },
+    "accepted_requiring_reevaluation": {
+      "minimum": 0,
+      "title": "Accepted Requiring Reevaluation",
+      "type": "integer"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "source_term",
+    "accepted_requiring_reevaluation",
+    "generated_at"
+  ],
+  "title": "TerminologyImpactReport",
+  "type": "object"
+}

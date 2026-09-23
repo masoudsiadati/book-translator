@@ -1,0 +1,299 @@
+{
+  "$defs": {
+    "ParagraphAlignmentAuditEntry": {
+      "additionalProperties": false,
+      "description": "One assessed job in a read-only alignment audit.",
+      "properties": {
+        "job_id": {
+          "minLength": 1,
+          "title": "Job Id",
+          "type": "string"
+        },
+        "chapter_id": {
+          "minLength": 1,
+          "title": "Chapter Id",
+          "type": "string"
+        },
+        "chunk_id": {
+          "minLength": 1,
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "acceptance_origin": {
+          "minLength": 1,
+          "title": "Acceptance Origin",
+          "type": "string"
+        },
+        "contract_mode": {
+          "enum": [
+            "marked",
+            "legacy_positional"
+          ],
+          "title": "Contract Mode",
+          "type": "string"
+        },
+        "evaluated": {
+          "title": "Evaluated",
+          "type": "boolean"
+        },
+        "aligned_pairs": {
+          "minimum": 0,
+          "title": "Aligned Pairs",
+          "type": "integer"
+        },
+        "measured_pairs": {
+          "minimum": 0,
+          "title": "Measured Pairs",
+          "type": "integer"
+        },
+        "flagged_pairs": {
+          "minimum": 0,
+          "title": "Flagged Pairs",
+          "type": "integer"
+        },
+        "error_findings": {
+          "minimum": 0,
+          "title": "Error Findings",
+          "type": "integer"
+        },
+        "warning_findings": {
+          "minimum": 0,
+          "title": "Warning Findings",
+          "type": "integer"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/ParagraphAlignmentFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "job_id",
+        "chapter_id",
+        "chunk_id",
+        "acceptance_origin",
+        "contract_mode",
+        "evaluated",
+        "aligned_pairs",
+        "measured_pairs",
+        "flagged_pairs",
+        "error_findings",
+        "warning_findings"
+      ],
+      "title": "ParagraphAlignmentAuditEntry",
+      "type": "object"
+    },
+    "ParagraphAlignmentFinding": {
+      "additionalProperties": false,
+      "description": "One alignment or marker-contract defect, recorded without any translated content.",
+      "properties": {
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "error",
+            "warning"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "source_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Paragraph Index"
+        },
+        "related_paragraph_index": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Related Paragraph Index"
+        },
+        "expected_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Marker"
+        },
+        "observed_marker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Marker"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "message"
+      ],
+      "title": "ParagraphAlignmentFinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The complete read-only alignment verdict over one translation run.\n\nThe audit changes nothing: no acceptance, no status, no counter, no translated byte.  It\nexists so a marker-less historical run can be measured under the same policy that governs new\nwork, which is the only way to know whether the policy reproduces what a human audit found.",
+  "properties": {
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "alignment_qa_version": {
+      "title": "Alignment Qa Version",
+      "type": "string"
+    },
+    "policy_id": {
+      "minLength": 1,
+      "title": "Policy Id",
+      "type": "string"
+    },
+    "policy_version": {
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^tr-[0-9a-f]{12}-\\d{3,}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "run_output_contract_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Output Contract Version"
+    },
+    "provider_contacted": {
+      "const": false,
+      "default": false,
+      "title": "Provider Contacted",
+      "type": "boolean"
+    },
+    "mutated_state": {
+      "const": false,
+      "default": false,
+      "title": "Mutated State",
+      "type": "boolean"
+    },
+    "assessed_jobs": {
+      "minimum": 0,
+      "title": "Assessed Jobs",
+      "type": "integer"
+    },
+    "skipped_jobs": {
+      "minimum": 0,
+      "title": "Skipped Jobs",
+      "type": "integer"
+    },
+    "aligned_pairs": {
+      "minimum": 0,
+      "title": "Aligned Pairs",
+      "type": "integer"
+    },
+    "measured_pairs": {
+      "minimum": 0,
+      "title": "Measured Pairs",
+      "type": "integer"
+    },
+    "jobs_with_findings": {
+      "minimum": 0,
+      "title": "Jobs With Findings",
+      "type": "integer"
+    },
+    "jobs_with_blocking_findings": {
+      "minimum": 0,
+      "title": "Jobs With Blocking Findings",
+      "type": "integer"
+    },
+    "finding_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Finding Counts",
+      "type": "object"
+    },
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/ParagraphAlignmentAuditEntry"
+      },
+      "title": "Entries",
+      "type": "array"
+    },
+    "skipped": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Skipped",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "alignment_qa_version",
+    "policy_id",
+    "policy_version",
+    "run_id",
+    "snapshot_id",
+    "assessed_jobs",
+    "skipped_jobs",
+    "aligned_pairs",
+    "measured_pairs",
+    "jobs_with_findings",
+    "jobs_with_blocking_findings",
+    "created_at"
+  ],
+  "title": "ParagraphAlignmentAuditReport",
+  "type": "object"
+}
