@@ -5,6 +5,7 @@ chapter and chunk identities, and its decisions restate the policy in the enforc
 every downstream consumer already reads. Nothing from the reference corpora is copied into it.
 """
 
+import hashlib
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -251,6 +252,28 @@ def _corpus_rivals(term: SeriesTerm) -> tuple[str, ...]:
     return kept
 
 
+# Snapshot validation re-derives the registry to prove the frozen one still matches, and one
+# worker process validates many times per job. The derivation is a pure function of the policy,
+# the book ID and the chunk texts, so a result is memoized under a digest of exactly those inputs;
+# callers receive a deep copy, so a hit is indistinguishable from recomputation.
+_DERIVATION_MEMO: dict[str, tuple[TerminologyRegistry, DerivationSummary]] = {}
+_DERIVATION_MEMO_LIMIT = 4
+
+
+def _derivation_key(
+    policy: SeriesTerminologyPolicy, book_id: str, corpus: tuple[ChunkText, ...]
+) -> str:
+    digest = hashlib.sha256()
+    for part in (policy.model_dump_json(), book_id):
+        digest.update(part.encode("utf-8"))
+        digest.update(b"\0")
+    for chunk in corpus:
+        for part in (chunk.chunk_id, chunk.chapter_id, chunk.source_text, chunk.context_text):
+            digest.update(part.encode("utf-8"))
+            digest.update(b"\0")
+    return digest.hexdigest()
+
+
 def derive_book_registry(
     policy: SeriesTerminologyPolicy,
     *,
@@ -258,6 +281,23 @@ def derive_book_registry(
     chunks: Iterable[ChunkText],
 ) -> tuple[TerminologyRegistry, DerivationSummary]:
     corpus = tuple(chunks)
+    key = _derivation_key(policy, book_id, corpus)
+    cached = _DERIVATION_MEMO.get(key)
+    if cached is None:
+        cached = _derive_book_registry(policy, book_id=book_id, corpus=corpus)
+        if len(_DERIVATION_MEMO) >= _DERIVATION_MEMO_LIMIT:
+            _DERIVATION_MEMO.pop(next(iter(_DERIVATION_MEMO)))
+        _DERIVATION_MEMO[key] = cached
+    registry, summary = cached
+    return registry.model_copy(deep=True), summary
+
+
+def _derive_book_registry(
+    policy: SeriesTerminologyPolicy,
+    *,
+    book_id: str,
+    corpus: tuple[ChunkText, ...],
+) -> tuple[TerminologyRegistry, DerivationSummary]:
     candidates: list[TerminologyCandidate] = []
     decisions: list[TerminologyDecision] = []
     occurrences_total = 0

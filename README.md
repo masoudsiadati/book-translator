@@ -135,8 +135,15 @@ book-translator discover-toc --force
 ```
 
 Existing output is protected unless `--force` is supplied. A dry run never writes, including
-when combined with `--force`. This command uses only the embedded PDF TOC; page-text fallback
-discovery is not implemented.
+when combined with `--force`. By default this command uses only the embedded PDF TOC. For a PDF
+without one whose text is laid out one printed line per block (an OCR conversion with running
+heads, print page numbers and `Page N` footers), `--text-headings` discovers the prologue,
+chapters, epilogue and glossary from the heading lines themselves, with sub-page anchors, and
+`extract-chapters` then rebuilds paragraphs and removes the counted page furniture:
+
+```bash
+book-translator discover-toc --book a-crown-of-swords --text-headings
+```
 
 Extract an inclusive, 1-based page range. Existing output is protected unless `--force` is supplied:
 

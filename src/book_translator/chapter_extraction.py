@@ -11,6 +11,12 @@ from pydantic import ValidationError
 
 from book_translator.atomic_write import atomic_write_text
 from book_translator.hashing import sha256_file
+from book_translator.line_layout import (
+    LINE_LAYOUT_EXTRACTION_VERSION,
+    LineLayoutError,
+    reconstruct,
+    render_source,
+)
 from book_translator.models import (
     SCHEMA_VERSION,
     ChapterMetadata,
@@ -26,6 +32,7 @@ from book_translator.paths import (
     narrative_chapter_id,
 )
 from book_translator.pdf_inspector import PdfError, open_pdf
+from book_translator.toc_discovery import sorted_text_blocks
 
 EXTRACTION_VERSION = "1.0"
 
@@ -59,6 +66,7 @@ class ExtractionPlan:
     entries: list[PlannedEntry]
     force: bool
     book: str | None = None
+    toc: TocDocument | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -265,6 +273,7 @@ def plan_extraction(
             planned,
             force,
             book,
+            toc,
         )
     finally:
         document.close()  # type: ignore[no-untyped-call]
@@ -274,6 +283,29 @@ def _normalize_block(text: str) -> str:
     normalized = text.replace("\r\n", "\n").replace("\r", "\n").replace("\u00a0", " ")
     normalized = "\n".join(line.rstrip() for line in normalized.split("\n"))
     return re.sub(r"\n{4,}", "\n\n\n", normalized).strip("\n")
+
+
+def extract_line_layout_entry(
+    document: pymupdf.Document, entry: TocEntry, toc: TocDocument
+) -> tuple[str, int, int]:
+    """Rebuild a line-layout entry's paragraphs between its sub-page anchors."""
+    pages = [
+        (page_number, sorted_text_blocks(document[page_number - 1]))
+        for page_number in range(entry.start_page, entry.end_page + 1)
+    ]
+    try:
+        rebuilt = reconstruct(
+            pages,
+            start_block=entry.start_block,
+            end_block=entry.end_block,
+            running_head_keys=toc.running_head_keys or [],
+            heading_groups=entry.heading_group_count or 0,
+        )
+        content = render_source(rebuilt.paragraphs)
+    except LineLayoutError as exc:
+        raise ChapterExtractionError(f"line layout of {entry.entry_id}: {exc}") from exc
+    words = sum(len(line.split()) for paragraph in rebuilt.paragraphs for line in paragraph.lines)
+    return content, words, len(rebuilt.paragraphs)
 
 
 def extract_entry_content(document: pymupdf.Document, entry: TocEntry) -> tuple[str, int, int]:
@@ -304,6 +336,8 @@ def _metadata_for(
     source_hash: str,
     words: int,
     paragraphs: int,
+    *,
+    line_layout: bool = False,
 ) -> ChapterMetadata:
     now = datetime.now(UTC)
     entry = planned.entry
@@ -328,7 +362,7 @@ def _metadata_for(
         chunk_count=0,
         status=ChapterStatus.EXTRACTED,
         warnings=[],
-        extraction_version=EXTRACTION_VERSION,
+        extraction_version=LINE_LAYOUT_EXTRACTION_VERSION if line_layout else EXTRACTION_VERSION,
         normalization_version="",
         created_at=now,
         updated_at=now,
@@ -356,13 +390,25 @@ def execute_extraction(plan: ExtractionPlan, *, project_root: Path) -> Extractio
                 continue
             source_existed = planned.paths.source.exists()
             try:
-                content, words, paragraphs = extract_entry_content(document, planned.entry)
+                if plan.toc is not None and plan.toc.layout == "line_blocks":
+                    content, words, paragraphs = extract_line_layout_entry(
+                        document, planned.entry, plan.toc
+                    )
+                else:
+                    content, words, paragraphs = extract_entry_content(document, planned.entry)
                 planned.paths.directory.mkdir(parents=True, exist_ok=True)
                 if plan.force and planned.paths.metadata.exists():
                     planned.paths.metadata.unlink()
                 atomic_write_text(planned.paths.source, content, overwrite=plan.force)
                 persisted_hash = sha256_file(planned.paths.source)
-                metadata = _metadata_for(planned, project_root, persisted_hash, words, paragraphs)
+                metadata = _metadata_for(
+                    planned,
+                    project_root,
+                    persisted_hash,
+                    words,
+                    paragraphs,
+                    line_layout=plan.toc is not None and plan.toc.layout == "line_blocks",
+                )
                 atomic_write_text(
                     planned.paths.metadata,
                     _serialize_metadata(metadata),

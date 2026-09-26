@@ -66,6 +66,45 @@
           "minLength": 1,
           "title": "Source Toc Title",
           "type": "string"
+        },
+        "start_block": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Block"
+        },
+        "end_block": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Block"
+        },
+        "heading_group_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heading Group Count"
         }
       },
       "required": [
@@ -103,7 +142,10 @@
     "source": {
       "anyOf": [
         {
-          "const": "embedded",
+          "enum": [
+            "embedded",
+            "text_headings"
+          ],
           "type": "string"
         },
         {
@@ -112,6 +154,34 @@
       ],
       "default": null,
       "title": "Source"
+    },
+    "layout": {
+      "anyOf": [
+        {
+          "const": "line_blocks",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Layout"
+    },
+    "running_head_keys": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Running Head Keys"
     },
     "source_pdf": {
       "anyOf": [

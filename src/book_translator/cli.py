@@ -298,6 +298,7 @@ from book_translator.toc_discovery import (
     TocDiscoveryError,
     TocDiscoveryResult,
     discover_embedded_toc,
+    discover_text_heading_toc,
 )
 from book_translator.toc_writer import write_toc
 from book_translator.translation_auto_repair import AutoRepairError
@@ -2411,7 +2412,7 @@ def _render_toc_summary(result: TocDiscoveryResult, output: str) -> None:
     table.add_column("Value")
     table.add_row("PDF path", str(result.path))
     table.add_row("PDF page count", str(result.page_count))
-    table.add_row("TOC source", "embedded")
+    table.add_row("TOC source", result.document.source or "embedded")
     table.add_row("Raw entries", str(result.raw_entry_count))
     table.add_row("Normalized entries", str(len(result.document.entries)))
     table.add_row("Front matter", str(counts["front_matter"]))
@@ -2433,6 +2434,13 @@ def discover_toc_command(
     force: Annotated[bool, typer.Option("--force")] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run")] = False,
     book: BookOption = None,
+    text_headings: Annotated[
+        bool,
+        typer.Option(
+            "--text-headings",
+            help="Discover a line-layout PDF's headings from its text instead of an embedded TOC.",
+        ),
+    ] = False,
 ) -> None:
     """Discover and normalize a PDF's embedded table of contents."""
     output_path = output if output is not None else _project_paths(book).toc
@@ -2442,7 +2450,13 @@ def discover_toc_command(
             raise TocDiscoveryError(
                 f"output file already exists: {output_path} (use --force to replace it)"
             )
-        result = discover_embedded_toc(configured_path, source_pdf=configured_path)
+        if text_headings:
+            book_title = load_book_config(_project_paths(book).book_config).title_en
+            result = discover_text_heading_toc(
+                configured_path, book_title=book_title, source_pdf=configured_path
+            )
+        else:
+            result = discover_embedded_toc(configured_path, source_pdf=configured_path)
         if not dry_run:
             write_toc(result.document, output_path, force=force)
     except (ProjectDataError, TocDiscoveryError, OSError, FileExistsError) as exc:

@@ -1,0 +1,15 @@
+schema_version: "1.0"
+request_kind: series_policy_amendment_request
+series_id: wheel-of-time
+resulting_policy_version: 1.3.0
+rationale: >-
+  Persian takes the singular noun after a quantifier (چند، هر، چندین), so "some Whitecloaks" is
+  correctly «چند فرزند نور». The singular Whitecloak canonical is authorized as a grammatical
+  realization of the plural decision; the preferred plural target is unchanged.
+terms:
+  - source_term: Whitecloaks
+    status: LOCKED
+    target_term: "فرزندان نور"
+    allowed_target_forms: ["فرزند نور"]
+    aliases: []
+    rationale: plural decision; the singular after a Persian quantifier is an authorized grammatical realization

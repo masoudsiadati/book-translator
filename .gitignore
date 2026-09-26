@@ -86,3 +86,11 @@ output/**
 
 # Experimental pilot runs may contain prose/provider payloads.
 workspace/pilot-runs/**
+
+# Extracted copyrighted/source book prose must stay outside Git.
+workspace/books/*/chapters/**/source.md
+workspace/books/*/chapters/**/cleaned.md
+workspace/books/*/chapters/**/context.md
+
+# Terminology-run in-flight/review scratch.
+workspace/terminology-runs/.ta-*

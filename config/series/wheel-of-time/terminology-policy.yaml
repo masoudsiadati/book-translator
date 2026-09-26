@@ -1,6 +1,6 @@
 schema_version: '1.0'
 registry_kind: series_terminology_policy
-version: 1.2.0
+version: 1.3.0
 series_id: wheel-of-time
 source_language: en
 target_language: fa
@@ -32355,10 +32355,13 @@ terms:
   classification: story_term
   status: LOCKED
   target_term: فرزندان نور
+  allowed_target_forms:
+  - فرزند نور
   provenance:
-    kind: explicit_project
-    origin: config/glossary.yaml
-    rationale: mandatory project glossary entry
+    kind: explicit_user
+    origin: amend-series-terminology:spa-2a87923197b580203a6c155a
+    rationale: plural decision; the singular after a Persian quantifier is an authorized
+      grammatical realization
     evidence_summary: ''
   variants:
   - target_form: شنل‌سفید
@@ -32414,7 +32417,8 @@ terms:
     competing_forms:
     - شنل‌سفید
     - شنل‌سفیدها
-  notes: []
+  notes:
+  - superseded LOCKED (explicit_project) target 'فرزندان نور' by explicit user decision
 - concept_id: sc-ffb96d7baccc6a7c53c8d472
   source_term: Fain
   aliases: []

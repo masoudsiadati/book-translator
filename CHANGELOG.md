@@ -7,6 +7,25 @@ the application; earlier milestone dates were not recorded and are not invented 
 
 ### Added
 
+- **Line-layout PDF ingestion (Line Layout 1.0.0).** `discover-toc --text-headings` discovers the
+  narrative structure of a PDF that has no embedded TOC from its own heading lines (`PROLOGUE`,
+  `CHAPTER [n]` with the number on the same or the next line, `EPILOGUE`, the first `GLOSSARY`),
+  records sub-page `start_block`/`end_block` anchors because such PDFs begin chapters mid-page,
+  and marks the TOC `layout: line_blocks` with the running-head keys it derived. A chapter number
+  the OCR lost is inferred from sequence and says so in `source_toc_title`; an explicit number
+  that breaks the sequence fails closed. Extraction of a line-layout TOC rebuilds paragraphs from
+  one-block-per-line pages, removes counted page furniture (`Page N` footers, print page numbers,
+  running heads, tolerating one OCR edit), and rejoins a paragraph across a physical seam only when
+  the seam is structurally a continuation; chapters record `extraction_version:
+  line-layout/1.0.0`. Embedded-TOC books are unaffected and their TOC files keep their bytes.
+
+### Changed
+
+- **Series terminology derivation is memoized per process.** Snapshot validation re-derives a
+  series book's registry to prove the frozen one still matches; the result is now cached under a
+  digest of the policy, book ID and chunk texts, so repeated validations in one worker process no
+  longer repeat ~60 s of regex counting. Results are deep-copied and byte-identical.
+
 - **Release-time semantic-gate waiver (Release Waiver 1.0.0).** `authorize-release-waiver RUN
   --reason R [--apply]` records an explicit, content-addressed authorization to publish a run whose
   jobs the semantic judge never saw, and `export-translation-run --semantic-waiver ID` presents it.

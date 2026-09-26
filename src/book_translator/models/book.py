@@ -105,11 +105,25 @@ class TocEntry(ContractModel):
     start_page: int = Field(ge=1)
     end_page: int = Field(ge=1)
     source_toc_title: str = Field(min_length=1)
+    # Sub-page boundaries, recorded only by text-heading discovery of a line-layout PDF whose
+    # entries begin mid-page: the entry starts at this index of the start page's sorted text
+    # blocks and stops before `end_block` on the end page. Absent means whole pages.
+    start_block: int | None = Field(default=None, ge=0)
+    end_block: int | None = Field(default=None, ge=0)
+    # The heading's own one-line groups (word, optional number line, title) in a line layout.
+    heading_group_count: int | None = Field(default=None, ge=0)
 
     @model_validator(mode="after")
     def page_range_is_ordered(self) -> "TocEntry":
         if self.end_page < self.start_page:
             raise ValueError("end_page must be greater than or equal to start_page")
+        if (
+            self.start_page == self.end_page
+            and self.start_block is not None
+            and self.end_block is not None
+            and self.end_block <= self.start_block
+        ):
+            raise ValueError("end_block must follow start_block on a single-page entry")
         return self
 
 
@@ -117,7 +131,12 @@ class TocDocument(ContractModel):
     """Versioned normalized embedded TOC persisted as workspace/toc.yaml."""
 
     schema_version: str = Field(pattern=r"^\d+\.\d+$")
-    source: Literal["embedded"] | None = None
+    source: Literal["embedded", "text_headings"] | None = None
+    # `line_blocks`: one text block per printed line, blank blocks between paragraphs, print
+    # furniture inside pages (see `book_translator.line_layout`). Absent means ordinary blocks.
+    layout: Literal["line_blocks"] | None = None
+    # Letter-only keys of the running heads a line-layout extraction removes as page furniture.
+    running_head_keys: list[str] | None = None
     source_pdf: Path | None = None
     source_pdf_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     pdf_page_count: int | None = Field(default=None, ge=1)
