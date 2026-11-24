@@ -18,7 +18,7 @@ from book_translator.book_metadata.engine import (
 )
 from book_translator.book_metadata.evidence import collect_pdf_evidence
 from book_translator.book_metadata.identity import BOOK_METADATA_ENGINE_VERSION, is_placeholder
-from book_translator.config import BookConfig, ProjectDataError, load_book_config
+from book_translator.config import BookConfig, ProjectDataError, load_book_config, require_pdf_path
 from book_translator.hashing import sha256_file
 from book_translator.models import (
     BOOK_METADATA_FIELDS,
@@ -149,7 +149,10 @@ def plan_book_metadata(
         config = load_book_config(paths.book_config)
     except ProjectDataError as exc:
         raise BookMetadataError(str(exc)) from exc
-    pdf_relative = Path(config.pdf_path.as_posix())
+    try:
+        pdf_relative = Path(require_pdf_path(config).as_posix())
+    except ProjectDataError as exc:
+        raise BookMetadataError(str(exc)) from exc
     if pdf_relative.is_absolute():
         raise BookMetadataError("configured pdf_path must be project-relative")
     pdf_path = project_root / pdf_relative

@@ -256,6 +256,45 @@ output_format: epub3
     )
 
 
+def synthetic_epub_project(root: Path) -> None:
+    synthetic_project(root)
+    epub = root / "input/book.epub"
+    epub.write_bytes(b"synthetic-epub")
+    config = (root / "config/book.yaml").read_text(encoding="utf-8")
+    (root / "config/book.yaml").write_text(
+        config.replace("pdf_path: input/book.pdf", "epub_path: input/book.epub"),
+        encoding="utf-8",
+    )
+    toc = TocDocument.model_validate(
+        yaml.safe_load((root / "workspace/toc.yaml").read_text(encoding="utf-8"))
+    )
+    _write_yaml(
+        root / "workspace/toc.yaml",
+        toc.model_copy(
+            update={
+                "source": "epub_spine",
+                "source_pdf": None,
+                "source_pdf_sha256": None,
+                "pdf_page_count": None,
+                "source_document": Path("input/book.epub"),
+                "source_document_sha256": _hash_bytes(epub.read_bytes()),
+                "source_item_count": 1,
+            }
+        ),
+    )
+
+
+def test_epub_snapshot_records_generic_source_document_lineage(tmp_path: Path) -> None:
+    synthetic_epub_project(tmp_path)
+
+    plan = plan_snapshot(project_root=tmp_path)
+
+    assert plan.manifest.book.source_pdf is None
+    assert plan.manifest.book.source_document == Path("input/book.epub")
+    assert plan.manifest.book.source_document_sha256 == _hash_bytes(b"synthetic-epub")
+    assert plan.manifest.book.source_format == "epub"
+
+
 def sample_manifest() -> TranslationManifest:
     def resource(kind: SnapshotResourceKind, letter: str) -> SnapshotResourceReference:
         return SnapshotResourceReference(

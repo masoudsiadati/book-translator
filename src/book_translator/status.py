@@ -267,7 +267,10 @@ def render_status(
     table.add_column("Value")
     table.add_row("Book title", f"{config.title_en} / {config.title_fa}")
     table.add_row("Languages", f"{config.source_language} → {config.target_language}")
-    table.add_row("Source PDF exists", "yes" if config.pdf_path.is_file() else "no")
+    table.add_row(
+        f"Source {config.source_format.upper()} exists",
+        "yes" if config.source_path.is_file() else "no",
+    )
     detected = len(progress.detected_chapters) if canonical_detected is None else canonical_detected
     table.add_row("Detected chapters", str(detected))
     table.add_row("Extracted chapters", str(extracted))

@@ -15,7 +15,7 @@ from pydantic import BaseModel, ValidationError
 
 from book_translator.atomic_write import atomic_write_text
 from book_translator.chapter_extraction import EXTRACTION_VERSION, load_toc
-from book_translator.config import BookConfig, load_book_config
+from book_translator.config import BookConfig, ProjectDataError, load_book_config, require_pdf_path
 from book_translator.document_chunking.engine import (
     CHUNK_ENGINE_VERSION,
     plan_document,
@@ -661,7 +661,11 @@ def plan_artifact_regeneration(
         config.previous_context_words,
     )
     toc = load_toc(project_paths.toc)
-    pdf_path = config.pdf_path if config.pdf_path.is_absolute() else project_root / config.pdf_path
+    try:
+        configured_pdf = require_pdf_path(config)
+    except ProjectDataError as exc:
+        raise ArtifactRegenerationError(str(exc)) from exc
+    pdf_path = configured_pdf if configured_pdf.is_absolute() else project_root / configured_pdf
     if toc.source_pdf_sha256 is None or sha256_file(pdf_path) != toc.source_pdf_sha256:
         raise ArtifactRegenerationError("configured PDF does not match canonical TOC provenance")
     if toc.source_pdf is not None and toc.source_pdf != _relative(pdf_path, project_root):

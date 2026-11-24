@@ -60,7 +60,12 @@ registry's before/after raw hashes, the invariant semantic hash, and every re-de
 Frozen historical resources and snapshots retain the earlier identity as evidence and are never
 migrated: current authoritative state and immutable historical state are distinct.
 
-Inspection and discovery may read the PDF. Extraction writes immutable chapter `source.md`.
+Inspection and discovery may read the configured PDF or EPUB. PDF extraction and provider-free EPUB
+import both write the same immutable chapter `source.md` contract. EPUB import resolves the package
+through `META-INF/container.xml`, treats the OPF spine as authoritative reading order, uses NCX
+labels when available, merges consecutive split resources into one logical narrative unit, and
+excludes non-narrative spine matter before publication. Downstream normalization and chunking do not
+branch on source format.
 The provider-neutral Source Quality Audit is a read-only boundary over immutable extraction,
 normalization, and chunk artifacts. It verifies lineage and conservation, reports conservative
 structural suspicions with stable content-derived identities, and never repairs or advances state.

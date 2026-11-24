@@ -131,7 +131,7 @@ class TocDocument(ContractModel):
     """Versioned normalized embedded TOC persisted as workspace/toc.yaml."""
 
     schema_version: str = Field(pattern=r"^\d+\.\d+$")
-    source: Literal["embedded", "text_headings"] | None = None
+    source: Literal["embedded", "text_headings", "epub_spine"] | None = None
     # `line_blocks`: one text block per printed line, blank blocks between paragraphs, print
     # furniture inside pages (see `book_translator.line_layout`). Absent means ordinary blocks.
     layout: Literal["line_blocks"] | None = None
@@ -140,6 +140,11 @@ class TocDocument(ContractModel):
     source_pdf: Path | None = None
     source_pdf_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     pdf_page_count: int | None = Field(default=None, ge=1)
+    # EPUB import records generic source-document lineage without re-labeling the archive as a PDF.
+    # The existing entry page fields carry 1-based spine positions for this source kind.
+    source_document: Path | None = None
+    source_document_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    source_item_count: int | None = Field(default=None, ge=1)
     entry_count: int | None = Field(default=None, ge=0)
     entries: list[TocEntry]
 
@@ -147,4 +152,19 @@ class TocDocument(ContractModel):
     def entry_count_matches_entries(self) -> "TocDocument":
         if self.entry_count is not None and self.entry_count != len(self.entries):
             raise ValueError("entry_count must equal the number of entries")
+        epub_values = (
+            self.source_document,
+            self.source_document_sha256,
+            self.source_item_count,
+        )
+        if self.source == "epub_spine":
+            if any(value is None for value in epub_values):
+                raise ValueError("EPUB spine TOC requires complete source-document lineage")
+            if any(
+                value is not None
+                for value in (self.source_pdf, self.source_pdf_sha256, self.pdf_page_count)
+            ):
+                raise ValueError("EPUB spine TOC cannot carry PDF lineage")
+        elif any(value is not None for value in epub_values):
+            raise ValueError("source-document lineage is only valid for an EPUB spine TOC")
         return self

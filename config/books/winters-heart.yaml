@@ -1,0 +1,29 @@
+# Book 9 configuration.
+book_id: "winters-heart-en-fa"
+title_en: "Winter's Heart"
+title_fa: ""
+author: "Robert Jordan"
+series_name: "The Wheel of Time"
+series_index: 9
+source_language: "en"
+target_language: "fa"
+epub_path: "input/book9.epub"
+chunk_target_words: 1800
+chunk_max_words: 2400
+previous_context_words: 250
+translation_prompt: "config/translation-prompt.md"
+glossary: "config/glossary.yaml"
+style_guide: "config/style-guide.md"
+series_terminology_policy: "config/series/wheel-of-time/terminology-policy.yaml"
+reference_corpus: "config/series/wheel-of-time/reference-corpus.yaml"
+terminology_acceptance_policy: "manual"
+terminology_confidence_threshold: 0.9
+terminology_review_required: true
+translation_provider_models:
+  codex-cli: []
+openai_reasoning_models: []
+provider_timeout_seconds: 600
+provider_max_output_tokens: 32000
+provider_sdk_retry_count: 0
+provider_store_raw_response: true
+output_format: "epub3"

@@ -144,7 +144,8 @@
         {
           "enum": [
             "embedded",
-            "text_headings"
+            "text_headings",
+            "epub_spine"
           ],
           "type": "string"
         },
@@ -221,6 +222,45 @@
       ],
       "default": null,
       "title": "Pdf Page Count"
+    },
+    "source_document": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Document"
+    },
+    "source_document_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Document Sha256"
+    },
+    "source_item_count": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Item Count"
     },
     "entry_count": {
       "anyOf": [

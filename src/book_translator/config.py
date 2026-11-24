@@ -28,7 +28,8 @@ class BookConfig(BaseModel):
     series_index: int | None = Field(default=None, ge=1)
     source_language: str = Field(min_length=2)
     target_language: str = Field(min_length=2)
-    pdf_path: Path
+    pdf_path: Path | None = None
+    epub_path: Path | None = None
     chunk_target_words: int = Field(gt=0)
     chunk_max_words: int = Field(gt=0)
     previous_context_words: int = Field(ge=0)
@@ -60,6 +61,8 @@ class BookConfig(BaseModel):
 
     @model_validator(mode="after")
     def target_must_not_exceed_maximum(self) -> "BookConfig":
+        if (self.pdf_path is None) == (self.epub_path is None):
+            raise ValueError("exactly one of pdf_path or epub_path must be configured")
         if self.chunk_target_words > self.chunk_max_words:
             raise ValueError("chunk_target_words must not exceed chunk_max_words")
         if self.previous_context_words >= self.chunk_max_words:
@@ -84,6 +87,29 @@ class BookConfig(BaseModel):
                 f"authenticated CLI session providers {sorted(CLI_SESSION_PROVIDERS)}"
             )
         return self
+
+    @property
+    def source_path(self) -> Path:
+        source = self.pdf_path if self.pdf_path is not None else self.epub_path
+        if source is None:  # Validation makes this unreachable; retained for type narrowing.
+            raise ValueError("book source path is not configured")
+        return source
+
+    @property
+    def source_format(self) -> Literal["pdf", "epub"]:
+        return "pdf" if self.pdf_path is not None else "epub"
+
+
+def require_pdf_path(config: BookConfig) -> Path:
+    if config.pdf_path is None:
+        raise ProjectDataError("book is configured with an EPUB source, not a PDF source")
+    return config.pdf_path
+
+
+def require_epub_path(config: BookConfig) -> Path:
+    if config.epub_path is None:
+        raise ProjectDataError("book is configured with a PDF source, not an EPUB source")
+    return config.epub_path
 
 
 def load_book_config(path: Path = Path("config/book.yaml")) -> BookConfig:

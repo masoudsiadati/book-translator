@@ -560,8 +560,8 @@ def _book_reference(
     *,
     project_root: Path,
     config: BookConfig,
-    pdf_relative: Path,
-    pdf_hash: str,
+    source_relative: Path,
+    source_hash: str,
     toc_path: Path,
     book: str | None = None,
 ) -> SnapshotBookReference:
@@ -573,6 +573,15 @@ def _book_reference(
         raise SnapshotError(str(exc)) from exc
     toc_file = Path(toc_path.relative_to(project_root).as_posix())
     toc_hash = sha256_file(toc_path)
+    lineage = (
+        {"source_pdf": source_relative, "source_pdf_sha256": source_hash}
+        if config.source_format == "pdf"
+        else {
+            "source_document": source_relative,
+            "source_document_sha256": source_hash,
+            "source_format": "epub",
+        }
+    )
     if resolved is None:
         return SnapshotBookReference(
             book_id=config.book_id,
@@ -581,12 +590,13 @@ def _book_reference(
             author=config.author,
             source_language=config.source_language,
             target_language=config.target_language,
-            source_pdf=pdf_relative,
-            source_pdf_sha256=pdf_hash,
+            **lineage,
             toc_file=toc_file,
             toc_sha256=toc_hash,
         )
-    if resolved.source_pdf_sha256 != pdf_hash:
+    if config.source_format != "pdf":
+        raise SnapshotError("resolved book metadata currently supports PDF sources only")
+    if resolved.source_pdf_sha256 != source_hash:
         raise SnapshotError("resolved book metadata does not describe the configured source PDF")
     metadata_hash = sha256_file(paths.book_metadata)
     return SnapshotBookReference(
@@ -598,8 +608,7 @@ def _book_reference(
         target_language=resolved.target_language,
         series_name=resolved.series_name,
         series_index=resolved.series_index,
-        source_pdf=pdf_relative,
-        source_pdf_sha256=pdf_hash,
+        **lineage,
         metadata_file=Path(paths.book_metadata.relative_to(project_root).as_posix()),
         metadata_sha256=metadata_hash,
         metadata_version=resolved.metadata_version,
@@ -628,12 +637,24 @@ def _build_manifest(
 ) -> TranslationManifest:
     paths = _project_paths(project_root, book)
     toc = _load_model(paths.toc, TocDocument)
-    pdf_relative = _relative_file(config.pdf_path, project_root)
-    pdf_hash = sha256_file(project_root / pdf_relative)
-    if toc.source_pdf_sha256 != pdf_hash:
-        raise SnapshotError("source PDF provenance does not match the canonical TOC")
-    if toc.source_pdf is not None and _relative_file(toc.source_pdf, project_root) != pdf_relative:
-        raise SnapshotError("source PDF path does not match the canonical TOC")
+    source_relative = _relative_file(config.source_path, project_root)
+    source_hash = sha256_file(project_root / source_relative)
+    if config.source_format == "pdf":
+        if toc.source_pdf_sha256 != source_hash:
+            raise SnapshotError("source PDF provenance does not match the canonical TOC")
+        if (
+            toc.source_pdf is not None
+            and _relative_file(toc.source_pdf, project_root) != source_relative
+        ):
+            raise SnapshotError("source PDF path does not match the canonical TOC")
+    else:
+        if toc.source != "epub_spine" or toc.source_document_sha256 != source_hash:
+            raise SnapshotError("source EPUB provenance does not match the canonical TOC")
+        if (
+            toc.source_document is None
+            or _relative_file(toc.source_document, project_root) != source_relative
+        ):
+            raise SnapshotError("source EPUB path does not match the canonical TOC")
     selection_mode, entries = _selected_entries(toc, selectors)
     chapters = [_chapter_reference(entry, project_root, book) for entry in entries]
     return TranslationManifest(
@@ -643,8 +664,8 @@ def _build_manifest(
         book=_book_reference(
             project_root=project_root,
             config=config,
-            pdf_relative=pdf_relative,
-            pdf_hash=pdf_hash,
+            source_relative=source_relative,
+            source_hash=source_hash,
             toc_path=paths.toc,
             book=book,
         ),

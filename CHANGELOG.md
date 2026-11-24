@@ -7,6 +7,16 @@ the application; earlier milestone dates were not recorded and are not invented 
 
 ### Added
 
+- **Provider-free EPUB ingestion (EPUB Import 1.0.0).** `import-epub [EPUB] --book BOOK` resolves
+  `META-INF/container.xml`, the OPF manifest and authoritative spine, and optional NCX navigation;
+  discovers prologue, numbered chapters, and epilogue; extracts paired NCX chapter titles; merges
+  consecutive split resources; and excludes title/publication pages, maps, contents, glossaries,
+  and about matter. HTML/XHTML becomes canonical Markdown with paragraph order, dialogue
+  punctuation, and emphasis preserved while navigation and page decoration are removed. Imported
+  chapters publish the existing immutable/hash-tracked source and metadata contract, so unchanged
+  normalization and chunking stages consume them. Book configuration now accepts exactly one of
+  `pdf_path` or `epub_path`; existing PDF configurations and artifacts are unchanged.
+
 - **Line-layout PDF ingestion (Line Layout 1.0.0).** `discover-toc --text-headings` discovers the
   narrative structure of a PDF that has no embedded TOC from its own heading lines (`PROLOGUE`,
   `CHAPTER [n]` with the number on the same or the next line, `EPILOGUE`, the first `GLOSSARY`),
@@ -20,6 +30,12 @@ the application; earlier milestone dates were not recorded and are not invented 
   line-layout/1.0.0`. Embedded-TOC books are unaffected and their TOC files keep their bytes.
 
 ### Changed
+
+- **Bounded nightly translation now covers at most three narrative units per invocation.**
+  `run-nightly-translation RUN_ID --max-units 3` remains sequential, resumes from the earliest
+  untranslated source-order unit, treats usable `qa_rejected` attempts as translated coverage
+  without repairing them, performs no semantic QA, preserves the local 22:00–05:00 gate, and
+  fails closed when another run-scoped nightly coordinator holds the lock.
 
 - **Series terminology derivation is memoized per process.** Snapshot validation re-derives a
   series book's registry to prove the frozen one still matches; the result is now cached under a

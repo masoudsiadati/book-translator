@@ -8,9 +8,11 @@ may reach the separate atomic registry application operation.
 The ordered pipeline is:
 
 0. Resolve canonical book metadata from local source evidence.
-1. Inspect the PDF without emitting book text.
-2. Discover chapters from the embedded TOC and persist a normalized TOC.
-3. Extract each chapter to immutable `source.md` using inclusive 1-based boundaries.
+1. Inspect the configured source without emitting book text.
+2. For PDF, discover chapters from the embedded/text heading TOC; for EPUB, resolve the container,
+   OPF manifest/spine, and optional NCX. Persist a normalized TOC.
+3. Extract/import each narrative unit to immutable `source.md` using inclusive 1-based PDF pages or
+   EPUB spine positions.
 4. Normalize each source into `cleaned.md` without changing `source.md`.
 5. Validate normalized structure, counts, lineage, and hashes.
 6. Split hash-current normalized chapters into deterministic generic document chunks.
@@ -58,6 +60,17 @@ Stages 1–5 may access the PDF as required. Chunking and later text processing 
 Markdown and metadata. Snapshot preflight streams the configured PDF solely to verify canonical hash
 provenance and never extracts text. Future external/translation stages must require a currently valid
 frozen translation snapshot ID.
+
+EPUB import is the source-format peer of PDF discovery plus extraction. It reads
+`META-INF/container.xml`, the selected OPF package, its manifest and spine, and the spine's NCX when
+present. ZIP entry order never participates. Structural NCX labels establish prologue/chapter/
+epilogue identity and a second fragment label supplies the title; conservative normalized resource
+stems are only a fallback for unlabeled split members. Consecutive members with one identity are
+merged in spine order. Title/publication pages, maps, contents, glossaries, and about pages are
+excluded. HTML block order, paragraph boundaries, dialogue punctuation, and `em`/`i` emphasis are
+preserved in canonical Markdown; navigation, scripts, styles, images, and decorative headings are
+discarded. Each resource boundary receives a monotonically increasing source marker based on its
+1-based spine position so the existing normalizer and chunker remain unchanged.
 
 Stage 3 reads boundaries exclusively from the selected workspace's canonical `toc.yaml`
 (`workspace/toc.yaml`, or `workspace/books/<book-id>/toc.yaml` under `--book`) and verifies its

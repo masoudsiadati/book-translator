@@ -43,6 +43,13 @@ remain valid and a rerun skips them. During a forced replacement, old metadata i
 source publication so an interruption cannot leave metadata claiming a mismatched source; rerun
 with the same explicit `--force` is then safe.
 
+EPUB import follows the same recovery rule. Planning re-parses the container, OPF spine, optional
+NCX, and HTML resources, then compares the exact rendered source and metadata lineage. An exact pair
+is skipped, a partial or conflicting pair is refused, and `--force` is refused once cleaned, chunk,
+translation, review, or final artifacts exist. A run interrupted between units is resumed by
+replanning; completed units skip and missing units publish. The canonical TOC must match the current
+archive hash, spine positions, identities, and titles before a non-forced rerun proceeds.
+
 Chapter normalization preflights every selected source, metadata record, source hash, existing
 normalized set, version, and downstream conflict before batch writes. A complete hash-current set is
 skipped. A version mismatch is stale and requires `--force`; a lone cleaned file or report, a

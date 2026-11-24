@@ -48,7 +48,13 @@ from book_translator.chapter_titles import (
     execute_chapter_titles,
     plan_chapter_titles,
 )
-from book_translator.config import BookConfig, ProjectDataError, load_book_config
+from book_translator.config import (
+    BookConfig,
+    ProjectDataError,
+    load_book_config,
+    require_epub_path,
+    require_pdf_path,
+)
 from book_translator.document_chunking import CHUNK_ENGINE_VERSION, ChunkingConfig
 from book_translator.document_chunking.workflow import (
     ChapterChunkingPlan,
@@ -62,6 +68,13 @@ from book_translator.epub import (
     EpubBuildPlan,
     execute_epub_build,
     plan_epub_build,
+)
+from book_translator.epub_ingestion import (
+    EpubImportPlan,
+    EpubImportResult,
+    EpubIngestionError,
+    execute_epub_import,
+    plan_epub_import,
 )
 from book_translator.execution_resolution import (
     EXECUTION_RESOLUTION_ENGINE_VERSION,
@@ -2320,7 +2333,13 @@ def status(book: BookOption = None) -> None:
 def _configured_or_explicit_pdf(pdf_path: Path | None, book: str | None = None) -> Path:
     if pdf_path is not None:
         return pdf_path
-    return load_book_config(_project_paths(book).book_config).pdf_path
+    return require_pdf_path(load_book_config(_project_paths(book).book_config))
+
+
+def _configured_or_explicit_epub(epub_path: Path | None, book: str | None = None) -> Path:
+    if epub_path is not None:
+        return epub_path
+    return require_epub_path(load_book_config(_project_paths(book).book_config))
 
 
 def _render_pdf_inspection(result: PdfInspectionResult) -> None:
@@ -2398,6 +2417,58 @@ def extract_pages_command(
     console.print(f"[bold]Extracted pages:[/bold] {result.page_count}")
     console.print(f"[bold]Extracted words:[/bold] {result.word_count}")
     console.print(f"[bold]Output size:[/bold] {result.byte_size:,} bytes")
+
+
+def _render_epub_import_summary(
+    plan: EpubImportPlan, result: EpubImportResult | None, *, dry_run: bool
+) -> None:
+    from rich.table import Table
+
+    table = Table(title="EPUB Import", show_header=False)
+    table.add_column("Field", style="bold")
+    table.add_column("Value")
+    rows = (
+        ("EPUB path", plan.epub_path),
+        ("Package document", plan.document.package_path),
+        ("Spine items", plan.document.spine_item_count),
+        ("Narrative units", len(plan.units)),
+        ("Units planned", sum(item.action != "skip" for item in plan.units)),
+        ("Units imported", len(result.imported_ids) if result else 0),
+        ("Units skipped", sum(item.action == "skip" for item in plan.units)),
+        (
+            "Extracted words",
+            result.total_words if result else sum(i.word_count for i in plan.units),
+        ),
+        ("Workspace", "not written (dry run)" if dry_run else plan.workspace_path),
+        ("Provider calls", 0),
+    )
+    for label, value in rows:
+        table.add_row(str(label), str(value))
+    console.print(table)
+
+
+@app.command("import-epub")
+def import_epub_command(
+    epub_path: Annotated[Path | None, typer.Argument()] = None,
+    force: Annotated[bool, typer.Option("--force")] = False,
+    dry_run: Annotated[bool, typer.Option("--dry-run")] = False,
+    book: BookOption = None,
+) -> None:
+    """Import an EPUB spine into canonical narrative source artifacts."""
+    try:
+        selected = _configured_or_explicit_epub(epub_path, book)
+        project_root = Path.cwd().resolve()
+        plan = plan_epub_import(
+            selected,
+            project_root=project_root,
+            book=book,
+            force=force,
+        )
+        result = None if dry_run else execute_epub_import(plan, project_root=project_root)
+    except (ProjectDataError, EpubIngestionError, OSError, UnicodeError) as exc:
+        error_console.print(f"[bold red]Error:[/bold red] {exc}")
+        raise typer.Exit(code=1) from exc
+    _render_epub_import_summary(plan, result, dry_run=dry_run)
 
 
 def _render_toc_summary(result: TocDiscoveryResult, output: str) -> None:
@@ -3569,6 +3640,47 @@ def _render_worker_progress(progress: WorkerProgress) -> None:
         markup=False,
         highlight=False,
     )
+
+
+@app.command("run-nightly-translation")
+def run_nightly_translation_command(
+    run_id: Annotated[str, typer.Argument()],
+    max_units: Annotated[int, typer.Option("--max-units")] = 3,
+) -> None:
+    """Resume one canonical run during the local 22:00-05:00 window.
+
+    The coordinator is intentionally translation-first: one codex-cli request at a time, at most
+    three source-order narrative units per invocation, no semantic QA, repair, or automatic retry.
+    """
+    from book_translator.nightly_translation import (
+        NightlyTranslationError,
+        run_nightly_translation,
+    )
+    from book_translator.translation_queue.locking import QueueLockTimeout
+
+    try:
+        checkpoint = run_nightly_translation(run_id, project_root=Path.cwd(), max_units=max_units)
+    except (NightlyTranslationError, QueueError, QueueLockTimeout, OSError, ValueError) as exc:
+        error_console.print(f"[bold red]Error:[/bold red] {exc}")
+        raise typer.Exit(code=1) from exc
+    from rich.table import Table
+
+    table = Table(title="Nightly Translation", show_header=False)
+    table.add_column("Field", style="bold")
+    table.add_column("Value")
+    table.add_row("Run", checkpoint.translation_run_id)
+    table.add_row("Provider", checkpoint.provider)
+    table.add_row(
+        "Translated coverage",
+        f"{checkpoint.translated_chunks_count}/{checkpoint.total_chunks}",
+    )
+    table.add_row("Complete units", str(len(checkpoint.units_with_complete_translated_coverage)))
+    table.add_row("Accepted", str(checkpoint.accepted_count))
+    table.add_row("QA rejected (kept)", str(checkpoint.qa_rejected_count))
+    table.add_row("Missing", str(checkpoint.missing_translation_count))
+    table.add_row("Next unit", checkpoint.next_unit or "none")
+    table.add_row("Next safe action", checkpoint.next_safe_action)
+    console.print(table)
 
 
 @app.command("run-translation-worker")

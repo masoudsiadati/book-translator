@@ -70,8 +70,12 @@ class SnapshotBookReference(ContractModel):
     target_language: str = Field(min_length=2)
     series_name: str | None = None
     series_index: int | None = Field(default=None, ge=1)
-    source_pdf: Path
-    source_pdf_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    # Legacy PDF lineage remains optional so historical manifests retain their exact shape.
+    source_pdf: Path | None = None
+    source_pdf_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    source_document: Path | None = None
+    source_document_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    source_format: Literal["epub"] | None = None
     metadata_file: Path | None = None
     metadata_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     metadata_version: str | None = Field(
@@ -88,6 +92,16 @@ class SnapshotBookReference(ContractModel):
             raise ValueError("a book metadata reference requires its path, hash, and version")
         if self.frozen_metadata_file is not None and self.metadata_sha256 is None:
             raise ValueError("a frozen book metadata copy requires the metadata hash")
+        pdf = (self.source_pdf, self.source_pdf_sha256)
+        document = (self.source_document, self.source_document_sha256, self.source_format)
+        if all(value is not None for value in pdf) == all(value is not None for value in document):
+            raise ValueError("book lineage requires exactly one complete PDF or source document")
+        if any(value is not None for value in pdf) and not all(value is not None for value in pdf):
+            raise ValueError("PDF lineage requires its path and hash")
+        if any(value is not None for value in document) and not all(
+            value is not None for value in document
+        ):
+            raise ValueError("source-document lineage requires its path, hash, and format")
         return self
 
 

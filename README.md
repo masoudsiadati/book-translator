@@ -1,6 +1,8 @@
 # book-translator
 
-`book-translator` is a local Python project intended to automate faithful English-to-Persian translation of fantasy novels from text-based PDFs and eventually produce valid RTL EPUB 3 books.
+`book-translator` is a local Python project intended to automate faithful English-to-Persian
+translation of fantasy novels from text-based PDFs or EPUB sources and eventually produce valid RTL
+EPUB 3 books.
 
 ## Current scope
 
@@ -87,7 +89,7 @@ book-translator inspect-pdf input/another-book.pdf
 ```
 
 Every command below that reads or writes the canonical workspace accepts `--book <book-id>`
-(`inspect-pdf`, `extract-pages`, `discover-toc`, `extract-chapters`, `normalize-chapters`,
+(`inspect-pdf`, `extract-pages`, `discover-toc`, `extract-chapters`, `import-epub`, `normalize-chapters`,
 `chunk-chapters`, `audit-source-quality`, `show-source-quality-finding`, `inspect-artifact-staleness`,
 `inspect-normalization-changes`, `regenerate-artifacts`, `resolve-book-metadata`,
 `freeze-translation-resources`, `create-translation-snapshot`, `validate-translation-snapshot`,
@@ -101,6 +103,18 @@ book-translator discover-toc input/book6.pdf --book lord-of-chaos
 book-translator extract-chapters input/book6.pdf --book lord-of-chaos --dry-run
 book-translator normalize-chapters --book lord-of-chaos --dry-run
 ```
+
+For an EPUB-configured book, import its OPF-spine narrative corpus directly into the same canonical
+chapter workspace:
+
+```bash
+book-translator import-epub --book the-path-of-daggers --dry-run
+book-translator import-epub --book the-path-of-daggers
+```
+
+The importer reads `META-INF/container.xml`, OPF manifest/spine, and NCX when present. Spine order is
+authoritative; split logical units are merged, non-narrative matter is excluded, and no provider is
+contacted.
 
 A second book of a series names its terminology lineage explicitly in `config/books/<id>.yaml`
 (`series_terminology_policy` and `reference_corpus`, configured together, or `terminology` for a
@@ -1227,7 +1241,7 @@ history. `AGENTS.md` is the concise mandatory entry point for Codex sessions.
 
 ## Directory overview
 
-- `input/`: source PDF files (ignored by Git)
+- `input/`: source PDF and EPUB files (ignored by Git)
 - `config/`: book metadata, glossary, style guide, and translation prompt
 - `extracted/`: extracted chapters and source text artifacts
 - `chunks/`: translation-sized source chunks

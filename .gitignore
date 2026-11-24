@@ -94,3 +94,31 @@ workspace/books/*/chapters/**/context.md
 
 # Terminology-run in-flight/review scratch.
 workspace/terminology-runs/.ta-*
+
+# Copyrighted/source book payloads
+input/*.epub
+input/*.pdf
+input/*.mobi
+input/*.azw3
+output/*.epub
+output/*.pdf
+
+# Book source/intermediate text
+workspace/books/*/chapters/**/source.md
+workspace/books/*/chapters/**/cleaned.md
+workspace/books/*/chapters/**/context.md
+
+# Legacy workspace layout
+workspace/chapters/**/source.md
+workspace/chapters/**/cleaned.md
+workspace/chapters/**/context.md
+
+# Runtime translation payloads
+workspace/translation-runs/
+logs/
+
+# Secrets
+.env
+.env.*
+!.env.example
+workspace/

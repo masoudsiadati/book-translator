@@ -13,14 +13,18 @@ project root.
 
 - `workspace/metadata.yaml` — `BookWorkspaceMetadata`: schema version, stable book ID, PDF path
   and hash, titles, author, languages, expected output, and timestamps.
-- `workspace/toc.yaml` — `TocDocument`: schema version, embedded-source provenance (source PDF,
+- `workspace/toc.yaml` — `TocDocument`: schema version, source provenance (source PDF,
   byte-exact hash, PDF page count, and entry count), and ordered normalized `TocEntry` values.
   Pages are inclusive and 1-based. Kinds are `front_matter`, `prologue`, `chapter`, `epilogue`,
   `appendix`, and `unknown`. Structural title prefixes determine narrative kinds independently of
   embedded hierarchy level. `source_toc_title` preserves the embedded TOC label with surrounding
   whitespace removed. Entries with the same start page share an end page determined by the next
   later distinct start page; the final distinct group ends at the PDF page count.
-- Chapter `metadata.yaml` — `ChapterMetadata`: identity and titles, inclusive PDF boundaries,
+  An EPUB-spine TOC instead records `source: epub_spine`, `source_document`, its byte-exact hash,
+  and `source_item_count`; entry page integers then carry 1-based spine positions. This additive
+  adapter publishes the same downstream chapter contract without labeling the archive as a PDF.
+- Chapter `metadata.yaml` — `ChapterMetadata`: identity and titles, inclusive PDF boundaries or EPUB
+  spine positions,
   source/cleaned paths and hashes, counts, lifecycle status, warnings, algorithm versions, and
   timestamps.
 - Chapter `normalization-report.yaml` — compact schema 1.0 provenance: chapter and source/cleaned
